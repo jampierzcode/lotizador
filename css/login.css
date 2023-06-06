@@ -18,8 +18,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  /* background: rgb(48 60 157); */
-  background: #f15539;
+  background: rgb(80 26 149);
+  /*background: #f15539;*/
   opacity: 0.95;
 }
 
@@ -38,7 +38,7 @@
   justify-content: center;
 }
 
-.form-login .header-form>img {
+.form-login .header-form > img {
   width: 150px;
 }
 
@@ -58,14 +58,14 @@
   padding: 0px 10px;
 }
 
-.form-login .body-form .group-date>ion-icon {
+.form-login .body-form .group-date > ion-icon {
   height: auto;
   font-size: 20px;
   padding: 0px 10px;
   color: #000;
 }
 
-.form-login .body-form .group-date>input {
+.form-login .body-form .group-date > input {
   width: 100%;
   padding: 10px 15px;
   border-style: none;
@@ -77,7 +77,7 @@
 .form-login .body-form .btn-submit {
   padding: 12px 24px;
   /* background: rgb(48 60 157); */
-  background: #f15539;
+  background: rgb(243 41 68);
   color: #fff;
   border-style: none;
   border-radius: 20px;

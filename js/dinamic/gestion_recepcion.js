@@ -1,109 +1,88 @@
 $(document).ready(function () {
   var funcion = "";
-  buscar_piso();
+  var id;
+  var numero;
+  buscar_proyectos();
+  var dominio1 = "https://lotizador.mccompany.pe";
+  var dominio2 = "http://localhost/lotizador";
 
-  buscar_habitaciones();
-
-  function buscar_piso() {
-    funcion = "buscar_piso_hab";
+  function buscar_proyectos() {
+    funcion = "buscar_proyectos_user";
     $.post(
       "../../controlador/UsuarioController.php",
       { funcion },
       (response) => {
         let template = "";
-        template += `<option value="0">Seleccione el Piso</option>`;
-        let pisos = JSON.parse(response);
-        pisos.forEach((piso) => {
-          template += `
-          <option value="${piso.id_piso}">${piso.numero_piso}</option>
-          `;
-        });
-        $("#search-piso").html(template);
-      }
-    );
-  }
-
-  function buscar_habitaciones() {
-    funcion = "buscar_habitacion";
-    var id_piso = $("#search-piso").val();
-    $.post(
-      "../../controlador/UsuarioController.php",
-      { funcion, id_piso },
-      (response) => {
-        let template = "";
-        if (response.trim() == "No existen registro de habitaciones") {
+        if (response.trim() == "no-register") {
           template += "No hay registros";
-          let estado = "";
         } else {
-          const habitaciones = JSON.parse(response);
-          habitaciones.forEach((habitacion) => {
-            estado = habitacion.estado.toLowerCase();
+          const proyectos = JSON.parse(response);
+          proyectos.forEach((proyecto) => {
             template += `
-            <div class="card-habs bg-${estado}">
+            <div class="card-habs" style="background: #310ecd;">
             <div class="body-card">
-                <ion-icon name="bed-outline"></ion-icon>
-                <h1>Nro: ${habitacion.n_cuarto}</h1>
-                <h1>${habitacion.numero_piso}</h1>
-                <span>${habitacion.nombre_categoria}</span>
-            </div>`;
-            if (habitacion.estado == "Disponible") {
-              template += `
-              <div class="footer-card">
-                <a href="?id=${habitacion.id_habitaciones}&&view=reservar">
-                    <span>${habitacion.estado}</span>
-                    <ion-icon name="chevron-forward-outline"></ion-icon>
-                </a>
-                
-            </div>`;
-            }
-            if (habitacion.estado == "Ocupado") {
-              template += `
-              <div class="footer-card">
-                <p >
-                    <span>${habitacion.estado}</span>
-                </p>
-                
-            </div>`;
-            }
-            if (habitacion.estado == "Limpieza") {
-              template += `
-              <div class="footer-card" >
-                <div class="footer-content">
-                    <span>${habitacion.estado}</span>
-                    <ion-icon name="chevron-forward-outline" n_hab="${habitacion.n_cuarto}" key="${habitacion.id_habitaciones}" id="limpieza-cancel"></ion-icon>
+                <ion-icon name="home"></ion-icon>
+                <h1>${proyecto.nombreProyecto}</h1>
+                <div class="proyectos_cards_link">
+                    <a id="rutaEnlace" style="color: #5b5b5b;" href="${dominio2}/views/Lotizador/?proyect=${proyecto.id}&&phoneNumber=${proyecto.phone_number}&&agent=${proyecto.id_agente}" target="_blank" rel="noopener noreferrer">Copiar Enlace</a>
                 </div>
-                
-            </div>`;
-            }
-            template += `
+                <button class="btnJsvm default" agent="${proyecto.id_agente}" key="${proyecto.id}" numberAgent="${proyecto.phone_number}" id="compartirBtn">Compartir en <ion-icon name="logo-whatsapp"></ion-icon></button>
             </div>
-            `;
+            </div>`;
           });
         }
-        $(".list-habitaciones").html(template);
-
-        $("ion-icon#limpieza-cancel").click((e) => {
-          let key = $(e.target).attr("key");
-          let n_hab = $(e.target).attr("n_hab");
-          var opcion = confirm(
-            `Desea terminar limpieza de habitacion ${n_hab} ?`
-          );
-          if (opcion == true) {
-            funcion = "habitacion_limpieza_terminada";
-            $.post(
-              "../../controlador/UsuarioController.php",
-              { funcion, key },
-              (response) => {
-                buscar_habitaciones();
-              }
-            );
-          } else {
-          }
-        });
+        $("#listProyectos").html(template);
       }
     );
   }
-  $("#search-piso").change(() => {
-    buscar_habitaciones();
+  $(document).on("click", "#rutaEnlace", function (event) {
+    event.preventDefault(); // Evita la acción de navegación predeterminada
+
+    // Copiar la ruta al portapapeles
+    var ruta = $(this).attr("href");
+    navigator.clipboard
+      .writeText(ruta)
+      .then(function () {
+        alert("La ruta se ha copiado al portapapeles.");
+      })
+      .catch(function (error) {
+        console.error("Error al copiar la ruta: ", error);
+      });
+  });
+  $(document).on("click", "#compartirBtn", function () {
+    let proyecto = $(this).attr("key");
+    let number_agente = $(this).attr("numberAgent");
+    let agente = $(this).attr("agent");
+    var ruta = `${dominio2}/views/Lotizador/?proyect=${proyecto}&&phoneNumber=${number_agente}&&agent=${agente}`;
+    if (navigator.share) {
+      // Comprobar si la API Web Share es compatible
+      navigator
+        .share({
+          title: "Título de tu enlace",
+          text: "Descripción de tu enlace",
+          url: ruta,
+        })
+        .then(function () {
+          console.log("Enlace compartido con éxito.");
+        })
+        .catch(function (error) {
+          console.error("Error al compartir el enlace: ", error);
+        });
+    } else {
+      // Si la API Web Share no es compatible, redirigir a una página de compartir alternativa
+      var mobileDetect =
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          navigator.userAgent
+        );
+      if (mobileDetect) {
+        window.location.href =
+          "whatsapp://send?text=" + encodeURIComponent(ruta);
+      } else {
+        window.open(
+          "https://www.facebook.com/sharer/sharer.php?u=" +
+            encodeURIComponent(ruta)
+        );
+      }
+    }
   });
 });

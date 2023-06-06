@@ -31,51 +31,6 @@ session_start();
     <?php
     include_once "../../components/Sidebar.php"
     ?>
-    <li class="links-menu-dashboard">
-        <div class="link-block">
-            <div class="left-link">
-                <a class="toggle-drop" href="../Dashboard">
-                    <ion-icon name="pie-chart"></ion-icon>
-                    <p>Dashboard</p>
-                </a>
-            </div>
-        </div>
-    </li>
-    <li class="links-menu-dashboard">
-        <div class="link-block">
-            <div class="left-link">
-                <a class="toggle-drop" href="../Proyectos">
-                    <ion-icon name="home"></ion-icon>
-                    <p>Proyectos</p>
-                </a>
-            </div>
-        </div>
-    </li>
-    <?php if($_SESSION["us_tipo"]==1){?>
-    <li class="links-menu-dashboard">
-        <div class="link-block">
-            <div class="left-link">
-                <a class="toggle-drop active-link" href="../Usuarios">
-                    <ion-icon name="people-sharp"></ion-icon>
-                    <p>Usuarios</p>
-                </a>
-            </div>
-        </div>
-    </li>
-    <?php }?>
-    <li class="links-menu-dashboard">
-        <div class="link-block">
-            <div class="left-link">
-                <a class="toggle-drop" href="../../controlador/LogoutController.php">
-                    <ion-icon name="chevron-back-circle-sharp"></ion-icon>
-                    <p>Cerrar sesión</p>
-                </a>
-            </div>
-        </div>
-    </li>
-    </ul>
-    </div>
-    </aside>
     <div class="container-dashboard">
         <span class="route">
             > Home > Clientes
@@ -158,6 +113,7 @@ session_start();
                     <ion-icon name="close-outline"></ion-icon>
                 </div>
                 <h1>Crear Usuario</h1>
+                <h1>Datos Personales</h1>
                 <div class="grid2Colum">
                     <div class="card-input">
                         <span>Tipo de documento</span>
@@ -214,6 +170,9 @@ session_start();
                             <input id="password-modal" type="text" placeholder="Ingrese los nombres o razon social">
                         </div>
                     </div>
+                </div>
+                <h1>Permisos</h1>
+                <div id="listPermisos">
                 </div>
                 <div class="card-input buttons-modal">
                     <button id="cancel-form" class="btn-cancel">Cancelar</button>

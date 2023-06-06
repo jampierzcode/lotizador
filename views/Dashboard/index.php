@@ -26,51 +26,7 @@ if (empty($_SESSION["id_usuario"])) {
     <?php
         include_once "../../components/Sidebar.php"
         ?>
-    <li class="links-menu-dashboard">
-        <div class="link-block">
-            <div class="left-link">
-                <a class="toggle-drop active-link" href="../Dashboard">
-                    <ion-icon name="pie-chart"></ion-icon>
-                    <p>Dashboard</p>
-                </a>
-            </div>
-        </div>
-    </li>
-    <li class="links-menu-dashboard">
-        <div class="link-block">
-            <div class="left-link">
-                <a class="toggle-drop" href="../Proyectos">
-                    <ion-icon name="home"></ion-icon>
-                    <p>Proyectos</p>
-                </a>
-            </div>
-        </div>
-    </li>
-    <?php if($_SESSION["us_tipo"]==1){?>
-    <li class="links-menu-dashboard">
-        <div class="link-block">
-            <div class="left-link">
-                <a class="toggle-drop" href="../Usuarios">
-                    <ion-icon name="people-sharp"></ion-icon>
-                    <p>Usuarios</p>
-                </a>
-            </div>
-        </div>
-    </li>
-    <?php }?>
-    <li class="links-menu-dashboard">
-        <div class="link-block">
-            <div class="left-link">
-                <a class="toggle-drop" href="../../controlador/LogoutController.php">
-                    <ion-icon name="chevron-back-circle-sharp"></ion-icon>
-                    <p>Cerrar sesión</p>
-                </a>
-            </div>
-        </div>
-    </li>
-    </ul>
-    </div>
-    </aside>
+
     <div class="container-dashboard">
         <span class="route">
             > Home

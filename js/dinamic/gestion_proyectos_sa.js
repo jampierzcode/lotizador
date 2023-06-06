@@ -30,7 +30,13 @@ $(document).ready(function () {
           if (data.users !== null) {
             let template = "";
             for (const user of data.users) {
-              template = `<span class="mode mode_done">${user.clienteNombre}</span>`;
+              let split_name = user.clienteNombre.split(" ");
+              let split_lastname = user.clienteApellido
+                ? user.clienteApellido.split(" ")
+                : "  ";
+              let splitA = split_name[0][0];
+              let splitB = split_lastname[0][0];
+              template += `<span class="mode mode_done">${splitA}${splitB}</span>`;
             }
             return template;
           } else {
@@ -115,10 +121,9 @@ $(document).ready(function () {
               return pro;
             });
           });
-
           const proyectosActualizados = await Promise.all(promesas);
           proyectosArray = proyectosActualizados;
-          dataTable.clear().rows.add(proyectosActualizados).draw();
+          dataTable.clear().rows.add(proyectosArray).draw();
         }
       }
     );

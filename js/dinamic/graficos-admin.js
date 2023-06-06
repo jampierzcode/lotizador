@@ -1,41 +1,59 @@
 $(document).ready(function () {
-  var ctx = document.getElementById("myChart").getContext("2d");
+  var datos = {
+    labels: [
+      "Lunes",
+      "Martes",
+      "Miércoles",
+      "Jueves",
+      "Viernes",
+      "Sábado",
+      "Domingo",
+    ],
+    datosVisitas: [15, 12, 8, 10, 5, 7, 9],
+  };
 
-  new Chart(ctx, {
-    type: "bar",
+  // Configuración del gráfico
+  var config = {
+    type: "line",
     data: {
-      labels: [
-        "Lunes",
-        "Martes",
-        "Miercoles",
-        "Jueves",
-        "Viernes",
-        "Sabado",
-        "Domingo",
-      ],
+      labels: datos.labels,
       datasets: [
         {
-          label: 'Ventas de la semana',
-          data: "800, 400, 500",
-          borderColor: "#000",
-          backgroundColor: "#fff",
-          borderWidth: 2,
-          borderRadius: "20",
-          borderSkipped: false,
-        }
+          label: "Visitas por Día de la Semana",
+          data: datos.datosVisitas,
+          borderColor: "rgb(75, 192, 192)",
+          fill: true,
+          tension: 0.4,
+        },
       ],
     },
     options: {
-      responsive: true,
       plugins: {
-        legend: {
-          position: 'top',
+        tooltip: {
+          mode: "index",
+          intersect: false,
         },
-        title: {
+      },
+      scales: {
+        x: {
           display: true,
-          text: 'Chart.js Bar Chart'
-        }
-      }
+          title: {
+            display: true,
+            text: "Día de la Semana",
+          },
+        },
+        y: {
+          display: true,
+          title: {
+            display: true,
+            text: "Número de Visitas",
+          },
+        },
+      },
     },
-  });
+  };
+
+  // Crear el gráfico
+  var ctx = document.getElementById("myChart").getContext("2d");
+  var myChart = new Chart(ctx, config);
 });

@@ -1,7 +1,55 @@
 $(document).ready(function () {
   var funcion = "";
   var usuariosArray = [];
+  var selectedValues = [];
   var idCliente = "";
+  var dataTable = $("#usuariosList").DataTable({
+    pageLength: 5,
+    aoColumnDefs: [
+      {
+        bSortable: false,
+        aTargets: ["nosort"],
+      },
+    ],
+    order: false,
+    bLengthChange: false,
+    dom: '<"top">ct<"top"p><"clear">',
+    columns: [
+      { data: "id_usuario" },
+      {
+        data: null,
+        render: function (data, type, row) {
+          return data.nombre + " " + data.apellido;
+        },
+      },
+      { data: "user" },
+      { data: "dni" },
+      { data: "correo" },
+      { data: "creator" },
+      // { data: 'office' }
+      {
+        data: null,
+        render: function (data, type, row) {
+          return `
+        <div class="flex-actions">
+        <button  key_user="${data.id_usuario}" class="btnLotes default" id="edit_usuario">
+        <ion-icon name="create-outline"></ion-icon>
+        </button>
+        <div class="dropdown">
+        <button class="btnJsvm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <ion-icon aria-label="Favorite" aria-hidden="true" name="ellipsis-vertical-outline"></ion-icon>
+        </button>
+        <ul class="dropdown-menu">
+          <li><button class="dropdown-item" href="#" key_proyect=${data.id_usuario}>+ Asigar agentes</button></li>
+          <li><button class="dropdown-item" href="#"><ion-icon key_hab=${data.id_usuario} id="remove-hab" name="trash-outline"></ion-icon> Eliminar Usuario</button></li>
+        </ul>
+      </div>
+        </div>`;
+        },
+      },
+    ],
+  });
+
   buscar_usuarios();
 
   // BUSCAR CLIENTES
@@ -11,61 +59,42 @@ $(document).ready(function () {
       "../../controlador/UsuarioController.php",
       { funcion },
       (response) => {
+        console.log(response);
         let template = "";
-        if (response.trim() == "no-register-clientes") {
+        if (response.trim() == "no-users-admin") {
           template += "No hay registros de clientes";
         } else {
-          console.log(response);
           const result = JSON.parse(response);
           const usuarios = result.reverse();
           usuariosArray = usuarios;
-          $("#usuariosList").DataTable({
-            pageLength: 5,
-            aoColumnDefs: [
-              {
-                bSortable: false,
-                aTargets: ["nosort"],
-              },
-            ],
-            data: usuarios,
-            order: false,
-            bLengthChange: false,
-            dom: '<"top">ct<"top"p><"clear">',
-            columns: [
-              { data: "id_usuario" },
-              {
-                data: null,
-                render: function (data, type, row) {
-                  return data.nombre + " " + data.apellido;
-                },
-              },
-              { data: "user" },
-              { data: "dni" },
-              { data: "correo" },
-              { data: "creator" },
-              // { data: 'office' }
-              {
-                data: null,
-                render: function (data, type, row) {
-                  return `
-                  <div class="flex-actions">
-                  <button  key_user="${data.id_usuario}" class="btnLotes default" id="edit_usuario">
-                  <ion-icon name="create-outline"></ion-icon>
-                  </button>
-                  <div class="dropdown">
-                  <button class="btnJsvm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  <ion-icon aria-label="Favorite" aria-hidden="true" name="ellipsis-vertical-outline"></ion-icon>
-                  </button>
-                  <ul class="dropdown-menu">
-                    <li><button class="dropdown-item" href="#" key_proyect=${data.id_usuario}>+ Asigar agentes</button></li>
-                    <li><button class="dropdown-item" href="#"><ion-icon key_hab=${data.id_usuario} id="remove-hab" name="trash-outline"></ion-icon> Eliminar Usuario</button></li>
-                  </ul>
-                </div>
-                  </div>`;
-                },
-              },
-            ],
+          dataTable.clear().rows.add(usuarios).draw();
+        }
+      }
+    );
+  }
+  function buscar_servicios() {
+    let funcion = "buscar_servicios";
+    $.post(
+      "../../controlador/UsuarioController.php",
+      { funcion },
+      (response) => {
+        console.log(response);
+        let template = "";
+        if (response.trim() === "no-services") {
+          template += "No hay registros";
+        } else {
+          const permisos = JSON.parse(response);
+          permisos.forEach((permiso) => {
+            template += `
+            <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="${permiso.id}" id="check-${permiso.nombre}">
+            <label class="form-check-label" for="check-${permiso.nombre}">
+                ${permiso.nombre}
+            </label>
+        </div>
+            `;
           });
+          $("#listPermisos").html(template);
         }
       }
     );
@@ -123,6 +152,21 @@ $(document).ready(function () {
       );
     }
   });
+  // Detectar cambio en las etiquetas checkbox
+  $(document).on("change", 'input[type="checkbox"]', function () {
+    var value = $(this).val(); // Obtener el valor de la casilla seleccionada
+
+    if ($(this).is(":checked")) {
+      // Agregar el valor al array si la casilla se selecciona
+      selectedValues.push(value);
+    } else {
+      // Remover el valor del array si la casilla se deselecciona
+      var index = selectedValues.indexOf(value);
+      if (index > -1) {
+        selectedValues.splice(index, 1);
+      }
+    }
+  });
 
   $("#add-user-form").click(() => {
     funcion = "add_user";
@@ -132,6 +176,7 @@ $(document).ready(function () {
     let correo = $("#correo-modal").val();
     let username = $("#username-modal").val();
     let password = $("#password-modal").val();
+    let permisos = selectedValues;
     if (nombres !== "undefined" && nombres && username && password) {
       let cen = 1;
       if (cen == 1) {
@@ -147,8 +192,20 @@ $(document).ready(function () {
             password,
           },
           (response) => {
-            if (response.trim() == "add-cliente") {
-              alert("Cliente agregado correctamente");
+            console.log(response);
+            if (response.trim() !== "") {
+              // alert("Cliente agregado correctamente");
+              if (permisos.length > 0) {
+                let funcion = "registar_servicios";
+                $.post(
+                  "../../controlador/UsuarioController.php",
+                  { funcion, permisos, id: response },
+                  (response) => {
+                    console.log(response);
+                  }
+                );
+              }
+
               buscar_usuarios();
               $("#documento-modal").val("");
               $("#nombres-modal").val("");
@@ -239,7 +296,7 @@ $(document).ready(function () {
       (elemento) => elemento.id_usuario === id_cliente
     );
     console.log(result);
-    $("#documento-modal-edit").val(result.dni !== 0 ? "" : result.dni);
+    $("#documento-modal-edit").val(result.dni == 0 ? "" : result.dni);
     $("#nombres-modal-edit").val(result.nombre);
     $("#apellidos-modal-edit").val(result.apellido);
     $("#correo-modal-edit").val(result.correo);
@@ -288,6 +345,7 @@ $(document).ready(function () {
 
   // SHOW MODAL CREATE
   $("#create-clients").click(() => {
+    buscar_servicios();
     $(".modal-create").removeClass("md-hidden");
     setTimeout(function () {
       $(".modal-create .form-create").addClass("modal-show");
@@ -315,9 +373,9 @@ $(document).ready(function () {
     $("#username-modal").val("");
     $("#password-modal").val("");
     setTimeout(function () {
-      $("#modal-edit-user .form-create").removeClass("modal-show");
+      $(".modal-create .form-create").removeClass("modal-show");
     }, 10);
-    $("#modal-edit-user").addClass("md-hidden");
+    $(".modal-create").addClass("md-hidden");
   });
 
   // modal edit

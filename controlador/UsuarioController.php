@@ -95,6 +95,30 @@ if ($_POST["funcion"] == "add_user") {
     $usuario->add_user($user, $documento, $nombres, $apellidos, $correo, $username, $password);
     echo $usuario->mensaje;
 }
+if ($_POST["funcion"] == "add_user_asesor") {
+    $user = intval($_SESSION["id_usuario"]);
+    $documento = intval($_POST["documento"]);
+    $nombres = $_POST["nombres"];
+    $apellidos = $_POST["apellidos"];
+    $correo = $_POST["correo"];
+    $phone = $_POST["phone"];
+    $username = $_POST["username"];
+    $password = md5($_POST["password"]);
+    $usuario->add_user_asesor($user, $documento, $nombres, $apellidos, $correo, $phone, $username, $password);
+    echo $usuario->mensaje;
+}
+if ($_POST["funcion"] == "registar_servicios") {
+    $permisos = $_POST["permisos"];
+    $id_usuario = $_POST["id"];
+    $usuario->add_permisos($id_usuario, $permisos);
+    echo $usuario->mensaje;
+}
+if ($_POST["funcion"] == "add_user_proyect") {
+    $proyectos = $_POST["proyectos"];
+    $id_usuario = $_POST["id"];
+    $usuario->add_user_proyect($id_usuario, $proyectos);
+    echo $usuario->mensaje;
+}
 // fin de seccion usuarios
 
 // SECTION DE RESERVAS
@@ -273,7 +297,8 @@ if ($_POST["funcion"] == "update_user") {
     $apellidos = $data_user["user_apellidos"];
     $documento = $data_user["user_documento"];
     $correo = $data_user["user_correo"];
-    $usuario->update_user($id, $nombres, $apellidos, $documento, $correo);
+    $phone = $data_user["user_phone"];
+    $usuario->update_user($id, $nombres, $apellidos, $documento, $correo, $phone);
     echo $usuario->mensaje;
 }
 if ($_POST["funcion"] == "asigned_user_proyecto") {
@@ -303,6 +328,26 @@ if ($_POST["funcion"] == "buscar_proyectos") {
                 'creadorApellido' => $dato->creador_apellido,
                 'imgUrl' => $dato->img_url,
                 'status' => $dato->proyect_status
+            );
+        }
+        $jsonstring = json_encode($json);
+        echo $jsonstring;
+    }
+}
+if ($_POST["funcion"] == "buscar_proyectos_user") {
+    $json = array();
+    $id_usuario = $_SESSION["id_usuario"];
+    $usuario->buscar_proyectos_user($id_usuario);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+        foreach ($usuario->datos as $dato) {
+            $json[] = array(
+                'id' => $dato->id,
+                'nombreProyecto' => $dato->nombre_proyecto,
+                "phone_number" => $dato->phone_number,
+                "id_agente" => $dato->id_agente,
             );
         }
         $jsonstring = json_encode($json);
@@ -366,6 +411,49 @@ if ($_POST["funcion"] == "buscar_usuarios_admin") {
                 'correo' => $dato->correo,
                 'user' => $dato->user,
                 'creator' => $dato->creator,
+            );
+        }
+        $jsonstring = json_encode($json);
+        echo $jsonstring;
+    }
+}
+if ($_POST["funcion"] == "buscar_usuarios_asesores") {
+    $json = array();
+    $id_usuario = $_SESSION["id_usuario"];
+    $usuario->buscar_usuarios_asesores($id_usuario);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+        foreach ($usuario->datos as $dato) {
+
+            $json[] = array(
+                'id_usuario' => $dato->id_usuario,
+                'nombre' => $dato->nombre,
+                'apellido' => $dato->apellido,
+                'phone_number' => $dato->phone_number,
+                'dni' => $dato->dni,
+                'correo' => $dato->correo,
+                'user' => $dato->user,
+                'status' => $dato->status
+            );
+        }
+        $jsonstring = json_encode($json);
+        echo $jsonstring;
+    }
+}
+if ($_POST["funcion"] == "buscar_servicios") {
+    $json = array();
+    $usuario->buscar_servicios();
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+        foreach ($usuario->datos as $dato) {
+
+            $json[] = array(
+                'id' => $dato->id,
+                'nombre' => $dato->nombre_servicio,
             );
         }
         $jsonstring = json_encode($json);

@@ -1,89 +1,44 @@
+<?php
+?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Lotizador</title>
-    <style>
-    #map {
-        height: 500px;
-    }
-
-    .leaflet-tile-pane {
-        max-width: 600px;
-        margin: 0 auto;
-    }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
+    <link rel="stylesheet" href="../../css/main.css" />
+    <link rel="stylesheet" href="../../css/Lotizador.css" />
 </head>
 
 <body>
-    <div id="map"></div>
+    <div id="map1"></div>
+    <div class="container-loteActual">
+        <h3>Mz/Zn: <span numberKey="" key="" id="mz_zonas"></span> Lote: <span numberKey="" key="" id="lote"></span>
+        </h3>
+        <div class="listDetail">
+            <p>Ancho: <span id="ancho"></span></p>
+            <p>Largo: <span id="largo"></span></p>
+            <p>Area: <span id="area"></span></p>
+            <p>Precio: <span id="precio"></span></p>
 
-    <label for="lot-name">Nombre del lote:</label>
-    <input type="text" id="lot-name"><br>
+        </div>
+        <p class="container-estado" id="estadoLote">
+        </p>
+        <!-- <div>
+            <button class="btnLotizador">Me interesa</button>
+        </div> -->
+    </div>
 
-    <label for="lot-price">Precio:</label>
-    <input type="text" id="lot-price"><br>
 
-    <button onclick="savePolygon()">Guardar</button>
-
-
+    <script src="../../js/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
 
-    <script>
-    var map = L.map('map').setView([51.505, -0.09], 13);
-
-    L.tileLayer('../../img/lote.png', {
-        attribution: '&copy; OpenStreetMap contributors',
-        maxZoom: 18,
-        maxNativeZoom: 17,
-        noWrap: true
-    }).addTo(map);
-
-    var drawnItems = new L.FeatureGroup();
-    map.addLayer(drawnItems);
-
-    var drawControl = new L.Control.Draw({
-        edit: {
-            featureGroup: drawnItems
-        },
-        draw: {
-            polygon: true,
-            circle: false,
-            circlemarker: false,
-            marker: false,
-            polyline: false,
-            rectangle: false
-        }
-    });
-    map.addControl(drawControl);
-
-    map.on(L.Draw.Event.CREATED, function(e) {
-        var layer = e.layer;
-        drawnItems.addLayer(layer);
-    });
-
-    function savePolygon() {
-        var polygons = [];
-        drawnItems.eachLayer(function(layer) {
-            if (layer instanceof L.Polygon) {
-                var polygon = {
-                    name: document.getElementById('lot-name').value,
-                    price: document.getElementById('lot-price').value,
-                    coordinates: layer.getLatLngs()[0].map(function(latLng) {
-                        return [latLng.lat, latLng.lng];
-                    })
-                };
-                polygons.push(polygon);
-            }
-        });
-
-        // Aquí puedes hacer algo con el array de polígonos en formato JSON
-        console.log(polygons);
-    }
-    </script>
+    <script src="./lotizador.js"></script>
 </body>
 
 </html>

@@ -1,189 +1,236 @@
 $(document).ready(function () {
-  var polygons = [];
-  var poligonoSeleccionado = null;
-  var creacionHabilitada = false;
-  var loteAncho;
-  var loteLargo;
-  var loteArea;
-  var loteMz;
-  var loteNumero;
-  var lotePrecio;
-  fetchLotes();
+  const urlParams = new URLSearchParams(window.location.search);
+  var id = urlParams.get("proyect");
+  var nameProyecto = "";
+  var numero = urlParams.get("phoneNumber");
+  var agent = urlParams.get("agent");
 
-  // Crear los dos mapas con CRS.Simple
-  var map1 = L.map("map1", {
-    crs: L.CRS.Simple,
-    minZoom: -4,
-    maxZoom: 4,
-    zoom: 0,
-  }).setView([0, 0], 1);
-
-  // Definir las dimensiones y límites de la imagen
-  var imageWidth = 800;
-  var imageHeight = 0;
-  var imageBounds = [
-    [0, 0],
-    [0, imageWidth],
-  ];
-
-  var desiredWidth = 1000;
-
-  // Capa base de la imagen para ambos mapas
-  var imageUrl = "../../img/lote.png"; // Ruta de la imagen
-  var image = L.imageOverlay(imageUrl, map1.getBounds()).addTo(map1);
-  // image.on("load", function () {
-  //   // Establecer la anchura y la altura automática de la imagen
-  //   image._image.style.width = desiredWidth + "px";
-  //   image._image.style.height = "auto";
-
-  //   // Obtener el ancho del contenedor del mapa
-  //   var mapContainerWidth = map1._container.offsetWidth;
-
-  //   // Calcular el margen izquierdo para centrar la imagen
-  //   var marginLeft = (mapContainerWidth - desiredWidth) / 2;
-  //   image._image.style.marginLeft = marginLeft + "px";
-  // });
-
-  // Capa de dibujo para cada mapa
-  var drawnItems1 = new L.FeatureGroup().addTo(map1);
-  // var drawnItems2 = new L.FeatureGroup().addTo(map2);
-
-  // Configurar el control de dibujo para cada mapa
-  var drawControl1 = new L.Control.Draw({
-    draw: {
-      polygon: false,
-      marker: false,
-      circlemarker: false,
-      circle: false,
-      polyline: false,
-      rectangle: false,
-    },
-    edit: {
-      featureGroup: drawnItems1,
-    },
-  });
-  map1.addControl(drawControl1);
-  // crear poligono en el mapa
-  map1.on(L.Draw.Event.CREATED, function (event) {
-    if (!creacionHabilitada) {
-      // La creación de polígonos no está habilitada
-      return;
-    }
-    var layer = event.layer;
-    drawnItems1.addLayer(layer);
-
-    var coordinates = layer.getLatLngs();
-    // Obtener las coordenadas del polígono
-
-    agregarPoligonos(layer, coordinates);
-    drawControl1.setDrawingOptions({ polygon: false }); // Habilitar la creación de polígonos
-    drawControl1.setDrawingOptions({ rectangle: false }); // Habilitar la creación de polígonos
-    map1.addControl(drawControl1);
-  });
-  // seleccionar el poligono en el map
-  drawnItems1.on("click", function (event) {
-    var layer = event.layer;
-    poligonoSeleccionado = layer;
-  });
-
-  function agregarPoligonos(layer, coordinates) {
-    // Guardar la información en el array de polígonos
-    var polygon = {
-      loteAncho,
-      loteLargo,
-      loteArea,
-      loteMz,
-      loteNumero,
-      lotePrecio,
-      coordinates: coordinates,
-      options: layer.options,
-    };
-    polygons.push(polygon);
-    console.log(polygons);
-    $(".createdZone").removeClass("active");
+  if (id && numero) {
+    console.log("entro");
+    var imageUrl;
+    var lotesArray = [];
+    var poligonoSeleccionado = null;
+    var creacionHabilitada = false;
+    var loteAncho;
+    var loteLargo;
+    var loteArea;
+    var loteMz;
+    var loteNumero;
+    var lotePrecio;
+    var formaActual = null;
+    var formaDibujada = null;
     fetchLotes();
-  }
-  function fetchLotes() {
-    let template = "";
-    if (polygons.length > 0) {
-      polygons.map((lote) => {
-        template += `
-        <button class="btnLotizador dragSquare">MZ: ${lote.loteMz} NLote: ${lote.loteNumero} Precio: ${lote.lotePrecio} Area: ${lote.loteArea}</button>
-        `;
-      });
-    } else {
-      template += `
-      <button class="btnLotizador dragSquare">No hay lotes</button>
-      `;
-    }
-    $(".listLotes").html(template);
-    loteAncho = 0;
-    loteLargo = 0;
-    loteArea = 0;
-    loteMz = 0;
-    loteNumero = 0;
-    lotePrecio = 0;
-  }
-  $("#creaCotizacion").click(() => {
-    $(".createdZone").addClass("active");
-  });
-  $("#closeCreated").click(() => {
-    $(".createdZone").removeClass("active");
-  });
-  $("#crearLote").click(() => {
-    loteAncho = $("#loteAncho").val();
-    loteLargo = $("#loteLargo").val();
-    loteArea = $("#loteArea").val();
-    loteMz = $("#loteMz").val();
-    loteNumero = $("#loteNumero").val();
-    lotePrecio = $("#lotePrecio").val();
-    if (
-      (loteArea !== "" && loteMz !== "" && loteNumero > 0, lotePrecio !== "")
-    ) {
-      creacionHabilitada = true;
-      console.log(drawControl1);
-      drawControl1.setDrawingOptions({ polygon: true }); // Habilitar la creación de polígonos
-      drawControl1.setDrawingOptions({ rectangle: true }); // Habilitar la creación de polígonos
-      map1.addControl(drawControl1);
-    } else {
-      // Nombre o precio no ingresados o inválidos
-      creacionHabilitada = false;
-      alert("Te faltan llenar campos para crear el poligono");
-    }
-  });
-  function copiarPoligono() {
-    // Verificar si hay un polígono seleccionado
-    if (poligonoSeleccionado) {
-      console.log(poligonoSeleccionado);
-      // Obtener las coordenadas del polígono seleccionado
-      var coordenadas = poligonoSeleccionado.getLatLngs();
-      console.log(coordenadas);
-
-      // Calcular el ancho del polígono seleccionado
-      var bounds = poligonoSeleccionado.getBounds();
-      var ancho = bounds.getEast() - bounds.getWest();
-
-      // Determinar la dirección de la copia (derecha o izquierda)
-      var direccion = "derecha"; // Puedes cambiar a 'izquierda' si deseas la dirección opuesta
-
-      // Crear una copia del polígono desplazada
-      var copiaPoligono = L.polygon(coordenadas, { color: "#001529" }).addTo(
-        map1
+    var map1 = L.map("map1", {
+      crs: L.CRS.Simple,
+      minZoom: -4,
+      maxZoom: 4,
+      zoom: 0,
+    });
+    buscarProyecto();
+    function buscarProyecto() {
+      let funcion = "buscar_proyectos";
+      $.post(
+        "../../controlador/MapaController.php",
+        { funcion },
+        (response) => {
+          const proyecto = JSON.parse(response);
+          nameProyecto = proyecto[0].nombreProyecto;
+        }
       );
-      // copiaPoligono.enableEdit(); // Habilitar la edición del polígono
-
-      // Establecer las coordenadas de la copia del polígono desplazadas según la dirección
-      var desplazamientoX = direccion === "derecha" ? ancho : -ancho;
-      var nuevasCoordenadas = coordenadas[0].map(function (coordenada) {
-        return L.latLng(coordenada.lat, coordenada.lng + desplazamientoX);
-      });
-      copiaPoligono.setLatLngs(nuevasCoordenadas);
-
-      // Agregar la copia del polígono al grupo de capas
-      drawnItems1.addLayer(copiaPoligono);
-    } else {
-      alert("No hay un polígono seleccionado.");
     }
+
+    // obtener imagen y escalarla en el centro
+    $.post(
+      "../../controlador/MapaController.php",
+      { funcion: "buscar-imagen-proyect", id_proyect: id },
+      (response) => {
+        const image = JSON.parse(response);
+        imageUrl = "../../" + image[0].imgURL;
+
+        var img = new Image();
+        img.src = imageUrl;
+
+        img.onload = function () {
+          var imageWidth = this.width;
+          var imageHeight = this.height;
+          console.log(imageHeight, imageWidth);
+
+          var imageBounds = [
+            [0, 0],
+            [imageHeight, imageWidth],
+          ];
+
+          var imageOverlay = L.imageOverlay(imageUrl, imageBounds);
+          imageOverlay.addTo(map1);
+          map1.fitBounds(imageBounds); // Ajustar los límites del mapa a la imagen
+        };
+      }
+    );
+    buscarLotes(id);
+    var lotesPintados = [];
+    function buscarLotes(id) {
+      let funcion = "buscar_lotes";
+      $.post(
+        "../../controlador/MapaController.php",
+        { funcion, id },
+        (response) => {
+          var template = "";
+          if (response.trim() === "no-register") {
+            template += `
+                <button class="btnLotizador dragSquare">No hay lotes</button>          
+                `;
+            $("#listLotes").html(template);
+          } else {
+            const lotes = JSON.parse(response);
+            selectLotes(lotes);
+          }
+        }
+      );
+    }
+    function selectLotes(lotes) {
+      map1.eachLayer(function (layer) {
+        // Verificar si la capa es un rectángulo o un polígono
+        if (layer instanceof L.Rectangle || layer instanceof L.Polygon) {
+          // Eliminar la capa del mapa
+          map1.removeLayer(layer);
+        }
+      });
+      lotes.map((lote) => {
+        let fillColor;
+        let estado;
+        switch (lote.estado) {
+          case "DISPONIBLE":
+            fillColor = "#71bf44"; // Verde
+            estado = "disponible";
+            break;
+          case "SEPARADO":
+            fillColor = "#e8db49"; // Amarillo
+            estado = "separado";
+            break;
+          case "OCUPADO":
+            fillColor = "#FF0000"; // Rojo
+            estado = "ocupado";
+            break;
+          default:
+            fillColor = "#a81318"; // Negro (color por defecto en caso de estado no válido)
+        }
+
+        // Definir el estilo del polígono con el color obtenido
+        const estiloPoligono = {
+          color: "#5b5b5b", // Color del borde (negro en este ejemplo)
+          fillColor: fillColor, // Color de relleno según el estado del lote
+          fillOpacity: 0.8, // Opacidad del fondo
+          weight: 1,
+        };
+        // map1.clearLayers();
+        if (lote.tipo === "rectangulo") {
+          let bounds = [
+            [lote.cordinates[0][0], lote.cordinates[0][1]],
+            [lote.cordinates[1][0], lote.cordinates[1][1]],
+          ];
+          let rectangle = L.rectangle(bounds, estiloPoligono).addTo(map1);
+          rectangle
+            .bindTooltip(
+              `
+            Lote: ${lote.numero} ${lote.mz_zona} <br> Precio: ${lote.precio}  <br> Area: ${lote.area}
+            
+            `
+            )
+            .openTooltip();
+          rectangle.on("click", function () {
+            let template = `
+              Estado: <span key_status="${lote.estado}" class="status ${estado}" id="estado">${lote.estado}</span> <button id="editEstate">Editar</button>
+              `;
+            // Actualizar los valores en la tarjeta de HTML
+            $("#mz_zonas").text(lote.mz_zona);
+            $("#lote").text(lote.numero);
+            // $("#lote").attr("key", lote.numero + lote.mz_zona);
+            // $("#lote").attr("numberKey", lote.id);
+            $("#ancho").text(lote.ancho);
+            $("#largo").text(lote.largo);
+            $("#area").text(lote.area);
+            $("#precio").text(lote.precio);
+            $("#estadoLote").html(template);
+            $(".container-edit-status").remove("md-hidden");
+            $(".container-edit-status").addClass("md-hidden");
+          });
+        } else if (lote.tipo === "poligono") {
+          let poligono = L.polygon(lote.cordinates, estiloPoligono).addTo(map1);
+          poligono
+            .bindTooltip(
+              `
+            Lote: ${lote.numero} ${lote.mz_zona} <br> Precio: ${lote.precio}  <br> Area: ${lote.area}
+            
+            `
+            )
+            .openTooltip();
+          poligono.on("click", function () {
+            let template = `
+              <a target="_blank" href="https://api.whatsapp.com/send?phone=+51${numero}&text=Hola%20me%20interesa%20el%20lote%20${
+              lote.numero + lote.mz_zona
+            }%20del%20proyecto%20${nameProyecto}%20..." class="btnJsvm default" id="editEstate">Me interesa</a>
+              `;
+            // Actualizar los valores en la tarjeta de HTML
+            $("#mz_zonas").text(lote.mz_zona);
+            $("#lote").text(lote.numero);
+            $("#lote").attr("key", lote.numero + lote.mz_zona);
+            $("#lote").attr("numberKey", lote.id);
+            $("#ancho").text(lote.ancho);
+            $("#largo").text(lote.largo);
+            $("#area").text(lote.area);
+            $("#precio").text(lote.precio);
+            $("#estadoLote").html(template);
+            $(".container-edit-status").addClass("md-hidden");
+          });
+        }
+      });
+    }
+
+    // FUNCION PARA PINTAR LOS LOTES EN EL CARRITO
+    function fetchLotes() {
+      let template = "";
+      if (lotesArray.length > 0) {
+        lotesArray.map((lote) => {
+          template += `
+              <button class="btnLotizador dragSquare">MZ: ${lote.loteMz} NLote: ${lote.loteNumero} Precio: ${lote.lotePrecio} Area: ${lote.loteArea}</button>
+              `;
+        });
+      } else {
+        template += `
+            <button class="btnLotizador dragSquare">No hay lotes</button>
+            `;
+      }
+      $("#listCarrito").html(template);
+      loteAncho = 0;
+      loteLargo = 0;
+      loteArea = 0;
+      loteMz = 0;
+      loteNumero = 0;
+      lotePrecio = 0;
+    }
+
+    // EVENTOS DE CLICK PARA CREAR UN LOTE
+    $("#creaCotizacion").click(() => {
+      $(".createdZone.addLote").addClass("active");
+      $(".createdZone.carrito").removeClass("active");
+    });
+    $("#closeCreated").click(() => {
+      $(".createdZone.addLote").removeClass("active");
+    });
+  } else {
+    $("body").html("No se puede acceder a esta ruta");
+  }
+
+  register_visitas(agent);
+  function register_visitas(agent) {
+    let funcion = "register_visitas";
+    $.post(
+      "../../controlador/MapaController.php",
+      { funcion, agent },
+      (response) => {
+        console.log(response);
+      }
+    );
   }
 
   // ...código posterior...ert("No hay un polígono seleccionado.");
