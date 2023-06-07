@@ -87,6 +87,21 @@ class Usuario
             return $this->mensaje;
         }
     }
+    function buscar_visitas_usuarios($id_usuario)
+    {
+        $sql = "SELECT usuario.id_usuario, CONCAT(usuario.nombre, ' ', usuario.apellido) as nombres, IFNULL(visitas.numero_visitas, 0) AS numero_visitas
+        FROM usuario LEFT JOIN visitas ON usuario.id_usuario = visitas.agente_id WHERE usuario.usuarioRol=3 AND usuario.createdBy=:id_usuario";
+        $query = $this->conexion->prepare($sql);
+        $query->execute(array(":id_usuario"=>$id_usuario));
+        $this->datos = $query->fetchAll(); // retorna objetos o no
+        if (!empty($this->datos)) {
+
+            return $this->datos;
+        } else {
+            $this->mensaje = "no-users-asesor";
+            return $this->mensaje;
+        }
+    }
     function buscar_servicios()
     {
         $sql = "SELECT id, nombre_servicio FROM servicios";

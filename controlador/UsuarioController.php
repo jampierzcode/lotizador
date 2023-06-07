@@ -442,6 +442,27 @@ if ($_POST["funcion"] == "buscar_usuarios_asesores") {
         echo $jsonstring;
     }
 }
+if ($_POST["funcion"] == "buscar_visitas_usuarios") {
+    $json = array();
+    
+    $id_usuario = intVal($_SESSION["id_usuario"]);
+    $usuario->buscar_visitas_usuarios($id_usuario);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+        foreach ($usuario->datos as $dato) {
+
+            $json[] = array(
+                'id_usuario' => $dato->id_usuario,
+                'nombres' => $dato->nombres,
+                'numero_visitas' => $dato->numero_visitas,
+            );
+        }
+        $jsonstring = json_encode($json);
+        echo $jsonstring;
+    }
+}
 if ($_POST["funcion"] == "buscar_servicios") {
     $json = array();
     $usuario->buscar_servicios();
