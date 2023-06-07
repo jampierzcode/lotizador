@@ -96,7 +96,7 @@
                 <div class="link-block">
                     <div class="left-link">
                         <a class="toggle-drop" href="../../controlador/LogoutController.php">
-                            <ion-icon name="people-sharp"></ion-icon>
+                            <ion-icon name="chevron-back-circle-sharp"></ion-icon>
                             <p>Cerrar sesion</p>
                         </a>
                     </div>

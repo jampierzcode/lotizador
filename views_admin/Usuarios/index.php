@@ -29,7 +29,7 @@ session_start();
 
 <body>
     <?php
-    include_once "../../components/Sidebar.php"
+    include_once "../../components/Sidebar_admin.php"
     ?>
     <div class="container-dashboard">
         <span class="route">
