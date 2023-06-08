@@ -30,11 +30,11 @@ class Usuario
         $this->datos = $query->fetchAll(); // retorna objetos o no
         return $this->datos;
     }
-    function buscar_datos_contabilidad()
+    function buscar_datos_contabilidad($id_usuario)
     {
-        $sql = "SELECT count(*) as reservas, (SELECT count(*) FROM cliente) as clientes, (SELECT count(*) FROM habitaciones) as habitaciones, (SELECT SUM(total) FROM ventas) as ventas FROM reservas";
+        $sql = "SELECT count(*) as proyectos, (SELECT count(*) FROM usuario WHERE usuario.createdBy=:id_usuario) as asesores FROM user_proyect where user_proyect.user_id=:id_usuario";
         $query = $this->conexion->prepare($sql);
-        $query->execute();
+        $query->execute(array(":id_usuario"=>$id_usuario));
         $this->datos = $query->fetchAll();
         // $this->datos = $query->fetchColumn();
         if (!empty($this->datos)) {

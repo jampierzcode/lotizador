@@ -238,7 +238,9 @@ p {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
 }
-
+.gap-10 {
+  gap: 1.5rem;
+}
 /* styles nav header */
 .nav-header {
   /* background-color: #fff; */

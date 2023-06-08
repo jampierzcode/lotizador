@@ -35,33 +35,40 @@ if (empty($_SESSION["id_usuario"])) {
             <div class="card-count">
                 <div class="left-card">
                     <h1>N° Proyectos</h1>
-                    <span id="data-reservas">0</span>
+                    <span id="data-proyectos">0</span>
                 </div>
                 <!-- <ion-icon name="calendar-outline"></ion-icon> -->
                 <ion-icon name="home-outline"></ion-icon>
             </div>
             <div class="card-count">
                 <div class="left-card">
-                    <h1>N° Clientes</h1>
-                    <span id="data-clients">0</span>
+                    <h1>N° Asesores</h1>
+                    <span id="data-asesores">0</span>
                 </div>
                 <ion-icon name="people-outline"></ion-icon>
             </div>
-            <div class="card-count ventas">
+            <!-- <div class="card-count ventas">
                 <div class="left-card">
                     <h1>Venta Total</h1>
                     <span id="data-ventas">S/00.00</span>
                 </div>
                 <ion-icon name="cash-outline"></ion-icon>
-            </div>
+            </div> -->
         </div>
         <span class="route">
             Visitas de enlaces de agentes
         </span>
-        <div class="listAgentes">
+        <div class="grid-2-column gap-10">
 
+            <div class="listAgentes">
+
+                <canvas id="visitas" width="150"></canvas>
+            </div>
+            <div class="dayAgentes">
+                <canvas id="circleVisitas" width="150"></canvas>
+
+            </div>
         </div>
-        <canvas id="myChart" width="150"></canvas>
     </div>
 </body>
 <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
@@ -74,7 +81,7 @@ if (empty($_SESSION["id_usuario"])) {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.5.1/chart.min.js"
     integrity="sha512-Wt1bJGtlnMtGP0dqNFH1xlkLBNpEodaiQ8ZN5JLA5wpc1sUlk/O5uuOMNgvzddzkpvZ9GLyYNa8w2s7rqiTk5Q=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<!-- <script src="../../js/dinamic/gestion_contabilidad.js"></script> -->
+<script src="../../js/dinamic/gestion_contabilidad.js"></script>
 <script src="../../js/dinamic/graficos-admin.js"></script>
 
 </html>

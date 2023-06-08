@@ -3,8 +3,8 @@ $(document).ready(function () {
   var id;
   var numero;
   buscar_proyectos();
-  var dominio1 = "https://lotizador.mccompany.pe";
-  var dominio2 = "http://localhost/lotizador";
+  var dominio2 = "https://lotizador.mccompany.pe";
+  // var dominio2 = "http://localhost/lotizador";
 
   function buscar_proyectos() {
     funcion = "buscar_proyectos_user";

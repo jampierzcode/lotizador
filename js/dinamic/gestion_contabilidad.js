@@ -7,12 +7,11 @@ $(document).ready(function () {
       "../../controlador/UsuarioController.php",
       { funcion },
       (response) => {
+        console.log(response);
         const datos = JSON.parse(response);
         datos.forEach((dato) => {
-          $("#data-reservas").html(dato.reservas);
-          $("#data-clients").html(dato.clientes);
-          $("#data-habs").html(dato.habitaciones);
-          $("#data-ventas").html(`S/${Number(dato.ventas).toFixed(2)}`);
+          $("#data-proyectos").html(dato.proyectos);
+          $("#data-asesores").html(dato.asesores);
         });
       }
     );

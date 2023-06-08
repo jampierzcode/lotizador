@@ -8,15 +8,16 @@ $id_usuario = $_SESSION['id_usuario'];
 // SECTION DASHBOARD CONTABILIDAD
 if ($_POST["funcion"] == "buscar_datos_contabilidad") {
     $json = array();
-    $usuario->buscar_datos_contabilidad();
+    $id_usuario = $_SESSION["id_usuario"];
+    $usuario->buscar_datos_contabilidad($id_usuario);
     // echo $usuario->datos;
     if ($usuario->datos) {
         foreach ($usuario->datos as $dato) {
             $json[] = array(
-                'reservas' => $dato->reservas,
-                'clientes' => $dato->clientes,
-                'habitaciones' => $dato->habitaciones,
-                'ventas' => $dato->ventas
+                'proyectos' => $dato->proyectos,
+                'asesores' => $dato->asesores,
+                // 'habitaciones' => $dato->habitaciones,
+                // 'ventas' => $dato->ventas
             );
         }
         $jsonstring = json_encode($json);
