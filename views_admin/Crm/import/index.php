@@ -1,6 +1,7 @@
 <?php
+
 session_start();
-if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 1) {
+if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
     header("Location: ../../index.php");
 } else {
 ?>
@@ -11,13 +12,13 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 1) {
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../../css/main.css">
-    <link rel="stylesheet" href="../../css/sidebar.css">
-    <link rel="stylesheet" href="../../css/navdashboard.css">
-    <link rel="stylesheet" href="../../css/container-dashboard.css">
-    <link rel="stylesheet" href="../../css/habitaciones.css">
-    <link rel="stylesheet" href="../../css/productos.css">
-    <link rel="icon" href="../../img/logo.jpg">
+    <link rel="stylesheet" href="../../../css/main.css">
+    <link rel="stylesheet" href="../../../css/sidebar.css">
+    <link rel="stylesheet" href="../../../css/navdashboard.css">
+    <link rel="stylesheet" href="../../../css/container-dashboard.css">
+    <link rel="stylesheet" href="../../../css/habitaciones.css">
+    <link rel="stylesheet" href="../../../css/productos.css">
+    <link rel="icon" href="../../../img/logo.jpg">
     <!-- data table CDN -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.css" />
     <!-- bootsttrap -->
@@ -26,16 +27,18 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 1) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous">
     </script>
+    <!-- select 2 -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <title>AppLotizador</title>
 </head>
 
 <body>
     <?php
-    include_once "../../components/Sidebar.php"
+    include_once "../../../components/Sidebar_admin.php"
     ?>
     <div class="container-dashboard">
         <span class="route">
-            > Home > Clientes
+            > Home > CRM > importar
         </span>
         <div class="confirm-popup md-hidden">
             <div class="form-confirm">
@@ -85,7 +88,15 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 1) {
                         <span>Correo</span>
                         <div class="input-group">
                             <!-- <ion-icon name="person-circle-outline"></ion-icon> -->
-                            <input id="correo-modal-edit" type="text" placeholder="Ingrese los nombres o razon social">
+                            <input id="correo-modal-edit" type="text" placeholder="Ingrese el correo del asesor">
+                        </div>
+                    </div>
+                    <div class="card-input">
+                        <span>Telefono/WhatsApp</span>
+                        <div class="input-group">
+                            <!-- <ion-icon name="person-circle-outline"></ion-icon> -->
+                            <input id="phone-modal-edit" type="text"
+                                placeholder="Ingrese el numero de telefono del asesor">
                         </div>
                     </div>
                     <!-- <div class="card-input">
@@ -108,7 +119,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 1) {
                 <!-- </form> -->
             </div>
         </div>
-        <div class="modal-create md-hidden">
+        <div id="crear-users" class="modal-create md-hidden">
             <div class="form-create">
                 <!-- <form id="form_producto_add"> -->
                 <div class="close-modal">
@@ -155,7 +166,14 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 1) {
                         <span>Correo</span>
                         <div class="input-group">
                             <!-- <ion-icon name="person-circle-outline"></ion-icon> -->
-                            <input id="correo-modal" type="text" placeholder="Ingrese los nombres o razon social">
+                            <input id="correo-modal" type="text" placeholder="Ingrese el correo del asesor">
+                        </div>
+                    </div>
+                    <div class="card-input">
+                        <span>Telefono/WhatsApp</span>
+                        <div class="input-group">
+                            <!-- <ion-icon name="person-circle-outline"></ion-icon> -->
+                            <input id="phone-modal" type="text" placeholder="Ingrese numero de telefono">
                         </div>
                     </div>
                     <div class="card-input">
@@ -173,9 +191,6 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 1) {
                         </div>
                     </div>
                 </div>
-                <h1>Permisos</h1>
-                <div id="listPermisos">
-                </div>
                 <div class="card-input buttons-modal">
                     <button id="cancel-form" class="btn-cancel">Cancelar</button>
                     <button id="add-user-form" class="btn-create">Crear</button>
@@ -183,8 +198,65 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 1) {
                 <!-- </form> -->
             </div>
         </div>
-        <div class="create-productos" style="margin-bottom: 20px">
+        <div id="asigned_proyects" class="modal-create md-hidden">
+            <div class="form-create">
+                <!-- <form id="form_producto_add"> -->
+                <div class="close-modal">
+                    <ion-icon name="close-outline"></ion-icon>
+                </div>
+                <h1>Asignar a Proyectos</h1>
+                <div class="fileProyect">
+                    <p class="text-center w-full">Usuario: <span id="nombre_user"></span></p>
+                </div>
+
+                <div id="list-campos" style="display: flex; flex-direction: row; gap: 15px">
+                    <select name="proyectos[]" multiple="multiple" id="proyect-user" style="width: 100%" class="users_proyect" name="state">
+
+                    </select>
+                    <button id="update-asigned-form" class="btn-add">Agregar</button>
+                </div>
+
+                <span class="route" style="margin-bottom: 0px !important">
+                    Proyectos asignados
+                </span>
+                <div class="listUsuarios">
+                    <div class="main-datatable">
+                        <div class="overflow-x">
+                            <table style="width:100% !important;" id="proyectsAsigned"
+                                class="table cust-datatable dataTable no-footer">
+                                <thead>
+                                    <tr>
+                                        <th style="min-width:30px;"># id</th>
+                                        <th style="min-width:80px;">Cliente asignado</th>
+                                        <th style="min-width:80px;">Asignado</th>
+                                        <th style="min-width:80px;">Acciones</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-input buttons-modal">
+                    <button id="cancel-form-asigned" class="btn-cancel">Cancelar</button>
+                    <button id="add-asigned_proyect" class="btn-create">Crear</button>
+                </div>
+                <!-- </form> -->
+            </div>
+        </div>
+
+
+        <!-- <div class="create-productos" style="margin-bottom: 20px">
             <button id="create-clients" class="btn-add">+ Crear</button>
+        </div> -->
+        <div class="dropdown">
+            <button class="btn-add dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <ion-icon name="people"></ion-icon> Contactos
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="./import"><ion-icon name="cloud-upload"></ion-icon> Importar</a></li>
+                <li><a class="dropdown-item" href="#"><ion-icon name="cloud-download"></ion-icon> Exportar</a></li>
+                <li><a class="dropdown-item" href="#">Something else here</a></li>
+            </ul>
         </div>
         <div class="main-datatable">
             <div class="overflow-x">
@@ -197,13 +269,12 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 1) {
                     <thead>
                         <tr>
                             <th># id</th>
-                            <th>Nombres/Razon Social</th>
+                            <th>Nombres</th>
                             <th>Username</th>
                             <th>Documento</th>
                             <th>Correo</th>
-                            <?php if($_SESSION["us_tipo"]==1){?>
-                            <th>Creador por</th>
-                            <?php }?>
+                            <th>Numero</th>
+                            <th>Status</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -222,7 +293,13 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 1) {
 <script src="../../js/jquery.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
 <script src="../../components/sidebar.js"></script>
-<script src="../../js/dinamic/gestion_usuarios.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<!-- lectura excel -->
+<script src="https://unpkg.com/read-excel-file@5.x/bundle/read-excel-file.min.js"></script>
+<script src= "./readFile.js"></script>
+<script src="../../js/dinamic/gestion_usuarios_admin.js"></script>
 
 </html>
 <?php }?>

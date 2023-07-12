@@ -7,7 +7,7 @@ $(document).ready(function () {
   // var dominio2 = "http://localhost/lotizador";
 
   function buscar_proyectos() {
-    funcion = "buscar_proyectos_user";
+    funcion = "buscar_proyectos_agentes";
     $.post(
       "../../controlador/UsuarioController.php",
       { funcion },
@@ -16,6 +16,7 @@ $(document).ready(function () {
         if (response.trim() == "no-register") {
           template += "No hay registros";
         } else {
+          console.log(response);
           const proyectos = JSON.parse(response);
           proyectos.forEach((proyecto) => {
             template += `

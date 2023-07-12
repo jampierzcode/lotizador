@@ -1,7 +1,22 @@
 <?php
 session_start();
 if (!empty($_SESSION["id_usuario"])) {
-    header("Location: views/Dashboard");
+    switch ($_SESSION["us_tipo"]) {
+        case 1:
+            header("Location: views/Dashboard");
+            break;
+        case 2:
+            header("Location: views_admin/Dashboard");
+            break;
+        case 3:
+            header("Location: views_asesor/Dashboard");
+            break;
+        
+        default:
+            # code...
+            break;
+    }
+    
 } else {
 ?>
 <!DOCTYPE html>

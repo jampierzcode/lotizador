@@ -120,6 +120,12 @@ if ($_POST["funcion"] == "add_user_proyect") {
     $usuario->add_user_proyect($id_usuario, $proyectos);
     echo $usuario->mensaje;
 }
+if ($_POST["funcion"] == "add_user_cliente") {
+    $asesor = $_POST["asesor"];
+    $id_cliente = $_POST["id"];
+    $usuario->add_user_cliente($id_cliente, $asesor);
+    echo $usuario->mensaje;
+}
 // fin de seccion usuarios
 
 // SECTION DE RESERVAS
@@ -308,9 +314,20 @@ if ($_POST["funcion"] == "asigned_user_proyecto") {
     $usuario->asigned_user_proyecto($id_proyecto, $user);
     echo $usuario->mensaje;
 }
+if ($_POST["funcion"] == "removed_asigned_user") {
+    $id_proyecto = intVal($_POST["id_proyecto"]);
+    $id_usuario = intVal($_POST["id_usuario"]);
+    $usuario->remove_user_proyecto($id_proyecto, $id_usuario);
+    echo $usuario->mensaje;
+}
 if ($_POST["funcion"] == "delete_user") {
     $id = $_POST["id"];
     $usuario->delete_user($id);
+    echo $usuario->mensaje;
+}
+if ($_POST["funcion"] == "removed_proyecto") {
+    $id_proyect = $_POST["id_proyect"];
+    $usuario->removed_proyecto($id_proyect);
     echo $usuario->mensaje;
 }
 
@@ -337,8 +354,47 @@ if ($_POST["funcion"] == "buscar_proyectos") {
 }
 if ($_POST["funcion"] == "buscar_proyectos_user") {
     $json = array();
-    $id_usuario = $_SESSION["id_usuario"];
+    $id_usuario = $_POST["id_cliente"];
     $usuario->buscar_proyectos_user($id_usuario);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+        foreach ($usuario->datos as $dato) {
+            $json[] = array(
+                'id' => $dato->id,
+                'nombreProyecto' => $dato->proyecto_nombre,
+                'asignado_usuario' => $dato->asignado_usuario
+            );
+        }
+        $jsonstring = json_encode($json);
+        echo $jsonstring;
+    }
+}
+if ($_POST["funcion"] == "buscar_asesor_cliente") {
+    $json = array();
+    $id_usuario = $_POST["id_cliente"];
+    $usuario->buscar_asesor_cliente($id_usuario);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+        foreach ($usuario->datos as $dato) {
+            $json[] = array(
+                'id' => $dato->usuario_id,
+                'nombreAsesor' => $dato->asesor_nombre,
+                'apellidoAsesor' => $dato->asesor_apellido,
+                'asignado_usuario' => $dato->asignado_usuario
+            );
+        }
+        $jsonstring = json_encode($json);
+        echo $jsonstring;
+    }
+}
+if ($_POST["funcion"] == "buscar_proyectos_agentes") {
+    $json = array();
+    $id_usuario = $_SESSION["id_usuario"];
+    $usuario->buscar_proyectos_agentes($id_usuario);
     if ($usuario->mensaje) {
         echo $usuario->mensaje;
     }
@@ -386,9 +442,11 @@ if ($_POST["funcion"] == "buscar_user_proyect") {
     if ($usuario->datos) {
         foreach ($usuario->datos as $dato) {
             $json[] = array(
-                'rol'=>$dato->rol,
+                'id' => $dato->id_usuario,
+                'rol' => $dato->rol,
                 'clienteNombre' => $dato->cliente_nombre,
                 'clienteApellido' => $dato->cliente_apellido,
+                'asignado_proyecto' => $dato->asignado_proyecto
             );
         }
         $jsonstring = json_encode($json);
@@ -445,7 +503,7 @@ if ($_POST["funcion"] == "buscar_usuarios_asesores") {
 }
 if ($_POST["funcion"] == "buscar_visitas_usuarios") {
     $json = array();
-    
+
     $id_usuario = intVal($_SESSION["id_usuario"]);
     $usuario->buscar_visitas_usuarios($id_usuario);
     if ($usuario->mensaje) {
@@ -507,18 +565,17 @@ if ($_POST["funcion"] == "agregar_lotes") {
     // $usuario->crear_lote($id, $lote);
     foreach ($lotesArray as $lote) {
         # code..
-        $loteAncho=$lote["loteAncho"];
-        $loteLargo=$lote["loteLargo"];
-        $loteArea=$lote["loteArea"];
-        $loteMz=$lote["loteMz"];
-        $loteNumero=$lote["loteNumero"];
-        $lotePrecio=$lote["lotePrecio"];
-        $tipo=$lote["tipo"];
-        $coordenadas=json_encode($lote["coordenadas"]);
-        $estado=$lote["estado"];
+        $loteAncho = $lote["loteAncho"];
+        $loteLargo = $lote["loteLargo"];
+        $loteArea = $lote["loteArea"];
+        $loteMz = $lote["loteMz"];
+        $loteNumero = $lote["loteNumero"];
+        $lotePrecio = $lote["lotePrecio"];
+        $tipo = $lote["tipo"];
+        $coordenadas = json_encode($lote["coordenadas"]);
+        $estado = $lote["estado"];
         $usuario->crear_lote($id, $loteAncho, $loteLargo, $loteArea, $loteMz, $loteNumero, $lotePrecio, $tipo, $estado, $coordenadas);
         echo $usuario->mensaje;
-        
     }
 }
 if ($_POST["funcion"] == "buscar_lotes") {
@@ -636,15 +693,9 @@ if ($_POST["funcion"] == "habitacion_limpieza_terminada") {
 // CREAR CLIENTES DESDE RECEPCION
 
 if ($_POST["funcion"] == "add_cliente") {
-    $tipo_documento = $_POST["tipo_documento"];
-    $documento = $_POST["documento"];
-    $nombres = $_POST["nombres"];
-    if ($tipo_documento == 1) {
-        $documento_tipo = "DNI";
-    } else {
-        $documento_tipo = "RUC";
-    }
-    $usuario->add_cliente($documento_tipo, $documento, $nombres);
+    $resultado = $_POST["resultado"];
+    $proyect_id = $_POST["proyect_id"];
+    $usuario->add_cliente($resultado, $proyect_id, $_SESSION["id_usuario"]);
     echo $usuario->mensaje;
 }
 // BUSCAR CLIENTES
@@ -659,10 +710,75 @@ if ($_POST["funcion"] == "buscar_clientes") {
     if ($usuario->datos) {
         foreach ($usuario->datos as $dato) {
             $json[] = array(
-                'id_cliente' => $dato->id_cliente,
+                'id' => $dato->id_cliente,
                 'nombres' => $dato->nombres,
-                'tipo_documento' => $dato->tipo_documento,
-                'documento' => $dato->documento
+                'apellidos' => $dato->apellidos,
+                'correo' => $dato->correo,
+                'celular' => $dato->celular,
+                'telefono' => $dato->telefono,
+                'origen' => $dato->origen,
+                'ciudad' => $dato->ciudad,
+                'nombre_proyecto' => $dato->nombre_proyecto,
+                'created_cliente' => $dato->created_cliente,
+                'proyecto_id' => $dato->proyet_id,
+                'asignado_usuario' => $dato->asignado_usuario
+            );
+        }
+        $jsonstring = json_encode($json);
+        echo $jsonstring;
+    }
+}
+if ($_POST["funcion"] == "buscar_clientes_by_asesor") {
+    $json = array();
+    $usuario->buscar_clientes_by_asesor($_SESSION["id_usuario"]);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+        foreach ($usuario->datos as $dato) {
+            $json[] = array(
+                'id' => $dato->id_cliente,
+                'nombres' => $dato->nombres,
+                'apellidos' => $dato->apellidos,
+                'correo' => $dato->correo,
+                'celular' => $dato->celular,
+                'telefono' => $dato->telefono,
+                'status' => $dato->status,
+                'origen' => $dato->origen,
+                'ciudad' => $dato->ciudad,
+                'nombre_proyecto' => $dato->nombre_proyecto,
+                'created_cliente' => $dato->created_cliente,
+                'proyecto_id' => $dato->proyet_id,
+            );
+        }
+        $jsonstring = json_encode($json);
+        echo $jsonstring;
+    }
+}
+// funciones de seguimiento
+if ($_POST["funcion"] == "seguimiento_cliente") {
+    $observacion = $_POST["observacion"];
+    $user = intVal($_SESSION["id_usuario"]);
+    $cliente = intval($_POST["cliente"]);
+    $status = $_POST["status"];
+    $fecha = $_POST["fecha"];
+    $hora = $_POST["hora"];
+    $usuario->seguimiento_cliente($user, $cliente, $observacion, $status, $fecha, $hora);
+    echo $usuario->mensaje;
+}
+if ($_POST["funcion"] == "buscar_historial_seguimiento") {
+    $cliente = intval($_POST["cliente"]);
+    $usuario->buscar_historial_seguimiento($cliente);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+        foreach ($usuario->datos as $dato) {
+            $json[] = array(
+                'observacion' => $dato->observacion,
+                'status' => $dato->status,
+                'fecha' => $dato->fecha_register,
+                'hora' => $dato->hora_register,
             );
         }
         $jsonstring = json_encode($json);

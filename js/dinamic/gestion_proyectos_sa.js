@@ -36,7 +36,12 @@ $(document).ready(function () {
                 : "  ";
               let splitA = split_name[0][0];
               let splitB = split_lastname[0][0];
-              template += `<span class="mode mode_done">${splitA}${splitB}</span>`;
+              if (user.asignado_proyecto == "Asignado") {
+                template += `<span class="mode mode_done">${splitA}${splitB}</span>`;
+              }
+            }
+            if (template === "") {
+              template += `<span class="mode mode_process">no asigned</span>`;
             }
             return template;
           } else {
@@ -61,17 +66,17 @@ $(document).ready(function () {
         render: function (data, type, row) {
           return `
           <div class="flex-actions">
-          <a target="_blank" href="lotizador?id=${data.id}" class="btnLotes"> Ver lotes </a>
-          <button class="btnLotes default"><ion-icon id=${data.id} name="create-outline"></ion-icon></button>
-          <div class="dropdown">
-          <button class="btnJsvm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-          <ion-icon aria-label="Favorite" aria-hidden="true" name="ellipsis-vertical-outline"></ion-icon>
-          </button>
-          <ul class="dropdown-menu">
-            <li><button class="dropdown-item" href="#"id="asigned_user" key_proyect=${data.id}>+ Asigar usuario</button></li>
-            <li><button class="dropdown-item" href="#"><ion-icon key_hab=${data.id} id="remove-hab" name="trash-outline"></ion-icon> Eliminar Proyecto</button></li>
-          </ul>
-        </div>
+            <a target="_blank" href="lotizador?id=${data.id}" class="btnLotes"> Ver lotes </a>
+            <button class="btnLotes default"><ion-icon id=${data.id} name="create-outline"></ion-icon></button>
+            <div class="dropdown">
+            <button class="btnJsvm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <ion-icon aria-label="Favorite" aria-hidden="true" name="ellipsis-vertical-outline"></ion-icon>
+            </button>
+            <ul class="dropdown-menu">
+              <li><button class="dropdown-item" href="#" id="asigned_user" key_proyect=${data.id}>+ Asigar usuario</button></li>
+              <li><button class="dropdown-item" href="#" key_proyect=${data.id} id="remove-proyect"><ion-icon name="trash-outline"></ion-icon> Eliminar Proyecto</button></li>
+            </ul>
+          </div>
           </div>
 
           `;
@@ -79,6 +84,48 @@ $(document).ready(function () {
       },
     ],
     // columnDefs: [{ type: "date-dd-mm-yyyy", aTargets: [5] }],
+    order: false,
+    bLengthChange: false,
+    dom: '<"top">ct<"top"p><"clear">',
+  });
+  var dataTableUsers = $("#usersASigneds").DataTable({
+    pageLength: 5,
+    aoColumnDefs: [
+      {
+        bSortable: false,
+        aTargets: ["nosort"],
+      },
+    ],
+    columns: [
+      { data: "id" },
+      {
+        data: null,
+        render: function (data) {
+          return `
+        <p>${data.clienteNombre} ${data.clienteApellido}</p>
+        `;
+        },
+      },
+      { data: "asignado_proyecto" },
+      {
+        data: null,
+        render: function (data, type, row) {
+          return `
+          <div class="flex-actions">
+          <div class="dropdown">
+            <button class="btnJsvm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <ion-icon aria-label="Favorite" aria-hidden="true" name="ellipsis-vertical-outline"></ion-icon>
+            </button>
+            <ul class="dropdown-menu">
+              <li><button class="dropdown-item" id="no-asigned_user" key_user=${data.id}>- Quitar usuario</button></li>
+              </ul>
+          </div>
+          </div>
+
+          `;
+        },
+      },
+    ],
     order: false,
     bLengthChange: false,
     dom: '<"top">ct<"top"p><"clear">',
@@ -150,43 +197,110 @@ $(document).ready(function () {
     });
   }
 
-  //  EDIT proyectos
-  $(document).on("click", "#asigned_user", function () {
+  //  asigned proyectos
+  $(document).on("click", "#asigned_user", async function () {
     let id_proyect = $(this).attr("key_proyect");
     id_proyecto = id_proyect;
     console.log(id_proyect);
     const result = proyectosArray.find(
       (elemento) => elemento.id === id_proyect
     );
-    $("#nombre_proyecto").html(result.nombreProyecto);
-    $("#modal-asigned").removeClass("md-hidden");
-    setTimeout(function () {
-      $("#modal-asigned .form-create").addClass("modal-show");
-    }, 10);
-    buscar_admin()
-      .then((usuarios) => {
-        let template = "";
-        if (usuarios !== null) {
-          usuarios.forEach((user) => {
-            template += `
-        <option value=${user.id_usuario}>${user.nombre} ${user.apellido}</option>
-        `;
-          });
-        } else {
-          template += `
-        <option value="0">No existen usuarios</option>
-        `;
+    try {
+      const usuarios = await buscar_user_proyect(id_proyect);
+      console.log(usuarios);
+      let template = `<option value="" selected></option>`;
+      let usuariosAsigned = [];
+      usuarios.forEach((user) => {
+        let option = `<option value=${user.id}>${user.clienteNombre} ${user.clienteApellido}</option>`;
+        if (user.asignado_proyecto === "Asignado") {
+          usuariosAsigned.push(user);
+          option = `<option value=${user.id} disabled>${user.clienteNombre} ${user.clienteApellido}</option>`;
         }
-        $(".users_proyect").html(template);
-        $(".users_proyect").select2({
-          allowClear: true,
-          placeholder: "Seleciona un usuario",
-        });
-      })
-      .catch((error) => {
-        // Manejar errores en caso de que ocurran
-        return error;
+        template += option;
       });
+      dataTableUsers.clear().rows.add(usuariosAsigned).draw();
+
+      $(".users_proyect").html(template);
+      $(".users_proyect").select2({
+        allowClear: true,
+        placeholder: "Selecciona un usuario",
+      });
+
+      $("#nombre_proyecto").html(result.nombreProyecto);
+      $("#modal-asigned").removeClass("md-hidden");
+      setTimeout(function () {
+        $("#modal-asigned .form-create").addClass("modal-show");
+      }, 10);
+    } catch (error) {
+      console.log(error);
+    }
+  });
+  $(document).on("click", "#no-asigned_user", function () {
+    if (confirm("¿Estás seguro de quitar usuario de proyecto?")) {
+      let funcion = "removed_asigned_user";
+      let id_usuario = $(this).attr("key_user");
+      console.log(id_proyecto, id_usuario);
+      $.post(
+        "../../controlador/UsuarioController.php",
+        { funcion, id_usuario, id_proyecto },
+        async (response) => {
+          if (response.trim() == "remove-asigned") {
+            alert("Se removio correctamente la asignacion del usuario");
+            buscar_proyectos();
+
+            const usuarios = await buscar_user_proyect(id_proyecto);
+            console.log(usuarios);
+            let template = `<option value="" selected></option>`;
+            let usuariosAsigned = [];
+            usuarios.forEach((user) => {
+              let option = `<option value=${user.id}>${user.clienteNombre} ${user.clienteApellido}</option>`;
+              if (user.asignado_proyecto === "Asignado") {
+                usuariosAsigned.push(user);
+                option = `<option value=${user.id} disabled>${user.clienteNombre} ${user.clienteApellido}</option>`;
+              }
+              template += option;
+            });
+            dataTableUsers.clear().rows.add(usuariosAsigned).draw();
+
+            $(".users_proyect").html(template);
+            $(".users_proyect").select2({
+              allowClear: true,
+              placeholder: "Selecciona un usuario",
+            });
+          } else {
+            alert("Hubo un error inesperado" + response);
+          }
+        }
+      );
+    } else {
+      // Aquí puedes realizar la acción correspondiente si el usuario cancela
+      alert("Acción cancelada");
+    }
+  });
+  $(document).on("click", "#remove-proyect", function () {
+    if (confirm("¿Estás seguro de eliminar este proyecto?")) {
+      let funcion = "removed_proyecto";
+      let id_proyect = $(this).attr("key_proyect");
+      $.post(
+        "../../controlador/UsuarioController.php",
+        { funcion, id_proyect },
+        async (response) => {
+          if (response.trim() == "delete-proyect") {
+            alert(
+              "Se removio correctamente el proyecto, lotes y usuarios asignados"
+            );
+            buscar_proyectos();
+          } else {
+            alert("Hubo un error inesperado" + response);
+          }
+        }
+      );
+      // Aquí puedes realizar la acción correspondiente si el usuario confirma
+      alert("Acción confirmada");
+    } else {
+      // Aquí puedes realizar la acción correspondiente si el usuario cancela
+      alert("Acción cancelada");
+    }
   });
 
   $("#update-asigned-form").click(() => {

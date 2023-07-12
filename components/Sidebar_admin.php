@@ -85,6 +85,21 @@
             </li>
             <?php
                         break;
+                    case 'CRM':
+                        # code...
+                        ?>
+            <li class="links-menu-dashboard">
+                <div class="link-block">
+                    <div class="left-link">
+                        <a class="toggle-drop" href="../Crm">
+                            <ion-icon name="people-sharp"></ion-icon>
+                            <p>CRM</p>
+                        </a>
+                    </div>
+                </div>
+            </li>
+            <?php
+                        break;
                     
                     default:
                         # code...

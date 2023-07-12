@@ -22,22 +22,22 @@
             <img src="../../img/avatar_default.jpg" alt="img_avatar_user" />
             <div class="info-perfil">
 
-                <p><?php echo $_SESSION["nombres"]?></p>
+                <p><?php echo $_SESSION["nombres"] ?></p>
                 <span><?php switch ($_SESSION["us_tipo"]) {
-                        case 1:
-                            echo "superadmin";
-                            break;
+                            case 1:
+                                echo "superadmin";
+                                break;
                             case 2:
                                 echo "admin";
                                 break;
-                                case 3:
-                                    echo "asesor";
-                                    break;
-                                    
-                                    default:
-                                    echo "null";
-                                    break;
-                                }?></span>
+                            case 3:
+                                echo "asesor";
+                                break;
+
+                            default:
+                                echo "null";
+                                break;
+                        } ?></span>
             </div>
         </div>
         <ul class="nav-links">
@@ -51,11 +51,28 @@
                     </div>
                 </div>
             </li>
+            <?php
+            if (!empty($_SESSION["permiso_crm"])) {
+
+            ?>
+                <li class="links-menu-dashboard">
+                    <div class="link-block">
+                        <div class="left-link">
+                            <a class="toggle-drop" href="../crm">
+                                <ion-icon name="people-sharp"></ion-icon>
+                                <p>CRM</p>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+            <?php
+            }
+            ?>
             <li class="links-menu-dashboard">
                 <div class="link-block">
                     <div class="left-link">
                         <a class="toggle-drop" href="../../controlador/LogoutController.php">
-                            <ion-icon name="people-sharp"></ion-icon>
+                            <ion-icon name="log-out-outline"></ion-icon>
                             <p>Cerrar sesion</p>
                         </a>
                     </div>

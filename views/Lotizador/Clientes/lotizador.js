@@ -2,11 +2,8 @@ $(document).ready(function () {
   const urlParams = new URLSearchParams(window.location.search);
   var id = urlParams.get("proyect");
   var nameProyecto = "";
-  var numero = urlParams.get("phoneNumber");
-  var agent = urlParams.get("agent");
 
-  if (id && numero) {
-    console.log("entro");
+  if (id) {
     var imageUrl;
     var lotesArray = [];
     var poligonoSeleccionado = null;
@@ -30,7 +27,7 @@ $(document).ready(function () {
     function buscarProyecto() {
       let funcion = "buscar_proyectos";
       $.post(
-        "../../controlador/MapaController.php",
+        "../../../controlador/MapaController.php",
         { funcion },
         (response) => {
           const proyecto = JSON.parse(response);
@@ -41,29 +38,33 @@ $(document).ready(function () {
 
     // obtener imagen y escalarla en el centro
     $.post(
-      "../../controlador/MapaController.php",
+      "../../../controlador/MapaController.php",
       { funcion: "buscar-imagen-proyect", id_proyect: id },
       (response) => {
-        const image = JSON.parse(response);
-        imageUrl = "../../" + image[0].imgURL;
+        if (response.trim() == "no-register") {
+          $("body").html("No existe ningun proyecto");
+        } else {
+          const image = JSON.parse(response);
+          imageUrl = "../../../" + image[0].imgURL;
 
-        var img = new Image();
-        img.src = imageUrl;
+          var img = new Image();
+          img.src = imageUrl;
 
-        img.onload = function () {
-          var imageWidth = this.width;
-          var imageHeight = this.height;
-          console.log(imageHeight, imageWidth);
+          img.onload = function () {
+            var imageWidth = this.width;
+            var imageHeight = this.height;
+            console.log(imageHeight, imageWidth);
 
-          var imageBounds = [
-            [0, 0],
-            [imageHeight, imageWidth],
-          ];
+            var imageBounds = [
+              [0, 0],
+              [imageHeight, imageWidth],
+            ];
 
-          var imageOverlay = L.imageOverlay(imageUrl, imageBounds);
-          imageOverlay.addTo(map1);
-          map1.fitBounds(imageBounds); // Ajustar los límites del mapa a la imagen
-        };
+            var imageOverlay = L.imageOverlay(imageUrl, imageBounds);
+            imageOverlay.addTo(map1);
+            map1.fitBounds(imageBounds); // Ajustar los límites del mapa a la imagen
+          };
+        }
       }
     );
     buscarLotes(id);
@@ -71,14 +72,14 @@ $(document).ready(function () {
     function buscarLotes(id) {
       let funcion = "buscar_lotes";
       $.post(
-        "../../controlador/MapaController.php",
+        "../../../controlador/MapaController.php",
         { funcion, id },
         (response) => {
           var template = "";
           if (response.trim() === "no-register") {
             template += `
-                <button class="btnLotizador dragSquare">No hay lotes</button>          
-                `;
+                  <button class="btnLotizador dragSquare">No hay lotes</button>          
+                  `;
             $("#listLotes").html(template);
           } else {
             const lotes = JSON.parse(response);
@@ -132,20 +133,12 @@ $(document).ready(function () {
           rectangle
             .bindTooltip(
               `
-            Lote: ${lote.numero} ${lote.mz_zona} <br> Precio: ${lote.precio}  <br> Area: ${lote.area}
-            
-            `
+              Lote: ${lote.numero} ${lote.mz_zona} <br> Precio: ${lote.precio}  <br> Area: ${lote.area}
+              
+              `
             )
             .openTooltip();
           rectangle.on("click", function () {
-            let template = `
-              Estado: <span key_status="${lote.estado}" class="status ${estado}" id="estado">${lote.estado}</span>
-              `;
-            let templateWhats = `
-              <a target="_blank" href="https://api.whatsapp.com/send?phone=+51${numero}&text=Hola%20me%20interesa%20el%20lote%20${
-              lote.numero + lote.mz_zona
-            }%20del%20proyecto%20${nameProyecto}%20..." class="btnJsvm default" id="editEstate">Me interesa</a>
-              `;
             // Actualizar los valores en la tarjeta de HTML
             $("#mz_zonas").text(lote.mz_zona);
             $("#lote").text(lote.numero);
@@ -155,8 +148,6 @@ $(document).ready(function () {
             $("#largo").text(lote.largo);
             $("#area").text(lote.area);
             $("#precio").text(lote.precio);
-            $("#estadoLote").html(template);
-            $(".containerWhats").html(templateWhats);
             $(".container-edit-status").remove("md-hidden");
             $(".container-edit-status").addClass("md-hidden");
           });
@@ -165,32 +156,19 @@ $(document).ready(function () {
           poligono
             .bindTooltip(
               `
-            Lote: ${lote.numero} ${lote.mz_zona} <br> Precio: ${lote.precio}  <br> Area: ${lote.area}
-            
-            `
+              Lote: ${lote.numero} ${lote.mz_zona} <br> Precio: ${lote.precio}  <br> Area: ${lote.area}
+              
+              `
             )
             .openTooltip();
           poligono.on("click", function () {
-            let template = `
-            Estado: <span key_status="${lote.estado}" class="status ${estado}" id="estado">${lote.estado}</span>
-            `;
-            let templateWhats = `
-            <a target="_blank" href="https://api.whatsapp.com/send?phone=+51${numero}&text=Hola%20me%20interesa%20el%20lote%20${
-              lote.numero + lote.mz_zona
-            }%20del%20proyecto%20${nameProyecto}%20..." class="btnJsvm default" id="editEstate">Me interesa</a>
-            `;
             // Actualizar los valores en la tarjeta de HTML
             $("#mz_zonas").text(lote.mz_zona);
             $("#lote").text(lote.numero);
-            $("#lote").attr("key", lote.numero + lote.mz_zona);
-            $("#lote").attr("numberKey", lote.id);
             $("#ancho").text(lote.ancho);
             $("#largo").text(lote.largo);
             $("#area").text(lote.area);
             $("#precio").text(lote.precio);
-
-            $("#estadoLote").html(template);
-            $(".containerWhats").html(templateWhats);
             $(".container-edit-status").addClass("md-hidden");
           });
         }
@@ -203,13 +181,13 @@ $(document).ready(function () {
       if (lotesArray.length > 0) {
         lotesArray.map((lote) => {
           template += `
-              <button class="btnLotizador dragSquare">MZ: ${lote.loteMz} NLote: ${lote.loteNumero} Precio: ${lote.lotePrecio} Area: ${lote.loteArea}</button>
-              `;
+                <button class="btnLotizador dragSquare">MZ: ${lote.loteMz} NLote: ${lote.loteNumero} Precio: ${lote.lotePrecio} Area: ${lote.loteArea}</button>
+                `;
         });
       } else {
         template += `
-            <button class="btnLotizador dragSquare">No hay lotes</button>
-            `;
+              <button class="btnLotizador dragSquare">No hay lotes</button>
+              `;
       }
       $("#listCarrito").html(template);
       loteAncho = 0;
@@ -230,18 +208,6 @@ $(document).ready(function () {
     });
   } else {
     $("body").html("No se puede acceder a esta ruta");
-  }
-
-  register_visitas(agent);
-  function register_visitas(agent) {
-    let funcion = "register_visitas";
-    $.post(
-      "../../controlador/MapaController.php",
-      { funcion, agent },
-      (response) => {
-        console.log(response);
-      }
-    );
   }
 
   // ...código posterior...ert("No hay un polígono seleccionado.");

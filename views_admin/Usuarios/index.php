@@ -1,6 +1,9 @@
 <?php
 
 session_start();
+if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
+    header("Location: ../../index.php");
+} else {
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -24,6 +27,8 @@ session_start();
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous">
     </script>
+    <!-- select 2 -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <title>AppLotizador</title>
 </head>
 
@@ -200,8 +205,36 @@ session_start();
                     <ion-icon name="close-outline"></ion-icon>
                 </div>
                 <h1>Asignar a Proyectos</h1>
-                <div id="listProyectos">
+                <div class="fileProyect">
+                    <p class="text-center w-full">Usuario: <span id="nombre_user"></span></p>
+                </div>
 
+                <div id="list-campos" style="display: flex; flex-direction: row; gap: 15px">
+                    <select name="proyectos[]" multiple="multiple" id="proyect-user" style="width: 100%" class="users_proyect" name="state">
+
+                    </select>
+                    <button id="update-asigned-form" class="btn-add">Agregar</button>
+                </div>
+
+                <span class="route" style="margin-bottom: 0px !important">
+                    Proyectos asignados
+                </span>
+                <div class="listUsuarios">
+                    <div class="main-datatable">
+                        <div class="overflow-x">
+                            <table style="width:100% !important;" id="proyectsAsigned"
+                                class="table cust-datatable dataTable no-footer">
+                                <thead>
+                                    <tr>
+                                        <th style="min-width:30px;"># id</th>
+                                        <th style="min-width:80px;">Cliente asignado</th>
+                                        <th style="min-width:80px;">Asignado</th>
+                                        <th style="min-width:80px;">Acciones</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-input buttons-modal">
                     <button id="cancel-form-asigned" class="btn-cancel">Cancelar</button>
@@ -250,6 +283,9 @@ session_start();
 <script src="../../js/jquery.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
 <script src="../../components/sidebar.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="../../js/dinamic/gestion_usuarios_admin.js"></script>
 
 </html>
+<?php }?>

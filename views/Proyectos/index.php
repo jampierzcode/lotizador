@@ -1,8 +1,8 @@
 <?php
 
 session_start();
-if (empty($_SESSION["id_usuario"])) {
-    header("Location: ../index.php");
+if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 1) {
+    header("Location: ../../index.php");
 } else {
 ?>
 <!DOCTYPE html>
@@ -48,22 +48,41 @@ if (empty($_SESSION["id_usuario"])) {
                 <div class="close-modal">
                     <ion-icon name="close-circle-outline"></ion-icon>
                 </div>
-                <h1 class="title-modal">Asiganr Usuario: </h1>
+                <h1 class="title-modal">Asignar Usuario</h1>
                 <div class="fileProyect">
-                    <p class="text-center w-full">Proyecto:</p>
-                    <p class="text-center" id="nombre_proyecto"></p>
+                    <p class="text-center w-full">Proyecto: <span id="nombre_proyecto"></span></p>
                 </div>
-                <div id="list-campos" style="display: flex; flex-direction: column; gap: 15px">
-                    <select id="user-proyect" class="users_proyect" name="state">
+                <div id="list-campos" style="display: flex; flex-direction: row; gap: 15px">
+                    <select id="user-proyect" style="width: 100%" class="users_proyect" name="state">
 
                     </select>
+                    <button id="update-asigned-form" class="btn-add">Agregar</button>
                 </div>
-                <div class="mt-4">
-                    <h4>Usuarios Registrados</h4>
+
+                <span class="route" style="margin-bottom: 0px !important">
+                    Usuarios Registrados
+                </span>
+                <div class="listUsuarios">
+                    <div class="main-datatable">
+                        <div class="overflow-x">
+                            <table style="width:100% !important;" id="usersASigneds"
+                                class="table cust-datatable dataTable no-footer">
+                                <thead>
+                                    <tr>
+                                        <th style="min-width:30px;"># id</th>
+                                        <th style="min-width:80px;">Cliente asignado</th>
+                                        <th style="min-width:80px;">Asignado</th>
+                                        <th style="min-width:80px;">Acciones</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
                 </div>
+
+
                 <div class="card-input buttons-modal">
                     <button id="cancel-form-asigned" class="btn-cancel">Cancelar</button>
-                    <button id="update-asigned-form" class="btn-create">Actualizar</button>
                 </div>
                 <!-- </form> -->
             </div>

@@ -1,5 +1,8 @@
 <?php
-session_start()
+session_start();
+if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 1) {
+    header("Location: ../../../index.php");
+} else {
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -139,3 +142,4 @@ session_start()
 </body>
 
 </html>
+<?php }?>

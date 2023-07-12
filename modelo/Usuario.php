@@ -22,9 +22,23 @@ class Usuario
         $this->datos = $query->fetchAll(); // retorna objetos o no
         return $this->datos;
     }
+    function view_creador_permiso($creador)
+    {
+        $sql = "SELECT
+        CASE WHEN EXISTS (
+            SELECT 1
+            FROM permisos
+            WHERE id_servicio = 3
+            AND id_usuario = :id_usuario
+        ) THEN 'SI' ELSE 'NO' END AS service_crm";
+        $query = $this->conexion->prepare($sql);
+        $query->execute(array(':id_usuario' => $creador));
+        $this->datos = $query->fetchAll(); // retorna objetos o no
+        return $this->datos;
+    }
     function Loguearse($username, $password)
     {
-        $sql = "SELECT id_usuario, nombre, apellido, usuarioRol as tipo FROM usuario WHERE user=:username and password=:password";
+        $sql = "SELECT id_usuario, nombre, apellido, createdBy as creator, usuarioRol as tipo FROM usuario WHERE user=:username and password=:password";
         $query = $this->conexion->prepare($sql);
         $query->execute(array(':username' => $username, ':password' => $password));
         $this->datos = $query->fetchAll(); // retorna objetos o no
@@ -34,7 +48,7 @@ class Usuario
     {
         $sql = "SELECT count(*) as proyectos, (SELECT count(*) FROM usuario WHERE usuario.createdBy=:id_usuario) as asesores FROM user_proyect where user_proyect.user_id=:id_usuario";
         $query = $this->conexion->prepare($sql);
-        $query->execute(array(":id_usuario"=>$id_usuario));
+        $query->execute(array(":id_usuario" => $id_usuario));
         $this->datos = $query->fetchAll();
         // $this->datos = $query->fetchColumn();
         if (!empty($this->datos)) {
@@ -77,7 +91,7 @@ class Usuario
     {
         $sql = "SELECT id_usuario, nombre, apellido, dni, correo, phone_number, user, usuarioStatus as status FROM usuario WHERE createdBy=:id_usuario";
         $query = $this->conexion->prepare($sql);
-        $query->execute(array(":id_usuario"=>$id_usuario));
+        $query->execute(array(":id_usuario" => $id_usuario));
         $this->datos = $query->fetchAll(); // retorna objetos o no
         if (!empty($this->datos)) {
 
@@ -92,7 +106,7 @@ class Usuario
         $sql = "SELECT usuario.id_usuario, CONCAT(usuario.nombre, ' ', usuario.apellido) as nombres, IFNULL(visitas.numero_visitas, 0) AS numero_visitas
         FROM usuario LEFT JOIN visitas ON usuario.id_usuario = visitas.agente_id WHERE usuario.usuarioRol=3 AND usuario.createdBy=:id_usuario";
         $query = $this->conexion->prepare($sql);
-        $query->execute(array(":id_usuario"=>$id_usuario));
+        $query->execute(array(":id_usuario" => $id_usuario));
         $this->datos = $query->fetchAll(); // retorna objetos o no
         if (!empty($this->datos)) {
 
@@ -121,7 +135,7 @@ class Usuario
     {
         $sql = "SELECT imgUrl as img_url FROM proyectos WHERE id=:id";
         $query = $this->conexion->prepare($sql);
-        $query->execute(array(":id"=>$id));
+        $query->execute(array(":id" => $id));
         $this->datos = $query->fetchAll(); // retorna objetos o no
         if (!empty($this->datos)) {
 
@@ -138,7 +152,7 @@ class Usuario
         $sql = "INSERT INTO lotes(proyectoID, ancho, largo, area, numero, mz_zona, precio, tipo, cordinates, estado ) VALUES (:proyectoID, :ancho, :largo, :area, :numero, :mz_zona, :precio, :tipo, :cordinates, :estado)";
         $query = $this->conexion->prepare($sql);
         try {
-            $query->execute(array(":proyectoID" => $id, ":ancho"=> $loteAncho, ":largo"=>$loteLargo, ":area"=>$loteArea, ":numero"=>$loteNumero,":mz_zona"=>$loteMz, ":precio"=>$lotePrecio, ":tipo"=>$tipo, ":cordinates"=>$coordenadas, ":estado"=>$estado));
+            $query->execute(array(":proyectoID" => $id, ":ancho" => $loteAncho, ":largo" => $loteLargo, ":area" => $loteArea, ":numero" => $loteNumero, ":mz_zona" => $loteMz, ":precio" => $lotePrecio, ":tipo" => $tipo, ":cordinates" => $coordenadas, ":estado" => $estado));
             $this->mensaje = "add-lotes";
             return $this->mensaje;
         } catch (\Throwable $error) {
@@ -147,10 +161,11 @@ class Usuario
         }
     }
 
-function buscar_lotes($id){
-    $sql = "SELECT * FROM lotes WHERE proyectoID=:id";
-    $query = $this->conexion->prepare($sql);
-        $query->execute(array(":id"=>$id));
+    function buscar_lotes($id)
+    {
+        $sql = "SELECT * FROM lotes WHERE proyectoID=:id";
+        $query = $this->conexion->prepare($sql);
+        $query->execute(array(":id" => $id));
         $this->datos = $query->fetchAll(); // retorna objetos o no
         if (!empty($this->datos)) {
 
@@ -158,10 +173,11 @@ function buscar_lotes($id){
         } else {
             $this->mensaje = "no-register";
             return $this->mensaje;
-        }    
-}
-function edit_lote($id, $estado){
-    $sql = "UPDATE lotes SET estado=:estado WHERE id=:id_lote";
+        }
+    }
+    function edit_lote($id, $estado)
+    {
+        $sql = "UPDATE lotes SET estado=:estado WHERE id=:id_lote";
         $query = $this->conexion->prepare($sql);
         try {
             $query->execute(array(":id_lote" => $id, ":estado" => $estado));
@@ -170,15 +186,15 @@ function edit_lote($id, $estado){
         } catch (\Throwable $error) {
             $this->mensaje = "no-update-lote" . $error;
             return $this->mensaje;
-        } 
-}
+        }
+    }
 
     function crear_habitaciones($n_habitacion, $habs_piso, $habs_cat, $caracteristicas)
     {
         $sql = "INSERT INTO habitaciones(n_cuarto, categoria, piso, estado, caracteristicas) VALUES (:n_cuarto, :categoria, :piso, :estado, :caracteristicas)";
         $query = $this->conexion->prepare($sql);
         try {
-            $query->execute(array(":n_cuarto" => $n_habitacion, ":categoria" => $habs_cat, ":piso" => $habs_piso, ":estado" => 1, ":caracteristicas"=>$caracteristicas));
+            $query->execute(array(":n_cuarto" => $n_habitacion, ":categoria" => $habs_cat, ":piso" => $habs_piso, ":estado" => 1, ":caracteristicas" => $caracteristicas));
             $this->mensaje = "add-habs";
             return $this->mensaje;
         } catch (\Throwable $error) {
@@ -191,7 +207,7 @@ function edit_lote($id, $estado){
         $sql = "INSERT INTO proyectos(nombreProyecto, imgUrl, cantLotes, createdBy, proyectStatus) VALUES (:nombre, :img, :lotes, :created, :status)";
         $query = $this->conexion->prepare($sql);
         try {
-            $query->execute(array(":nombre" => $proyecto_nombre, ":img"=>$galeria, ":lotes"=> $proyecto_lotes, ":created"=>$created, ":status"=> "CREADA"));
+            $query->execute(array(":nombre" => $proyecto_nombre, ":img" => $galeria, ":lotes" => $proyecto_lotes, ":created" => $created, ":status" => "CREADA"));
             $this->mensaje = "add-proyecto";
             return $this->mensaje;
         } catch (\Throwable $error) {
@@ -204,7 +220,7 @@ function edit_lote($id, $estado){
         $sql = "UPDATE usuario SET nombre=:nombre, apellido=:apellido, dni=:dni, correo=:correo, phone_number=:phone_number WHERE id_usuario=:id_usuario";
         $query = $this->conexion->prepare($sql);
         try {
-            $query->execute(array(":nombre" => $nombres, ":apellido"=>$apellidos, ":dni"=>$documento, ":correo"=>$correo, ':phone_number'=> $phone, ":id_usuario"=>$id));
+            $query->execute(array(":nombre" => $nombres, ":apellido" => $apellidos, ":dni" => $documento, ":correo" => $correo, ':phone_number' => $phone, ":id_usuario" => $id));
             $this->mensaje = "update-usuario";
             return $this->mensaje;
         } catch (\Throwable $error) {
@@ -217,11 +233,24 @@ function edit_lote($id, $estado){
         $sql = "INSERT INTO user_proyect(user_id, proyecto_id) VALUES (:user_id, :proyecto_id)";
         $query = $this->conexion->prepare($sql);
         try {
-            $query->execute(array(":user_id" => $id_user, ":proyecto_id"=>$id_proyecto));
+            $query->execute(array(":user_id" => $id_user, ":proyecto_id" => $id_proyecto));
             $this->mensaje = "user-asigned";
             return $this->mensaje;
         } catch (\Throwable $error) {
             $this->mensaje = "no-user-signed" . $error;
+            return $this->mensaje;
+        }
+    }
+    function remove_user_proyecto($id_proyecto, $id_usuario)
+    {
+        $sql = "DELETE FROM user_proyect WHERE user_id = :user_id AND proyecto_id = :proyecto_id";
+        $query = $this->conexion->prepare($sql);
+        try {
+            $query->execute(array(":user_id" => $id_usuario, ":proyecto_id" => $id_proyecto));
+            $this->mensaje = "remove-asigned";
+            return $this->mensaje;
+        } catch (\Throwable $error) {
+            $this->mensaje = "no-remove-asigned" . $error;
             return $this->mensaje;
         }
     }
@@ -230,11 +259,29 @@ function edit_lote($id, $estado){
         $sql = "DELETE FROM usuario WHERE id_usuario=:id_usuario";
         $query = $this->conexion->prepare($sql);
         try {
-            $query->execute(array(":id_usuario"=>$id));
+            $query->execute(array(":id_usuario" => $id));
             $this->mensaje = "delete-usuario";
             return $this->mensaje;
         } catch (\Throwable $error) {
             $this->mensaje = "no-delete-usuario" . $error;
+            return $this->mensaje;
+        }
+    }
+    function removed_proyecto($id_proyect)
+    {
+        $sql = "DELETE FROM proyectos
+        WHERE id = :proyecto_id;
+        
+        DELETE FROM lotes
+        WHERE proyectoID = :proyecto_id;
+        DELETE FROM user_proyect WHERE proyecto_id = :proyecto_id";
+        $query = $this->conexion->prepare($sql);
+        try {
+            $query->execute(array(":proyecto_id" => $id_proyect));
+            $this->mensaje = "delete-proyect";
+            return $this->mensaje;
+        } catch (\Throwable $error) {
+            $this->mensaje = "no-delete-proyect" . $error;
             return $this->mensaje;
         }
     }
@@ -284,7 +331,7 @@ function edit_lote($id, $estado){
         return $this->mensaje;
     }
 
-    
+
 
     function buscar_proyectos()
     {
@@ -317,11 +364,16 @@ function edit_lote($id, $estado){
     // }
     function buscar_proyectos_user($id_usuario)
     {
-        try{
+        try {
             # code...
-            $sql = "SELECT PRO.id, PRO.nombreProyecto as nombre_proyecto, USPRO.user_id as id_agente, USER.phone_number FROM user_proyect as USPRO inner join usuario as USER on USPRO.user_id=USER.id_usuario inner join proyectos as PRO on USPRO.proyecto_id=PRO.id WHERE USPRO.user_id=:id_usuario";
+            $sql = "SELECT PROYECTO.id, PROYECTO.nombreProyecto AS proyecto_nombre, CASE WHEN PROUSER.user_id IS NULL THEN 'No asignado' ELSE 'Asignado' END AS asignado_usuario
+            FROM proyectos AS PROYECTO
+            LEFT JOIN (SELECT * FROM user_proyect WHERE user_id = :id) AS PROUSER ON PROUSER.proyecto_id = PROYECTO.id
+            INNER JOIN user_proyect AS USRPROY ON USRPROY.proyecto_id = PROYECTO.id
+            WHERE USRPROY.user_id = :id_creator;
+            ";
             $query = $this->conexion->prepare($sql);
-            $query->execute(array(":id_usuario" =>$id_usuario));
+            $query->execute(array(":id" => $id_usuario, ":id_creator" => $_SESSION['id_usuario']));
             $this->datos = $query->fetchAll(); // retorna objetos o no
             if (!empty($this->datos)) {
                 return $this->datos;
@@ -329,10 +381,67 @@ function edit_lote($id, $estado){
                 $this->mensaje = "no-register";
                 return $this->mensaje;
             }
-        }catch(\Throwable $error){
+        } catch (\Throwable $error) {
             $this->mensaje = "no-proyectos" . $error;
             return $this->mensaje;
-        }         
+        }
+    }
+    function buscar_asesor_cliente($id_usuario)
+    {
+        try {
+            # code...
+            $sql = "SELECT
+            USUARIO.id_usuario AS usuario_id,
+            USUARIO.nombre AS asesor_nombre,
+            USUARIO.apellido AS asesor_apellido,
+            CASE
+                WHEN USRCLIENTE.cliente_id IS NULL THEN 'No asignado'
+                ELSE 'Asignado'
+            END AS asignado_usuario
+        FROM
+            usuario AS USUARIO
+            LEFT JOIN (
+                SELECT *
+                FROM user_cliente
+                WHERE cliente_id = :id
+            ) AS USRCLIENTE ON USUARIO.id_usuario = USRCLIENTE.user_id
+        WHERE
+            USUARIO.usuarioRol = 3
+            AND USUARIO.createdBy = :created_by_user_id;
+        
+            ";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":id" => $id_usuario, ":created_by_user_id" => $_SESSION["id_usuario"]));
+            $this->datos = $query->fetchAll(); // retorna objetos o no
+            if (!empty($this->datos)) {
+                return $this->datos;
+            } else {
+                $this->mensaje = "no-register";
+                return $this->mensaje;
+            }
+        } catch (\Throwable $error) {
+            $this->mensaje = "no-proyectos" . $error;
+            return $this->mensaje;
+        }
+    }
+    function buscar_proyectos_agentes($id_usuario)
+    {
+        try {
+            # code...
+            $sql = "SELECT PRO.id, PRO.nombreProyecto as nombre_proyecto, USPRO.user_id as id_agente, USER.phone_number FROM user_proyect as USPRO inner join usuario as USER on USPRO.user_id=USER.id_usuario inner join proyectos as PRO on USPRO.proyecto_id=PRO.id WHERE USPRO.user_id=:id_usuario";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":id_usuario" => $id_usuario));
+            $this->datos = $query->fetchAll(); // retorna objetos o no
+            if (!empty($this->datos)) {
+                return $this->datos;
+            } else {
+                $this->mensaje = "no-register";
+                return $this->mensaje;
+            }
+        } catch (\Throwable $error) {
+            $this->mensaje = "no-proyectos" . $error;
+            return $this->mensaje;
+        }
     }
     // function buscar_proyectos()
     // {
@@ -351,7 +460,7 @@ function edit_lote($id, $estado){
     {
         $sql = "SELECT PRO.id, PRO.nombreProyecto as nombre_proyecto, PRO.imgUrl as img_url, PRO.proyectStatus as proyect_status, USER.nombre as cliente_nombre, USER.apellido as cliente_apellido FROM user_proyect as USPRO inner join proyectos as PRO on USPRO.proyecto_id=PRO.id inner join usuario as USER on USPRO.user_id=USER.id_usuario WHERE USPRO.user_id=:id";
         $query = $this->conexion->prepare($sql);
-        $query->execute(array(":id"=>$_SESSION["id_usuario"]));
+        $query->execute(array(":id" => $_SESSION["id_usuario"]));
         $this->datos = $query->fetchAll(); // retorna objetos o no
         if (!empty($this->datos)) {
             return $this->datos;
@@ -362,9 +471,10 @@ function edit_lote($id, $estado){
     }
     function buscar_user_proyect($id_proyecto)
     {
-        $sql = "SELECT CLIENTE.usuarioRol as rol, CLIENTE.nombre as cliente_nombre, CLIENTE.apellido as cliente_apellido FROM user_proyect as PROUSER inner join usuario as CLIENTE on PROUSER.user_id=CLIENTE.id_usuario  inner join proyectos as PRO on PROUSER.proyecto_id=PRO.id WHERE PRO.id=:id";
+        $sql = "SELECT CLIENTE.id_usuario, CLIENTE.usuarioRol AS rol, CLIENTE.nombre AS cliente_nombre, CLIENTE.apellido AS cliente_apellido, CASE WHEN PROUSER.user_id IS NULL THEN 'No asignado' ELSE 'Asignado' END AS asignado_proyecto FROM usuario AS CLIENTE LEFT JOIN (SELECT * FROM user_proyect WHERE proyecto_id = :id) AS PROUSER ON PROUSER.user_id = CLIENTE.id_usuario WHERE CLIENTE.UsuarioRol = 2;
+      ";
         $query = $this->conexion->prepare($sql);
-        $query->execute(array(":id"=>$id_proyecto));
+        $query->execute(array(":id" => $id_proyecto));
         $this->datos = $query->fetchAll(); // retorna objetos o no
         if (!empty($this->datos)) {
             return $this->datos;
@@ -547,27 +657,20 @@ function edit_lote($id, $estado){
             return $this->mensaje;
         }
     }
-    function add_cliente($documento_tipo, $documento, $nombres)
+    function add_cliente($resultado, $proyect_id, $created_by)
     {
-        $sql = "SELECT id_cliente, nombres, documento FROM cliente WHERE documento=:documento";
-        $query = $this->conexion->prepare($sql);
-        $query->execute(array(":documento" => $documento));
-        $this->datos = $query->fetchAll(); // retorna objetos o no
-        if (!empty($this->datos)) {
-
-            $this->mensaje = "Existe el cliente";
-            return $this->mensaje;
-        } else {
-            try {
-                $sql = "INSERT INTO cliente(nombres, tipo_documento, documento) VALUES(:nombres, :tipo_documento, :documento)";
+        try {
+            foreach ($resultado as $dato) {
+                # code...
+                $sql = "INSERT INTO cliente(nombres, apellidos, documento, correo, celular, telefono, Pais, createdBy, origen, campania, ciudad, proyet_id, status) VALUES(:nombres, :apellidos, :documento, :correo, :celular, :telefono, :Pais, :createdBy, :origen, :campania, :ciudad, :proyet_id, :status)";
                 $query = $this->conexion->prepare($sql);
-                $query->execute(array(":nombres" => $nombres, ":tipo_documento" => $documento_tipo, ":documento" => $documento));
-                $this->mensaje = "add-cliente";
-                return $this->mensaje;
-            } catch (\Throwable $error) {
-                $this->mensaje = "no-add-cliente" . $error;
-                return $this->mensaje;
+                $query->execute(array(":nombres" => $dato["nombre"], ":apellidos" => $dato["apellido"], ":documento" => $dato["documento"], ":correo" => $dato["correo"], ":celular" => $dato["celular"], ":telefono" => $dato["telefono"], ":Pais" => $dato["Pais"], ":origen" => $dato["origen"], ":campania" => $dato["campaña"], ":ciudad" => $dato["ciudad"], ":proyet_id" => $proyect_id, ":createdBy" => $created_by, ":status" => "NO CONTACTADO"));
             }
+            $this->mensaje = "add-cliente";
+            return $this->mensaje;
+        } catch (\Throwable $error) {
+            $this->mensaje = "no-add-cliente" . $error;
+            return $this->mensaje;
         }
     }
     function add_user($user, $documento, $nombres, $apellidos, $correo, $username, $password)
@@ -585,9 +688,11 @@ function edit_lote($id, $estado){
                 $this->conexion->beginTransaction();
                 $sql = "INSERT INTO usuario(nombre, apellido, dni, correo, user, password, usuarioRol, createdBy, usuarioStatus) VALUES(:nombre, :apellido, :dni, :correo, :username, :password, :usuarioRol, :createdBy, :usuarioStatus)";
                 $query = $this->conexion->prepare($sql);
-                $query->execute(array(":nombre" =>$nombres, ':apellido'=>$apellidos, ':dni'=>$documento, ':correo'=>$correo, ":username"=>$username, ":password"=>$password,
-                ":usuarioRol"=>2, ":createdBy"=>$user, ":usuarioStatus"=>true));
-                
+                $query->execute(array(
+                    ":nombre" => $nombres, ':apellido' => $apellidos, ':dni' => $documento, ':correo' => $correo, ":username" => $username, ":password" => $password,
+                    ":usuarioRol" => 2, ":createdBy" => $user, ":usuarioStatus" => true
+                ));
+
                 $usuarioId = $this->conexion->lastInsertId(); // Obtener el ID del usuario insertado
 
                 $this->conexion->commit(); // Confirmar la transacción
@@ -614,8 +719,10 @@ function edit_lote($id, $estado){
             try {
                 $sql = "INSERT INTO usuario(nombre, apellido, dni, correo, phone_number, user, password, usuarioRol, createdBy, usuarioStatus) VALUES(:nombre, :apellido, :dni, :correo, :phone_number, :username, :password, :usuarioRol, :createdBy, :usuarioStatus)";
                 $query = $this->conexion->prepare($sql);
-                $query->execute(array(":nombre" =>$nombres, ':apellido'=>$apellidos, ':dni'=>$documento, ':correo'=>$correo, ':phone_number'=>$phone, ":username"=>$username, ":password"=>$password,
-                ":usuarioRol"=>3, ":createdBy"=>$user, ":usuarioStatus"=>true)); // Confirmar la transacción
+                $query->execute(array(
+                    ":nombre" => $nombres, ':apellido' => $apellidos, ':dni' => $documento, ':correo' => $correo, ':phone_number' => $phone, ":username" => $username, ":password" => $password,
+                    ":usuarioRol" => 3, ":createdBy" => $user, ":usuarioStatus" => true
+                )); // Confirmar la transacción
 
                 $this->mensaje = "add-user-asesor";
                 return $this->mensaje;
@@ -625,37 +732,90 @@ function edit_lote($id, $estado){
             }
         }
     }
-    function add_permisos($id_usuario, $permisos){
+    function seguimiento_cliente($usuario, $cliente, $observacion, $status, $fecha, $hora)
+    {
+        try {
+            # code...
+            $sql = "INSERT INTO registro_contact(user_id, cliente_id, observacion, status, fecha_register, hora_register) VALUES (:user_id, :cliente_id, :observacion, :status, :fecha_register, :hora_register)";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":user_id" => $usuario, ":cliente_id" => $cliente, ":observacion" => $observacion, ":status" => $status, ":fecha_register" => $fecha, ":hora_register" => $hora));
+
+            // modificando el status de cliente
+            $sql = "UPDATE cliente SET status=:status WHERE id_cliente=:id_cliente";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":id_cliente" => $cliente, ":status" => $status));
+
+            $this->mensaje = "add-register-contact";
+            return $this->mensaje;
+        } catch (\Throwable $error) {
+            $this->mensaje = "no-register-contact" . $error;
+            return $this->mensaje;
+        }
+    }
+    function buscar_historial_seguimiento($cliente)
+    {
+        try {
+            # code...
+            $sql = "SELECT * FROM registro_contact WHERE cliente_id=:id_cliente";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":id_cliente" => $cliente));
+            $this->datos = $query->fetchAll(); // retorna objetos o no
+            if (!empty($this->datos)) {
+                return $this->datos;
+            } else {
+                $this->mensaje = "no-data";
+                return $this->mensaje;
+            }
+        } catch (\Throwable $error) {
+            $this->mensaje = $error;
+            return $this->mensaje;
+        }
+    }
+    function add_permisos($id_usuario, $permisos)
+    {
         foreach ($permisos as $permiso) {
-            try{
+            try {
                 # code...
                 $sql = "INSERT INTO permisos(id_usuario, id_servicio) VALUES (:id_usuario, :id_servicio)";
                 $query = $this->conexion->prepare($sql);
-                $query->execute(array(":id_usuario" =>$id_usuario, ':id_servicio'=>$permiso));
-            }catch(\Throwable $error){
+                $query->execute(array(":id_usuario" => $id_usuario, ':id_servicio' => $permiso));
+            } catch (\Throwable $error) {
                 $this->mensaje = "no-add-services" . $error;
                 return $this->mensaje;
-            }            
+            }
         }
         $this->mensaje = "add-services";
         return $this->mensaje;
-
     }
-    function add_user_proyect($id_usuario, $proyectos){
+    function add_user_proyect($id_usuario, $proyectos)
+    {
         foreach ($proyectos as $proyecto) {
-            try{
+            try {
                 # code...
                 $sql = "INSERT INTO user_proyect(user_id, proyecto_id) VALUES (:id_usuario, :id_proyecto)";
                 $query = $this->conexion->prepare($sql);
-                $query->execute(array(":id_usuario" =>$id_usuario, ':id_proyecto'=>$proyecto));
-            }catch(\Throwable $error){
+                $query->execute(array(":id_usuario" => $id_usuario, ':id_proyecto' => $proyecto));
+            } catch (\Throwable $error) {
                 $this->mensaje = "no-add-proyectos" . $error;
                 return $this->mensaje;
-            }            
+            }
         }
         $this->mensaje = "add-user-proyects";
         return $this->mensaje;
-
+    }
+    function add_user_cliente($id_cliente, $asesor)
+    {
+        try {
+            # code...
+            $sql = "INSERT INTO user_cliente(user_id, cliente_id) VALUES (:id_usuario, :id_cliente)";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":id_usuario" => $asesor, ':id_cliente' => $id_cliente));
+            $this->mensaje = "add-user-cliente";
+            return $this->mensaje;
+        } catch (\Throwable $error) {
+            $this->mensaje = "no-add-proyectos" . $error;
+            return $this->mensaje;
+        }
     }
     function borrar_cliente($id_cliente)
     {
@@ -675,9 +835,44 @@ function edit_lote($id, $estado){
     function buscar_clientes()
     {
         try {
-            $sql = "SELECT * FROM cliente";
+            $sql = "SELECT
+            CLIENTE.*,
+            CASE WHEN USRCLIENTE.user_id IS NULL THEN 'No asignado' ELSE CONCAT(USUARIO.nombre, ' ', USUARIO.apellido) END AS asignado_usuario,
+            PROYECTO.nombreProyecto AS nombre_proyecto
+        FROM
+            cliente AS CLIENTE
+            LEFT JOIN user_cliente AS USRCLIENTE ON USRCLIENTE.cliente_id = CLIENTE.id_cliente
+            LEFT JOIN usuario AS USUARIO ON USUARIO.id_usuario = USRCLIENTE.user_id
+            LEFT JOIN proyectos AS PROYECTO ON PROYECTO.id = CLIENTE.proyet_id
+        ";
             $query = $this->conexion->prepare($sql);
             $query->execute();
+            $this->datos = $query->fetchAll(); // retorna objetos o no
+            if (!empty($this->datos)) {
+                return $this->datos;
+            } else {
+                $this->mensaje = "no-register-clientes";
+                return $this->mensaje;
+            }
+        } catch (\Throwable $error) {
+            $this->mensaje = "fatal_error";
+            return $this->mensaje;
+            //throw $th;
+        }
+    }
+    function buscar_clientes_by_asesor($id_usuario)
+    {
+        try {
+            $sql = "SELECT c.*, p.nombreProyecto AS nombre_proyecto
+            FROM usuario u
+            JOIN user_cliente uc ON u.id_usuario = uc.user_id
+            JOIN cliente c ON uc.cliente_id = c.id_cliente
+            LEFT JOIN proyectos p ON c.proyet_id = p.id
+            WHERE u.id_usuario = :id_usuario
+            AND u.usuarioRol = 3;
+            ";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":id_usuario" => $id_usuario));
             $this->datos = $query->fetchAll(); // retorna objetos o no
             if (!empty($this->datos)) {
                 return $this->datos;

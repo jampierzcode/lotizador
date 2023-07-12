@@ -159,6 +159,10 @@ tr {
   color: #0a0a0a;
   border: 2px solid #ececec;
 }
+.btnLotes.success {
+  background: #018c50;
+  color: #fff;
+}
 
 table th {
   background: rgb(244, 246, 248) !important;

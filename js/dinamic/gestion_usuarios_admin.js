@@ -86,32 +86,25 @@ $(document).ready(function () {
     );
   }
   // buscar proeyectos
-  function buscar_proyectos() {
-    let funcion = "buscar_proyectos_user";
-    $.post(
-      "../../controlador/UsuarioController.php",
-      { funcion },
-      (response) => {
-        console.log(response);
-        let template = "";
-        if (response.trim() === "no-register") {
-          template += "No hay registros";
-        } else {
-          const proyectos = JSON.parse(response);
-          proyectos.forEach((proyecto) => {
-            template += `
-            <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="${proyecto.id}" id="check-${proyecto.nombreProyecto}">
-            <label class="form-check-label" for="check-${proyecto.nombreProyecto}">
-                ${proyecto.nombreProyecto}
-            </label>
-        </div>
-            `;
-          });
-          $("#listProyectos").html(template);
+  function buscar_proyectos(id_cliente) {
+    return new Promise((resolve, reject) => {
+      let funcion = "buscar_proyectos_user";
+      $.post(
+        "../../controlador/UsuarioController.php",
+        { funcion, id_cliente },
+        (response) => {
+          console.log(response);
+          if (response.trim() == "no-register") {
+            resolve(null);
+          } else {
+            const proyects = JSON.parse(response);
+            resolve(proyects);
+          }
         }
-      }
-    );
+      ).fail((error) => {
+        reject(error);
+      });
+    });
   }
 
   //   CREATE usuarios
@@ -254,7 +247,48 @@ $(document).ready(function () {
       alert(template);
     }
   });
+  var datatablesProyects = $("#proyectsAsigned").DataTable({
+    pageLength: 5,
+    aoColumnDefs: [
+      {
+        bSortable: false,
+        aTargets: ["nosort"],
+      },
+    ],
+    columns: [
+      { data: "id" },
+      {
+        data: null,
+        render: function (data) {
+          return `
+        <p>${data.nombreProyecto}</p>
+        `;
+        },
+      },
+      { data: "asignado_usuario" },
+      {
+        data: null,
+        render: function (data, type, row) {
+          return `
+          <div class="flex-actions">
+          <div class="dropdown">
+            <button class="btnJsvm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <ion-icon aria-label="Favorite" aria-hidden="true" name="ellipsis-vertical-outline"></ion-icon>
+            </button>
+            <ul class="dropdown-menu">
+              <li><button class="dropdown-item" id="no-asigned_user" key_proyect=${data.id}>- Quitar usuario</button></li>
+              </ul>
+          </div>
+          </div>
 
+          `;
+        },
+      },
+    ],
+    order: false,
+    bLengthChange: false,
+    dom: '<"top">ct<"top"p><"clear">',
+  });
   // REMOVE PRODUCTOS
   $(document).on("click", "#remove_usuario", function () {
     let id_cliente = $(this).attr("key_user");
@@ -355,7 +389,7 @@ $(document).ready(function () {
   });
 
   // ASIGNAR PROYECTOS
-  $(document).on("click", "#asigned_proyect", function () {
+  $(document).on("click", "#asigned_proyect", async function () {
     let id_cliente = $(this).attr("key_asesor");
     idCliente = id_cliente;
     console.log(id_cliente);
@@ -363,16 +397,54 @@ $(document).ready(function () {
       (elemento) => elemento.id_usuario === id_cliente
     );
     console.log(result);
-    buscar_proyectos();
+    //
+    try {
+      const proyectos = await buscar_proyectos(id_cliente);
+      console.log(proyectos);
+      let template;
+      // let template = `<option value="" selected></option>`;
+      let proyectsAsigned = [];
+      proyectos.forEach((proyect) => {
+        let option = `<option value=${proyect.id}>${proyect.nombreProyecto}</option>`;
+        if (proyect.asignado_usuario === "Asignado") {
+          proyectsAsigned.push(proyect);
+          option = `<option value=${proyect.id} disabled>${proyect.nombreProyecto}</option>`;
+        }
+        template += option;
+      });
+      datatablesProyects.clear().rows.add(proyectsAsigned).draw();
+
+      $(".users_proyect").html(template);
+      $(".users_proyect").select2({
+        allowClear: true,
+        placeholder: "Selecciona un Proyecto",
+      });
+
+      $("#nombre_user").html(
+        result.nombre +
+          " " +
+          (result.apellido !== "" && result.apellido !== null
+            ? result.apellido
+            : "")
+      );
+      $("#modal-asigned").removeClass("md-hidden");
+      setTimeout(function () {
+        $("#modal-asigned .form-create").addClass("modal-show");
+      }, 10);
+    } catch (error) {
+      console.log(error);
+    }
+    //
     $("#asigned_proyects").removeClass("md-hidden");
     setTimeout(function () {
       $("#asigned_proyects .form-create").addClass("modal-show");
     }, 10);
   });
-  $("#add-asigned_proyect").click(() => {
+  $("#update-asigned-form").click(() => {
     funcion = "add_user_proyect";
-    let proyectos = selectedValues;
+    let proyectos = $("#proyect-user").val();
     const id = idCliente;
+
     console.log(proyectos);
     console.log(idCliente);
     $.post(

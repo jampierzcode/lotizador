@@ -34,6 +34,7 @@ $(document).ready(function () {
           return `
           <div class="flex-actions">
           <a target="_blank" href="lotizador?id=${data.id}" class="btnLotes"> Ver lotes </a>
+          <button target="_blank" keyProyect="https://lotizador.mccompany.pe/views/Lotizador/Clientes/?proyect=${data.id}" id="rutaEnlace" class="btnLotes"> Copiar Link </button>
           
           </div>
 
@@ -64,4 +65,24 @@ $(document).ready(function () {
       }
     );
   }
+  $(document).on("click", "#rutaEnlace", function (event) {
+    event.preventDefault(); // Evita la acción de navegación predeterminada
+
+    // Copiar la ruta al portapapeles
+    var ruta = $(this).attr("keyProyect");
+    navigator.clipboard
+      .writeText(ruta)
+      .then(function () {
+        // alert("La ruta se ha copiado al portapapeles.");
+        $("#rutaEnlace").text("Copiado!");
+        $("#rutaEnlace").addClass("success");
+        setTimeout(function () {
+          $("#rutaEnlace").text("Copiar Link");
+          $("#rutaEnlace").removeClass("success");
+        }, 3000);
+      })
+      .catch(function (error) {
+        console.error("Error al copiar la ruta: ", error);
+      });
+  });
 });
