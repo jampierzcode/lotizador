@@ -1,3 +1,23 @@
+<?php
+// Obtén la URL actual
+$currentUrl = basename($_SERVER['REQUEST_URI']);
+
+// Define los enlaces de tu sidebar con sus respectivas URLs
+$links = [
+    [
+        'url' => '../Dashboard',
+        'icon' => 'pie-chart',
+        'text' => 'Dashboard'
+    ],
+    [
+        'url' => '../crm',
+        'icon' => 'people-sharp',
+        'text' => 'CRM'
+    ],
+    // Agrega más enlaces aquí si es necesario
+];
+
+?>
 <nav class="navbar-dashboard">
     <div class="drop-down-menu">
         <ion-icon name="reorder-three-outline"></ion-icon>
@@ -44,7 +64,7 @@
             <li class="links-menu-dashboard">
                 <div class="link-block">
                     <div class="left-link">
-                        <a class="toggle-drop" href="../Dashboard">
+                        <a class="toggle-drop <?php echo ($currentUrl === "Dashboard") ? ' active-link' : ''; ?>" href="../Dashboard">
                             <ion-icon name="pie-chart"></ion-icon>
                             <p>Dashboard</p>
                         </a>
@@ -58,7 +78,7 @@
                 <li class="links-menu-dashboard">
                     <div class="link-block">
                         <div class="left-link">
-                            <a class="toggle-drop" href="../crm">
+                            <a class="toggle-drop <?php echo ($currentUrl === "crm") ? ' active-link' : ''; ?>" href="../crm">
                                 <ion-icon name="people-sharp"></ion-icon>
                                 <p>CRM</p>
                             </a>

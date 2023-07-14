@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <link
+      href="http://getbootstrap.com/dist/css/bootstrap.css"
+      rel="stylesheet"
+    />
+
+    <link
+      href="https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/fixedcolumns/3.2.2/js/dataTables.fixedColumns.min.js"></script>
+    <link
+      href="https://cdn.datatables.net/fixedcolumns/3.2.2/css/fixedColumns.dataTables.min.css"
+      rel="stylesheet"
+    />
+
+    <table
+      id="example"
+      style="width: 100%"
+      class="table-bordered table-striped"
+    >
+      <thead>
+        <tr>
+          <th rowspan="2">Id</th>
+          <th rowspan="2">
+            <div style="width: 200px !important">Producto</div>
+          </th>
+          <th colspan="6" style="text-align: center">Ventas</th>
+        </tr>
+        <tr>
+          <th>Ene</th>
+          <th>Feb</th>
+          <th>Mar</th>
+          <th>Abr</th>
+          <th>May</th>
+          <th>Jun</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>Producto 1</td>
+          <td>5</td>
+          <td>5</td>
+          <td>5</td>
+          <td>5</td>
+          <td>5</td>
+          <td>5</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Producto 2</td>
+          <td>50</td>
+          <td>54</td>
+          <td>5</td>
+          <td>5</td>
+          <td>87</td>
+          <td>56</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Producto 3</td>
+          <td>6</td>
+          <td>6</td>
+          <td>8</td>
+          <td>5</td>
+          <td>3</td>
+          <td>8</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>Producto 4</td>
+          <td>6</td>
+          <td>6</td>
+          <td>6</td>
+          <td>5</td>
+          <td>6</td>
+          <td>8</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>Producto 5</td>
+          <td>6</td>
+          <td>6</td>
+          <td>6</td>
+          <td>5</td>
+          <td>6</td>
+          <td>8</td>
+        </tr>
+      </tbody>
+    </table>
+    <script>
+      $(document).ready(function () {
+        var table = $("#example").DataTable({
+          scrollY: "160px",
+          scrollX: true,
+          scrollCollapse: true,
+          paging: false,
+          fixedColumns: {
+            leftColumns: 2, //Le indico que deje fijas solo las 2 primeras columnas
+          },
+        });
+      });
+    </script>
+  </body>
+</html>

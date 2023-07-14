@@ -102,7 +102,7 @@ $(document).ready(function () {
   });
   $("body").on("click", "#subirData", function () {
     const asignaciones = [];
-    const valProyect = $("#listMyProyects").val();
+    const proyecto_id = $("#listMyProyects").val();
     let contadorAsignacion = 0;
     $('select[name="etiqueta-field-data"]').each(function () {
       const position = $(this).attr("propPosition");
@@ -144,26 +144,31 @@ $(document).ready(function () {
     console.log(asignaciones);
     console.log(contadorAsignacion);
     if (asignaciones.length === contadorAsignacion) {
-      if (valProyect !== "0") {
+      if (proyecto_id !== "0") {
         let funcion = "add_cliente";
-        $.post(
-          "../../controlador/UsuarioController.php",
-          { funcion, resultado, proyect_id: valProyect },
-          (response) => {
-            console.log(response);
-            if (response.trim() === "no-add-cliente") {
-              alert("Ocurrio un error contacta con el administrador");
-            } else {
-              var urlActual = window.location.href;
+        resultado.forEach((result, index) => {
+          $.post(
+            "../../controlador/UsuarioController.php",
+            { funcion, result, proyecto_id },
+            (response) => {
+              const data = JSON.parse(response);
+              console.log(data);
 
-              // Eliminar la última parte de la URL (la carpeta actual)
-              var urlPadre = urlActual.substring(0, urlActual.lastIndexOf("/"));
-              console.log(urlPadre);
-              // Redireccionar a la carpeta anterior
-              window.location.href = urlPadre;
+              if (data.hasOwnProperty("error")) {
+                // Si la respuesta contiene un mensaje de error, muestra el mensaje
+                alert(data.error);
+              }
             }
-          }
-        );
+          );
+        });
+        alert("Se subieron correctamente todos los datos");
+        var urlActual = window.location.href;
+
+        // Eliminar la última parte de la URL (la carpeta actual)
+        var urlPadre = urlActual.substring(0, urlActual.lastIndexOf("/"));
+        console.log(urlPadre);
+        // Redireccionar a la carpeta anterior
+        window.location.href = urlPadre;
       } else {
         alert("Debes seleccionar un proyecto a donde asignar los clientes");
       }

@@ -5,6 +5,13 @@ $(document).ready(function () {
   buscar_clientes();
   var dataTable = $("#usuariosList").DataTable({
     pageLength: 5,
+    scrollX: true,
+    // scrollCollapse: true,
+    // paging: false,
+    fixedColumns: {
+      leftColumns: 3, //Le indico que deje fijas solo las 2 primeras columnas
+      // rightColumns: 1,
+    },
     aoColumnDefs: [
       {
         bSortable: false,
@@ -145,6 +152,101 @@ $(document).ready(function () {
       }
     );
   }
+  // agregar lead
+  buscar_proyectos();
+  function buscar_proyectos() {
+    funcion = "buscar_proyectos_agentes";
+    $.post(
+      "../../controlador/UsuarioController.php",
+      { funcion },
+      (response) => {
+        let template = "";
+        if (response.trim() == "no-register") {
+          template += `<option value="0">Seleccione un proyecto</option>`;
+        } else {
+          template += `<option value="0">Seleccione un proyecto</option>`;
+          const proyectos = JSON.parse(response);
+          proyectos.forEach((proyecto) => {
+            template += `<option value="${proyecto.id}">${proyecto.nombreProyecto}</option>`;
+          });
+        }
+        $("#proyecto-lead").html(template);
+      }
+    );
+  }
+  $("#modal-lead").click(() => {
+    $("#crear-lead").removeClass("md-hidden");
+    setTimeout(function () {
+      $("#crear-lead .form-create").addClass("modal-show");
+    }, 10);
+  });
+  $("#registerLead").submit((e) => {
+    e.preventDefault();
+    let nombre = $("#nombre-lead").val();
+    let apellido = $("#apellido-lead").val();
+    let documento = $("#documento-lead").val();
+    let celular = $("#celular-lead").val();
+    let telefono = $("#telefono-lead").val();
+    let origen = $("#origen-lead").val();
+    let ciudad = $("#ciudad-lead").val();
+    let pais = $("#pais-lead").val();
+    let campania = $("#campania-lead").val();
+    let correo = $("#email-lead").val();
+    let proyecto_id = $("#proyecto-lead").val();
+    const result = {
+      nombre: nombre,
+      apellido: apellido,
+      documento: documento,
+      correo: correo,
+      celular: celular,
+      telefono: telefono,
+      Pais: pais,
+      origen: origen,
+      campaña: campania,
+      ciudad: ciudad,
+    };
+    console.log(result);
+    if (proyecto_id !== "0") {
+      let funcion = "add_cliente";
+      $.post(
+        "../../controlador/UsuarioController.php",
+        { funcion, result, proyecto_id },
+        (response) => {
+          console.log(response);
+          const data = JSON.parse(response);
+          console.log(data);
+
+          if (data.hasOwnProperty("error")) {
+            // Si la respuesta contiene un mensaje de error, muestra el mensaje
+            alert(data.error);
+          } else {
+            funcion = "add_user_cliente_asesor";
+            alert("se subio correctamente el cliente");
+            let id = data.id;
+            setTimeout(function () {
+              $("#crear-lead .form-create").removeClass("modal-show");
+            }, 1000);
+            $("#crear-lead").addClass("md-hidden");
+            buscar_clientes();
+            $("#nombre-lead").val("");
+            $("#apellido-lead").val("");
+            $("#documento-lead").val("");
+            $("#celular-lead").val("");
+            $("#telefono-lead").val("");
+            $("#origen-lead").val("");
+            $("#ciudad-lead").val("");
+            $("#pais-lead").val("");
+            $("#campania-lead").val("");
+            $("#email-lead").val("");
+            $("#proyecto-lead").val("");
+          }
+        }
+      );
+    } else {
+      alert("Debe seleccionar un proyecto");
+    }
+  });
+
   // asignar clientes
   $(document).on("change", ".cliente-checkbox", function () {
     var clientesSeleccionados = $(".cliente-checkbox:checked").length;

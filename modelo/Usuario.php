@@ -659,18 +659,21 @@ class Usuario
     }
     function add_cliente($resultado, $proyect_id, $created_by)
     {
+        $dato = $resultado;
         try {
-            foreach ($resultado as $dato) {
-                # code...
-                $sql = "INSERT INTO cliente(nombres, apellidos, documento, correo, celular, telefono, Pais, createdBy, origen, campania, ciudad, proyet_id, status) VALUES(:nombres, :apellidos, :documento, :correo, :celular, :telefono, :Pais, :createdBy, :origen, :campania, :ciudad, :proyet_id, :status)";
-                $query = $this->conexion->prepare($sql);
-                $query->execute(array(":nombres" => $dato["nombre"], ":apellidos" => $dato["apellido"], ":documento" => $dato["documento"], ":correo" => $dato["correo"], ":celular" => $dato["celular"], ":telefono" => $dato["telefono"], ":Pais" => $dato["Pais"], ":origen" => $dato["origen"], ":campania" => $dato["campaña"], ":ciudad" => $dato["ciudad"], ":proyet_id" => $proyect_id, ":createdBy" => $created_by, ":status" => "NO CONTACTADO"));
-            }
-            $this->mensaje = "add-cliente";
-            return $this->mensaje;
+            # code...
+            $sql = "INSERT INTO cliente(nombres, apellidos, documento, correo, celular, telefono, Pais, createdBy, origen, campania, ciudad, proyet_id, status) VALUES(:nombres, :apellidos, :documento, :correo, :celular, :telefono, :Pais, :createdBy, :origen, :campania, :ciudad, :proyet_id, :status)";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":nombres" => $dato["nombre"], ":apellidos" => $dato["apellido"], ":documento" => $dato["documento"], ":correo" => $dato["correo"], ":celular" => $dato["celular"], ":telefono" => $dato["telefono"], ":Pais" => $dato["Pais"], ":origen" => $dato["origen"], ":campania" => $dato["campaña"], ":ciudad" => $dato["ciudad"], ":proyet_id" => $proyect_id, ":createdBy" => $created_by, ":status" => "NO CONTACTADO"));
+            // Obtener el ID del cliente insertado
+            $cliente_id = $this->conexion->lastInsertId();
+            // Devolver el ID del cliente como respuesta
+            $response = array("id" => $cliente_id);
+            echo json_encode($response);
         } catch (\Throwable $error) {
-            $this->mensaje = "no-add-cliente" . $error;
-            return $this->mensaje;
+            // Devolver un mensaje de error en caso de excepción
+            $response = array("error" => $error);
+            echo json_encode($response);
         }
     }
     function add_user($user, $documento, $nombres, $apellidos, $correo, $username, $password)
@@ -814,6 +817,20 @@ class Usuario
             return $this->mensaje;
         } catch (\Throwable $error) {
             $this->mensaje = "no-add-proyectos" . $error;
+            return $this->mensaje;
+        }
+    }
+    function delete_cliente_asesor($cliente, $asesor)
+    {
+        try {
+            # code...
+            $sql = "DELETE FROM user_cliente WHERE user_id=:id_usuario AND cliente_id=:id_cliente";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":id_usuario" => $asesor, ':id_cliente' => $cliente));
+            $this->mensaje = "delete-user-cliente";
+            return $this->mensaje;
+        } catch (\Throwable $error) {
+            $this->mensaje = "no-delete-user-cliente" . $error;
             return $this->mensaje;
         }
     }

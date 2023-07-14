@@ -5,7 +5,15 @@ $(document).ready(function () {
   buscar_clientes();
 
   var dataTable = $("#usuariosList").DataTable({
+    // scrollY: "160px",
     pageLength: 5,
+    scrollX: true,
+    // scrollCollapse: true,
+    // paging: false,
+    fixedColumns: {
+      leftColumns: 2, //Le indico que deje fijas solo las 2 primeras columnas
+      // rightColumns: 1,
+    },
     aoColumnDefs: [
       {
         bSortable: false,
@@ -27,7 +35,6 @@ $(document).ready(function () {
       {
         data: null,
         render: function (data, type, row) {
-          console.log(data?.status);
           let template_status = imprimirStatus(data?.status); // Cambiar de const a let
 
           template_status += `
@@ -44,6 +51,7 @@ $(document).ready(function () {
           return `
               <div class="flex-actions">
               <button target="_blank" keyClient="${data?.id}" id="editClient" class="btnJsvm normal"><ion-icon name="create-sharp"></ion-icon></button>
+              <button target="_blank" keyClient="${data?.id}" id="removeClient" class="btnJsvm danger"><ion-icon name="trash"></ion-icon></button>
               <button target="_blank" keyClient="${data?.id}" id="historialCliente" class="btnJsvm normal">Historial</button>
               
               
@@ -58,13 +66,17 @@ $(document).ready(function () {
     bLengthChange: false,
     dom: '<"top">ct<"top"p><"clear">',
   });
+  // Activar columnas fijas
+  // new $.fn.dataTable.FixedColumns(dataTable, {
+  //   leftColumns: 2, // Número de columnas fijas a la izquierda
+  //   rightColumns: 1, // Número de columnas fijas a la derecha
+  // });
   // función de animación
   function animarProgress() {
     let count = 3;
     let total = 10;
     var progressBar = document.querySelector(".progreessbar .barSize");
     $("#numberVisit").html(count);
-    console.log(progressBar);
     progressBar.style.width = `${(count / total) * 100}%`;
   }
 
@@ -78,9 +90,10 @@ $(document).ready(function () {
       "../../controlador/UsuarioController.php",
       { funcion },
       (response) => {
-        let template = "";
+        $("#spin-load").html("");
+        console.log(response);
         if (response.trim() == "no-register-clientes") {
-          template += "<td>No hay registros</td>";
+          dataTable.clear().draw();
         } else {
           const clientes = JSON.parse(response);
           clientesList = clientes;
@@ -110,10 +123,6 @@ $(document).ready(function () {
     idCliente = cliente;
     let funcion = "buscar_historial_seguimiento";
     buscarHistorial(funcion, cliente);
-    $("#historial-event").removeClass("md-hidden");
-    setTimeout(function () {
-      $("#historial-event .form-create").addClass("modal-show");
-    }, 10);
   });
   function buscarHistorial(funcion, cliente) {
     $.post(
@@ -132,20 +141,24 @@ $(document).ready(function () {
           sortedData.forEach((history) => {
             template += `
             <li class="mb-10 ml-4">
-                            <div class="absolute w-3 h-3 bg-gray-200 rounded-full mt-1.5 -left-1.5 border border-white dark:border-gray-900 dark:bg-gray-700"></div>
-                            <time class="mb-1 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">${
-                              history.fecha + " " + history.hora
-                            }</time>
+            <div class="absolute w-3 h-3 bg-gray-200 rounded-full mt-1.5 -left-1.5 border border-white dark:border-gray-900 dark:bg-gray-700"></div>
+            <time class="mb-1 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">${
+              history.fecha + " " + history.hora
+            }</time>
                             <h3 class="flex items-center gap-4 text-lg font-semibold text-gray-900 dark:text-white">Estado Registrado: ${imprimirStatus(
                               history.status
                             )}</h3>
                             <p class="mb-4 text-base font-normal text-gray-500 dark:text-gray-400">${
                               history.observacion
                             }</p>
-                        </li>
-            `;
+                            </li>
+                            `;
           });
           $("#list-historial").html(template);
+          $("#historial-event").removeClass("md-hidden");
+          setTimeout(function () {
+            $("#historial-event .form-create").addClass("modal-show");
+          }, 10);
         }
       }
     );
@@ -198,6 +211,12 @@ $(document).ready(function () {
     return template;
   }
 
+  $("#modal-lead").click(() => {
+    $("#crear-lead").removeClass("md-hidden");
+    setTimeout(function () {
+      $("#crear-lead .form-create").addClass("modal-show");
+    }, 10);
+  });
   $(document).on("click", "#registerSeguimiento", function () {
     let id_cliente = $(this).attr("keyClient");
     idCliente = id_cliente;
@@ -213,6 +232,30 @@ $(document).ready(function () {
 
     // seguimiento_cliente(observacion, id_cliente, status);
   });
+  $(document).on("click", "#removeClient", function () {
+    let id_cliente = $(this).attr("keyClient");
+    idCliente = id_cliente;
+    let funcion = "delete_cliente_asesor";
+    const confirmed = confirm("Estas seguro de archivar al cliente?");
+    if (confirmed) {
+      $.post(
+        "../../controlador/UsuarioController.php",
+        { funcion, id_cliente },
+        (response) => {
+          console.log(response);
+          if (response.trim() === "delete-user-cliente") {
+            alert("Se archivo correctamente");
+            buscar_clientes();
+          } else {
+            alert("Ocurrio un error, contacta al administrador");
+          }
+        }
+      );
+    }
+
+    // seguimiento_cliente(observacion, id_cliente, status);
+  });
+
   $("#registerFormEvento").submit((e) => {
     e.preventDefault();
     let status = $("#status-evento").val();
@@ -227,10 +270,111 @@ $(document).ready(function () {
       $("#observaciones-evento").val("");
       setTimeout(function () {
         $("#crear-event .form-create").removeClass("modal-show");
-      }, 10);
+      }, 1000);
       $("#crear-event").addClass("md-hidden");
     } else {
       showToast();
+    }
+  });
+  // registrar lead indiidual
+  buscar_proyectos();
+  function buscar_proyectos() {
+    funcion = "buscar_proyectos_agentes";
+    $.post(
+      "../../controlador/UsuarioController.php",
+      { funcion },
+      (response) => {
+        let template = "";
+        if (response.trim() == "no-register") {
+          template += `<option value="0">Seleccione un proyecto</option>`;
+        } else {
+          template += `<option value="0">Seleccione un proyecto</option>`;
+          const proyectos = JSON.parse(response);
+          proyectos.forEach((proyecto) => {
+            template += `<option value="${proyecto.id}">${proyecto.nombreProyecto}</option>`;
+          });
+        }
+        $("#proyecto-lead").html(template);
+      }
+    );
+  }
+
+  $("#registerLead").submit((e) => {
+    e.preventDefault();
+    let nombre = $("#nombre-lead").val();
+    let apellido = $("#apellido-lead").val();
+    let documento = $("#documento-lead").val();
+    let celular = $("#celular-lead").val();
+    let telefono = $("#telefono-lead").val();
+    let origen = $("#origen-lead").val();
+    let ciudad = $("#ciudad-lead").val();
+    let pais = $("#pais-lead").val();
+    let campania = $("#campania-lead").val();
+    let correo = $("#email-lead").val();
+    let proyecto_id = $("#proyecto-lead").val();
+    const result = {
+      nombre: nombre,
+      apellido: apellido,
+      documento: documento,
+      correo: correo,
+      celular: celular,
+      telefono: telefono,
+      Pais: pais,
+      origen: origen,
+      campaña: campania,
+      ciudad: ciudad,
+    };
+    console.log(result);
+    if (proyecto_id !== "0") {
+      let funcion = "add_cliente";
+      $.post(
+        "../../controlador/UsuarioController.php",
+        { funcion, result, proyecto_id },
+        (response) => {
+          console.log(response);
+          const data = JSON.parse(response);
+          console.log(data);
+
+          if (data.hasOwnProperty("error")) {
+            // Si la respuesta contiene un mensaje de error, muestra el mensaje
+            alert(data.error);
+          } else {
+            funcion = "add_user_cliente_asesor";
+            alert("se subio correctamente el cliente");
+            let id = data.id;
+            $.post(
+              "../../controlador/UsuarioController.php",
+              { funcion, id },
+              (response) => {
+                console.log(response);
+                if (response.trim() == "add-user-cliente") {
+                  alert("Se asigno cliente al asesor");
+                  setTimeout(function () {
+                    $("#crear-lead .form-create").removeClass("modal-show");
+                  }, 1000);
+                  $("#crear-lead").addClass("md-hidden");
+                  buscar_clientes();
+                  $("#nombre-lead").val("");
+                  $("#apellido-lead").val("");
+                  $("#documento-lead").val("");
+                  $("#celular-lead").val("");
+                  $("#telefono-lead").val("");
+                  $("#origen-lead").val("");
+                  $("#ciudad-lead").val("");
+                  $("#pais-lead").val("");
+                  $("#campania-lead").val("");
+                  $("#email-lead").val("");
+                  $("#proyecto-lead").val("");
+                } else {
+                  alert("No se asigno, contacta al administrador");
+                }
+              }
+            );
+          }
+        }
+      );
+    } else {
+      alert("Debe seleccionar un proyecto");
     }
   });
   const showToast = () => {
@@ -297,6 +441,10 @@ $(document).ready(function () {
     $("#nombres-modal").val("");
     $("#historial-event").addClass("md-hidden");
     $("#historial-event .form-create").removeClass("modal-show");
+  });
+  $("#crear-lead .form-create .close-modal").click(() => {
+    $("#crear-lead").addClass("md-hidden");
+    $("#crear-lead .form-create").removeClass("modal-show");
   });
   // fin de presentation modal
 });

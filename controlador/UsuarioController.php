@@ -126,6 +126,12 @@ if ($_POST["funcion"] == "add_user_cliente") {
     $usuario->add_user_cliente($id_cliente, $asesor);
     echo $usuario->mensaje;
 }
+if ($_POST["funcion"] == "add_user_cliente_asesor") {
+    $asesor = $_SESSION["id_usuario"];
+    $id_cliente = $_POST["id"];
+    $usuario->add_user_cliente($id_cliente, $asesor);
+    echo $usuario->mensaje;
+}
 // fin de seccion usuarios
 
 // SECTION DE RESERVAS
@@ -693,9 +699,16 @@ if ($_POST["funcion"] == "habitacion_limpieza_terminada") {
 // CREAR CLIENTES DESDE RECEPCION
 
 if ($_POST["funcion"] == "add_cliente") {
-    $resultado = $_POST["resultado"];
-    $proyect_id = $_POST["proyect_id"];
+    $resultado = $_POST["result"];
+    $proyect_id = $_POST["proyecto_id"];
     $usuario->add_cliente($resultado, $proyect_id, $_SESSION["id_usuario"]);
+    echo $usuario->mensaje;
+}
+
+if ($_POST["funcion"] == "delete_cliente_asesor") {
+    $cliente = intVal($_POST["id_cliente"]);
+    $asesor = intVal($_SESSION["id_usuario"]);
+    $usuario->delete_cliente_asesor($cliente, $asesor);
     echo $usuario->mensaje;
 }
 // BUSCAR CLIENTES
