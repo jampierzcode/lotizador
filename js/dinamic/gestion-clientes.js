@@ -174,6 +174,27 @@ $(document).ready(function () {
       }
     );
   }
+  // filter cliente
+  $("#cliente-search").on("keyup", function () {
+    var nombre = $(this).val();
+    console.log(clientesList);
+    console.log(nombre);
+    if (nombre !== "") {
+      const result = clientesList.filter(function (persona) {
+        var nombreCompleto = (
+          persona.nombres +
+          " " +
+          persona.apellidos
+        ).toLowerCase();
+        return nombreCompleto.includes(nombre);
+      });
+
+      dataTable.clear().rows.add(result).draw();
+    } else {
+      dataTable.clear().rows.add(clientesList).draw();
+    }
+  });
+
   $("#modal-lead").click(() => {
     $("#crear-lead").removeClass("md-hidden");
     setTimeout(function () {

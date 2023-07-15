@@ -91,7 +91,6 @@ $(document).ready(function () {
       { funcion },
       (response) => {
         $("#spin-load").html("");
-        console.log(response);
         if (response.trim() == "no-register-clientes") {
           dataTable.clear().draw();
         } else {
@@ -424,6 +423,27 @@ $(document).ready(function () {
       }
     );
   }
+
+  // filter cliente
+  $("#cliente-search").on("keyup", function () {
+    var nombre = $(this).val();
+    console.log(clientesList);
+    console.log(nombre);
+    if (nombre !== "") {
+      const result = clientesList.filter(function (persona) {
+        var nombreCompleto = (
+          persona.nombres +
+          " " +
+          persona.apellidos
+        ).toLowerCase();
+        return nombreCompleto.includes(nombre);
+      });
+
+      dataTable.clear().rows.add(result).draw();
+    } else {
+      dataTable.clear().rows.add(clientesList).draw();
+    }
+  });
 
   // FIN DE MODAL ASIGNES
   $("#crear-event .form-create .close-modal").click(() => {
