@@ -432,12 +432,12 @@ class Usuario
             $query = $this->conexion->prepare($sql);
             $query->execute(array(":id_usuario" => $id_usuario));
             $this->datos = $query->fetchAll(); // retorna objetos o no
-            if (!empty($this->datos)) {
-                return $this->datos;
-            } else {
-                $this->mensaje = "no-register";
-                return $this->mensaje;
-            }
+            // if (!empty($this->datos)) {
+            return $this->datos;
+            // } else {
+            //     $this->mensaje = "no-register";
+            //     return $this->mensaje;
+            // }
         } catch (\Throwable $error) {
             $this->mensaje = "no-proyectos" . $error;
             return $this->mensaje;
@@ -665,6 +665,25 @@ class Usuario
             $sql = "INSERT INTO cliente(nombres, apellidos, documento, correo, celular, telefono, Pais, createdBy, origen, campania, ciudad, proyet_id, status) VALUES(:nombres, :apellidos, :documento, :correo, :celular, :telefono, :Pais, :createdBy, :origen, :campania, :ciudad, :proyet_id, :status)";
             $query = $this->conexion->prepare($sql);
             $query->execute(array(":nombres" => $dato["nombre"], ":apellidos" => $dato["apellido"], ":documento" => $dato["documento"], ":correo" => $dato["correo"], ":celular" => $dato["celular"], ":telefono" => $dato["telefono"], ":Pais" => $dato["Pais"], ":origen" => $dato["origen"], ":campania" => $dato["campaña"], ":ciudad" => $dato["ciudad"], ":proyet_id" => $proyect_id, ":createdBy" => $created_by, ":status" => "NO CONTACTADO"));
+            // Obtener el ID del cliente insertado
+            $cliente_id = $this->conexion->lastInsertId();
+            // Devolver el ID del cliente como respuesta
+            $response = array("id" => $cliente_id);
+            echo json_encode($response);
+        } catch (\Throwable $error) {
+            // Devolver un mensaje de error en caso de excepción
+            $response = array("error" => $error);
+            echo json_encode($response);
+        }
+    }
+    function edit_cliente($resultado, $proyect_id, $cliente)
+    {
+        $dato = $resultado;
+        try {
+            # code...
+            $sql = "UPDATE cliente SET nombres=:nombres, apellidos=:apellidos, documento=:documento, correo=:correo, celular=:celular, telefono=:telefono, Pais=:Pais, origen=:origen, campania=:campania, ciudad=:ciudad, proyet_id=:proyet_id WHERE id_cliente=:id_cliente";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":nombres" => $dato["nombre"], ":apellidos" => $dato["apellido"], ":documento" => $dato["documento"], ":correo" => $dato["correo"], ":celular" => $dato["celular"], ":telefono" => $dato["telefono"], ":Pais" => $dato["Pais"], ":origen" => $dato["origen"], ":campania" => $dato["campaña"], ":ciudad" => $dato["ciudad"], ":proyet_id" => $proyect_id, ":id_cliente" => $cliente));
             // Obtener el ID del cliente insertado
             $cliente_id = $this->conexion->lastInsertId();
             // Devolver el ID del cliente como respuesta

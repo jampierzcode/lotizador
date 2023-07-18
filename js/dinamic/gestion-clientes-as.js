@@ -2,6 +2,7 @@ $(document).ready(function () {
   var funcion = "";
   var clientesList;
   var idCliente;
+  var proyectosList = [];
   buscar_clientes();
 
   var dataTable = $("#usuariosList").DataTable({
@@ -215,7 +216,150 @@ $(document).ready(function () {
     setTimeout(function () {
       $("#crear-lead .form-create").addClass("modal-show");
     }, 10);
+    let template = "";
+    template += `<option value="0">Seleccione un proyecto</option>`;
+    proyectosList.forEach((proyecto) => {
+      template += `<option value="${proyecto.id}">${proyecto.nombreProyecto}</option>`;
+    });
+    $("#crear-lead #proyecto-lead").html(template);
   });
+  $(document).on("click", "#editClient", function () {
+    // console.log(e);
+    // console.log("hola");
+    let template = "";
+    template += `<option value="0">Seleccione un proyecto</option>`;
+    proyectosList.forEach((proyecto) => {
+      template += `<option value="${proyecto.id}">${proyecto.nombreProyecto}</option>`;
+    });
+    $("#editar-lead #proyecto-lead").html(template);
+    $("#editar-lead").removeClass("md-hidden");
+    setTimeout(function () {
+      $("#editar-lead .form-create").addClass("modal-show");
+    }, 10);
+    const id_cliente = $(this).attr("keyClient");
+    idCliente = id_cliente;
+    const clienteResult = clientesList.filter(
+      (elemento) => elemento.id === id_cliente
+    );
+    console.log(id_cliente, clienteResult);
+
+    $("#editar-lead #nombre-lead").val(clienteResult[0].nombres);
+    $("#editar-lead #apellido-lead").val(clienteResult[0].apellidos);
+    $("#editar-lead #documento-lead").val(clienteResult[0].documento);
+    $("#editar-lead #celular-lead").val(clienteResult[0].celular);
+    $("#editar-lead #telefono-lead").val(clienteResult[0].telefono);
+    $("#editar-lead #origen-lead").val(clienteResult[0].origen);
+    $("#editar-lead #ciudad-lead").val(clienteResult[0].ciudad);
+    $("#editar-lead #pais-lead").val(clienteResult[0].Pais);
+    $("#editar-lead #campania-lead").val(clienteResult[0].campania);
+    $("#editar-lead #email-lead").val(clienteResult[0].correo);
+
+    $("#editar-lead #proyecto-lead").val(clienteResult[0].proyecto_id);
+  });
+
+  function llenarFiltros() {
+    let template = "";
+    template += `<option value="Todos">Todos</option>`;
+    // console.log(proyectosList);
+    proyectosList.forEach((proyecto) => {
+      template += `<option value="${proyecto.id}">${proyecto.nombreProyecto}</option>`;
+    });
+    $("#filter-proyecto").html(template);
+  }
+  function filtrarProyectos() {
+    const nombreProyecto = $("#filter-proyecto").val();
+    const nombreApellido = $("#cliente-search").val().toLowerCase();
+    console.log(nombreProyecto, nombreApellido);
+
+    const clientes = clientesList.filter((proyecto) => {
+      if (nombreProyecto && proyecto.nombreProyecto === "Todos") {
+        return false;
+      }
+      if (nombreApellido && !contieneNombreApellido(proyecto, nombreApellido)) {
+        return false;
+      }
+      return true;
+    });
+
+    dataTable.clear().rows.add(clientes).draw();
+  }
+
+  // Función auxiliar para verificar si el nombre y apellido coinciden con el filtro
+  function contieneNombreApellido(proyecto, nombreApellido) {
+    const nombreCompleto =
+      `${proyecto.nombres} ${proyecto.apellidos}`.toLowerCase();
+    return nombreCompleto.includes(nombreApellido);
+  }
+
+  // Event listeners para los cambios en el select y el input
+  $("#cliente-search, #filter-proyecto").on("change keyup", filtrarProyectos);
+
+  // Llama a la función inicialmente para mostrar todos los proyectos
+  // filtrarProyectos();
+
+  $("#editar-lead #editLead").submit((e) => {
+    e.preventDefault();
+    let nombre = $("#editar-lead #nombre-lead").val();
+    let apellido = $("#editar-lead #apellido-lead").val();
+    let documento = $("#editar-lead #documento-lead").val();
+    let celular = $("#editar-lead #celular-lead").val();
+    let telefono = $("#editar-lead #telefono-lead").val();
+    let origen = $("#editar-lead #origen-lead").val();
+    let ciudad = $("#editar-lead #ciudad-lead").val();
+    let pais = $("#editar-lead #pais-lead").val();
+    let campania = $("#editar-lead #campania-lead").val();
+    let correo = $("#editar-lead #email-lead").val();
+    let proyecto_id = $("#editar-lead #proyecto-lead").val();
+    const result = {
+      nombre: nombre,
+      apellido: apellido,
+      documento: documento,
+      correo: correo,
+      celular: celular,
+      telefono: telefono,
+      Pais: pais,
+      origen: origen,
+      campaña: campania,
+      ciudad: ciudad,
+    };
+    console.log(result);
+    if (proyecto_id !== "0") {
+      let funcion = "edit_cliente";
+      $.post(
+        "../../controlador/UsuarioController.php",
+        { funcion, result, proyecto_id, cliente: idCliente },
+        (response) => {
+          console.log(response);
+          const data = JSON.parse(response);
+          console.log(data);
+
+          if (data.hasOwnProperty("error")) {
+            // Si la respuesta contiene un mensaje de error, muestra el mensaje
+            alert(data.error);
+          } else {
+            alert("Se edito correctamente al cliente");
+            setTimeout(function () {
+              $("#editar-lead .form-create").removeClass("modal-show");
+            }, 1000);
+            $("#editar-lead").addClass("md-hidden");
+            buscar_clientes();
+
+            $("#editar-lead #nombre-lead").val("");
+            $("#editar-lead #apellido-lead").val("");
+            $("#editar-lead #documento-lead").val("");
+            $("#editar-lead #celular-lead").val("");
+            $("#editar-lead #telefono-lead").val("");
+            $("#editar-lead #origen-lead").val("");
+            $("#editar-lead #ciudad-lead").val("");
+            $("#editar-lead #pais-lead").val("");
+            $("#editar-lead #campania-lead").val("");
+            $("#editar-lead #email-lead").val("");
+          }
+        }
+      );
+    }
+  });
+
   $(document).on("click", "#registerSeguimiento", function () {
     let id_cliente = $(this).attr("keyClient");
     idCliente = id_cliente;
@@ -277,27 +421,18 @@ $(document).ready(function () {
   });
   // registrar lead indiidual
   buscar_proyectos();
-  function buscar_proyectos() {
+  async function buscar_proyectos() {
     funcion = "buscar_proyectos_agentes";
-    $.post(
-      "../../controlador/UsuarioController.php",
-      { funcion },
-      (response) => {
-        let template = "";
-        if (response.trim() == "no-register") {
-          template += `<option value="0">Seleccione un proyecto</option>`;
-        } else {
-          template += `<option value="0">Seleccione un proyecto</option>`;
-          const proyectos = JSON.parse(response);
-          proyectos.forEach((proyecto) => {
-            template += `<option value="${proyecto.id}">${proyecto.nombreProyecto}</option>`;
-          });
-        }
-        $("#proyecto-lead").html(template);
-      }
-    );
-  }
+    const response = await $.post("../../controlador/UsuarioController.php", {
+      funcion,
+    });
+    const proyectos = JSON.parse(response);
+    proyectosList = proyectos;
 
+    llenarFiltros();
+    filtrarProyectos();
+  }
+  // registrar lead
   $("#registerLead").submit((e) => {
     e.preventDefault();
     let nombre = $("#nombre-lead").val();
@@ -425,25 +560,25 @@ $(document).ready(function () {
   }
 
   // filter cliente
-  $("#cliente-search").on("keyup", function () {
-    var nombre = $(this).val();
-    console.log(clientesList);
-    console.log(nombre);
-    if (nombre !== "") {
-      const result = clientesList.filter(function (persona) {
-        var nombreCompleto = (
-          persona.nombres +
-          " " +
-          persona.apellidos
-        ).toLowerCase();
-        return nombreCompleto.includes(nombre);
-      });
+  // $("#cliente-search").on("keyup", function () {
+  //   var nombre = $(this).val();
+  //   console.log(clientesList);
+  //   console.log(nombre);
+  //   if (nombre !== "") {
+  //     const result = clientesList.filter(function (persona) {
+  //       var nombreCompleto = (
+  //         persona.nombres +
+  //         " " +
+  //         persona.apellidos
+  //       ).toLowerCase();
+  //       return nombreCompleto.includes(nombre);
+  //     });
 
-      dataTable.clear().rows.add(result).draw();
-    } else {
-      dataTable.clear().rows.add(clientesList).draw();
-    }
-  });
+  //     dataTable.clear().rows.add(result).draw();
+  //   } else {
+  //     dataTable.clear().rows.add(clientesList).draw();
+  //   }
+  // });
 
   // FIN DE MODAL ASIGNES
   $("#crear-event .form-create .close-modal").click(() => {
@@ -465,6 +600,10 @@ $(document).ready(function () {
   $("#crear-lead .form-create .close-modal").click(() => {
     $("#crear-lead").addClass("md-hidden");
     $("#crear-lead .form-create").removeClass("modal-show");
+  });
+  $("#editar-lead .form-create .close-modal").click(() => {
+    $("#editar-lead").addClass("md-hidden");
+    $("#editar-lead .form-create").removeClass("modal-show");
   });
   // fin de presentation modal
 });

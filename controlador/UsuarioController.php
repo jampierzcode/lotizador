@@ -73,14 +73,6 @@ if ($_POST["funcion"] == "borrar_cliente") {
     $usuario->borrar_cliente($id_cliente);
     echo $usuario->mensaje;
 }
-if ($_POST["funcion"] == "edit_cliente") {
-    $id_producto = $_POST["id_producto"];
-    $nombre = $_POST["nombre"];
-    $precio = $_POST["precio"];
-    $inventario = $_POST["inventario"];
-    $usuario->edit_producto($id_producto, $nombre, $precio, $inventario);
-    echo $usuario->mensaje;
-}
 
 // FIN DE SECTION DE CLIENTES
 
@@ -704,6 +696,13 @@ if ($_POST["funcion"] == "add_cliente") {
     $usuario->add_cliente($resultado, $proyect_id, $_SESSION["id_usuario"]);
     echo $usuario->mensaje;
 }
+if ($_POST["funcion"] == "edit_cliente") {
+    $resultado = $_POST["result"];
+    $proyect_id = $_POST["proyecto_id"];
+    $cliente = $_POST["cliente"];
+    $usuario->edit_cliente($resultado, $proyect_id, $cliente);
+    echo $usuario->mensaje;
+}
 
 if ($_POST["funcion"] == "delete_cliente_asesor") {
     $cliente = intVal($_POST["id_cliente"]);
@@ -753,12 +752,15 @@ if ($_POST["funcion"] == "buscar_clientes_by_asesor") {
                 'id' => $dato->id_cliente,
                 'nombres' => $dato->nombres,
                 'apellidos' => $dato->apellidos,
+                'documento' => $dato->documento,
                 'correo' => $dato->correo,
                 'celular' => $dato->celular,
                 'telefono' => $dato->telefono,
                 'status' => $dato->status,
                 'origen' => $dato->origen,
                 'ciudad' => $dato->ciudad,
+                'campania' => $dato->campania,
+                'Pais' => $dato->pais,
                 'nombre_proyecto' => $dato->nombre_proyecto,
                 'created_cliente' => $dato->created_cliente,
                 'proyecto_id' => $dato->proyet_id,
