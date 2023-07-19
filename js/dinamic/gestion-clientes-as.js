@@ -37,12 +37,24 @@ $(document).ready(function () {
         data: null,
         render: function (data, type, row) {
           let template_status = imprimirStatus(data?.status); // Cambiar de const a let
+          //           switch (data?.status) {
+          //             case "NO CONTACTADO":
+          //               template_status += `
+          //   <div class="flex-actions">
+          //   <button target="_blank" statusClient="${data.status}" keyClient="${data?.id}" id="" class="btnJsvm default mt-2">Contactar</button>
+          // </div>
+          //   `;
+          //               break;
 
+          //             default:
           template_status += `
               <div class="flex-actions">
               <button target="_blank" statusClient="${data.status}" keyClient="${data?.id}" id="registerSeguimiento" class="btnJsvm info mt-2">Registrar Evento</button>
             </div>
               `;
+          //     break;
+          // }
+
           return template_status;
         },
       },
@@ -74,11 +86,25 @@ $(document).ready(function () {
   // });
   // función de animación
   function animarProgress() {
-    let count = 3;
-    let total = 10;
-    var progressBar = document.querySelector(".progreessbar .barSize");
-    $("#numberVisit").html(count);
-    progressBar.style.width = `${(count / total) * 100}%`;
+    let funcion = "buscar_visitas_programadas";
+    $.post(
+      "../../controlador/UsuarioController.php",
+      { funcion },
+      (response) => {
+        console.log(response);
+        let count;
+        if (response === "") {
+          count = 0;
+        } else {
+          const visitas = JSON.parse(response);
+          count = visitas.length;
+        }
+        let total = 10;
+        var progressBar = document.querySelector(".progreessbar .barSize");
+        $("#numberVisit").html(count);
+        progressBar.style.width = `${(count / total) * 100}%`;
+      }
+    );
   }
 
   // Llamar a la función de animación
@@ -398,13 +424,49 @@ $(document).ready(function () {
 
     // seguimiento_cliente(observacion, id_cliente, status);
   });
-
+  $("#status-evento").on("change", function (e) {
+    console.log(e);
+    let tipo = e.target.value;
+    console.log(tipo);
+    if (tipo === "VISITA") {
+      $("#fecha_visita").removeClass("hidden");
+    } else {
+      $("#fecha_visita").addClass("hidden");
+    }
+  });
+  function registerVisita(fecha, hora, cliente) {
+    let funcion = "add_visita_cliente";
+    $.post(
+      "../../controlador/UsuarioController.php",
+      { funcion, fecha, hora, cliente },
+      (response) => {
+        console.log(response);
+        if (response.trim() === "add-register-visita") {
+          alert("Se registro la visita correctamente");
+          animarProgress();
+        } else {
+          alert("No se registro, contacta al administrador");
+        }
+      }
+    );
+  }
   $("#registerFormEvento").submit((e) => {
     e.preventDefault();
     let status = $("#status-evento").val();
     let observaciones = $("#observaciones-evento").val();
     console.log(status, observaciones);
     if (status !== "0") {
+      if (status === "VISITA") {
+        let fecha = $("#date-visita").val();
+        let hora = $("#time-visita").val() + ":00";
+        if (fecha && hora) {
+          registerVisita(fecha, hora, idCliente);
+          $("#date-visita").val(null);
+          $("#time-visita").val(null);
+        } else {
+          return;
+        }
+      }
       seguimiento_cliente(observaciones, idCliente, status);
 
       let funcion = "buscar_historial_seguimiento";

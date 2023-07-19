@@ -690,6 +690,20 @@ if ($_POST["funcion"] == "habitacion_limpieza_terminada") {
 // SECTION DE CLIENTES 
 // CREAR CLIENTES DESDE RECEPCION
 
+if ($_POST["funcion"] == "buscar_visitas_programadas") {
+    $user = $_SESSION["id_usuario"];
+    $usuario->buscar_visitas_programadas($user);
+    echo json_encode($usuario->datos);
+    // echo $usuario->mensaje;
+}
+if ($_POST["funcion"] == "add_visita_cliente") {
+    $fecha = $_POST["fecha"];
+    $hora = $_POST["hora"];
+    $cliente = $_POST["cliente"];
+    $user = $_SESSION["id_usuario"];
+    $usuario->add_visita_cliente($fecha, $hora, $cliente, $user);
+    echo $usuario->mensaje;
+}
 if ($_POST["funcion"] == "add_cliente") {
     $resultado = $_POST["result"];
     $proyect_id = $_POST["proyecto_id"];

@@ -18,14 +18,13 @@ $links = [
 ];
 
 ?>
-<nav class="navbar-dashboard">
+<nav class="navbar-dashboard justify-between">
     <div class="drop-down-menu">
         <ion-icon name="reorder-three-outline"></ion-icon>
     </div>
-    <div class="user-login" style="gap: 20px">
-        <!-- <FaBell /> campanas-->
-        <!-- <img src="../../img/jampier.jpg" alt="img_avatar_user" /> -->
-        <img src="../../img/avatar_default.jpg" alt="img_avatar_user" />
+    <div class="relative">
+        <img class="w-10 h-10 rounded-full" src="../../img/avatar_default.jpg" alt="">
+        <span class="bottom-0 left-7 absolute  w-3.5 h-3.5 bg-green-400 border-2 border-white dark:border-gray-800 rounded-full"></span>
     </div>
 </nav>
 <div class="overlay-sidebar"></div>
@@ -40,6 +39,7 @@ $links = [
     <div class="main">
         <div class="perfil-user">
             <img src="../../img/avatar_default.jpg" alt="img_avatar_user" />
+
             <div class="info-perfil">
 
                 <p><?php echo $_SESSION["nombres"] ?></p>

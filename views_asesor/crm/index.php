@@ -243,6 +243,19 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                             </select>
 
                         </div>
+                        <div id="fecha_visita" class="grid gap-4 grid-cols-2 hidden">
+
+                            <div class="mb-6">
+                                <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Fecha</label>
+                                <input type="date" id="date-visita" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="El cliente ..."></input>
+
+                            </div>
+                            <div class="mb-6">
+                                <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Hora</label>
+                                <input type="time" id="time-visita" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="El cliente ..."></input>
+
+                            </div>
+                        </div>
                         <div class="mb-6">
 
                             <label for="observaciones" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Observaciones</label>
@@ -298,6 +311,27 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                         </div>
                     </div>
                 </div>
+                <div class="relative inline-block text-left">
+                    <div>
+                        <button type="button" class="inline-flex items-center w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 btn-add hover:bg-gray-50" id="menu-button-etiqueta" aria-expanded="false" aria-haspopup="true">
+
+                            <ion-icon name="pricetags"></ion-icon>
+
+                            Etiquetas
+                            <svg class="-mr-1 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div id="expand-etiqueta" class="absolute left-0 z-10 mt-2 w-56 origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none hidden" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
+                        <div class="py-1" role="none">
+                            <li id="modal-lead" class="flex items-center gap-2 cursor-pointer hover:bg-slate-200 text-gray-700 block px-4 py-2 text-sm" role="menuitem" tabindex="-1" id="menu-item-0"><ion-icon name="add-outline"></ion-icon> Crear etiqueta</li>
+
+                        </div>
+                    </div>
+                </div>
+                <input type="color" value="#5b5b5b">
             </div>
             <div>
                 <p>Filter Avanzado:</p>
@@ -437,6 +471,61 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                     menu.style.opacity = '0';
                     setTimeout(function() {
                         menu.classList.add('hidden');
+                    }, 300);
+                }
+            });
+            // Obtiene el botón y el menú desplegable etiqueta
+            var button_etiqueta = document.getElementById('menu-button-etiqueta');
+            var menu_etiqueta = document.getElementById('expand-etiqueta');
+
+            // Agrega un evento de clic al botón para mostrar/ocultar el menú desplegable
+            menu_etiqueta.addEventListener('click', function() {
+                var expanded = button_etiqueta.getAttribute('aria-expanded') === 'true' || false;
+                button_etiqueta.setAttribute('aria-expanded', !expanded);
+
+                if (!expanded) {
+                    menu_etiqueta.style.transformOrigin = 'left top';
+                    menu_etiqueta.style.transform = 'scale(0)';
+                    menu_etiqueta.style.opacity = '0';
+                    setTimeout(function() {
+                        menu_etiqueta.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
+                        menu_etiqueta.style.transform = 'scale(1)';
+                        menu_etiqueta.style.opacity = '1';
+                    }, 0);
+                    menu.classList.remove('hidden');
+                } else {
+                    menu_etiqueta.style.transformOrigin = 'left top';
+                    menu_etiqueta.style.opacity = '1';
+                    menu_etiqueta.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
+                    menu_etiqueta.style.transform = 'scale(0)';
+                    menu_etiqueta.style.opacity = '0';
+                    setTimeout(function() {
+                        menu_etiqueta.classList.add('hidden');
+                    }, 300);
+                }
+            });
+            button_etiqueta.addEventListener('click', function() {
+                var expanded = button_etiqueta.getAttribute('aria-expanded') === 'true' || false;
+                button_etiqueta.setAttribute('aria-expanded', !expanded);
+
+                if (!expanded) {
+                    menu_etiqueta.style.transformOrigin = 'left top';
+                    menu_etiqueta.style.transform = 'scale(0)';
+                    menu_etiqueta.style.opacity = '0';
+                    setTimeout(function() {
+                        menu_etiqueta.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
+                        menu_etiqueta.style.transform = 'scale(1)';
+                        menu_etiqueta.style.opacity = '1';
+                    }, 0);
+                    menu_etiqueta.classList.remove('hidden');
+                } else {
+                    menu_etiqueta.style.transformOrigin = 'left top';
+                    menu_etiqueta.style.opacity = '1';
+                    menu_etiqueta.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
+                    menu_etiqueta.style.transform = 'scale(0)';
+                    menu_etiqueta.style.opacity = '0';
+                    setTimeout(function() {
+                        menu_etiqueta.classList.add('hidden');
                     }, 300);
                 }
             });

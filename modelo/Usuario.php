@@ -5,6 +5,7 @@ class Usuario
 {
     var $datos;
     var $mensaje;
+    public $conexion;
 
     public function __construct()
     {
@@ -674,6 +675,37 @@ class Usuario
             // Devolver un mensaje de error en caso de excepción
             $response = array("error" => $error);
             echo json_encode($response);
+        }
+    }
+    function add_visita_cliente($fecha, $hora, $cliente, $usuario)
+    {
+        try {
+            # code...
+            $sql = "INSERT INTO visitas_cliente(fecha_visita, hora_visita, cliente_id, user_id) VALUES(:fecha, :hora, :cliente, :usuario)";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":fecha" => $fecha, ":hora" => $hora, ":cliente" => $cliente, ":usuario" => $usuario));
+
+            $this->mensaje = "add-register-visita";
+            return $this->mensaje;
+        } catch (\Throwable $error) {
+            // Devolver un mensaje de error en caso de excepción
+            $this->mensaje = "no-gesiter-visita" . $error;
+            return $this->mensaje;
+        }
+    }
+    function buscar_visitas_programadas($usuario)
+    {
+        try {
+            # code...
+            $sql = "SELECT * from visitas_cliente WHERE user_id = :usuario";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":usuario" => $usuario));
+            $this->datos = $query->fetchAll();
+            return $this->datos;
+        } catch (\Throwable $error) {
+            // Devolver un mensaje de error en caso de excepción
+            $this->mensaje = $error;
+            return $this->mensaje;
         }
     }
     function edit_cliente($resultado, $proyect_id, $cliente)
