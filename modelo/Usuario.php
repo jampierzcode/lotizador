@@ -677,13 +677,13 @@ class Usuario
             echo json_encode($response);
         }
     }
-    function add_visita_cliente($fecha, $hora, $cliente, $usuario)
+    function add_visita_cliente($fecha, $hora, $cliente, $usuario, $tipo)
     {
         try {
             # code...
-            $sql = "INSERT INTO visitas_cliente(fecha_visita, hora_visita, cliente_id, user_id) VALUES(:fecha, :hora, :cliente, :usuario)";
+            $sql = "INSERT INTO interaccion_cliente(fecha_visita, hora_visita, cliente_id, user_id, tipo) VALUES(:fecha, :hora, :cliente, :usuario, :tipo)";
             $query = $this->conexion->prepare($sql);
-            $query->execute(array(":fecha" => $fecha, ":hora" => $hora, ":cliente" => $cliente, ":usuario" => $usuario));
+            $query->execute(array(":fecha" => $fecha, ":hora" => $hora, ":cliente" => $cliente, ":usuario" => $usuario, ":tipo" => $tipo));
 
             $this->mensaje = "add-register-visita";
             return $this->mensaje;
@@ -697,7 +697,7 @@ class Usuario
     {
         try {
             # code...
-            $sql = "SELECT * from visitas_cliente WHERE user_id = :usuario";
+            $sql = "SELECT * from interaccion_cliente WHERE user_id = :usuario";
             $query = $this->conexion->prepare($sql);
             $query->execute(array(":usuario" => $usuario));
             $this->datos = $query->fetchAll();

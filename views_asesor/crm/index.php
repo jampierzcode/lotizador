@@ -208,7 +208,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                                 <select type="text" id="proyecto-lead" placeholder="Ingrese ciudad de origen" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"></select>
                             </div>
                         </div>
-                        <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Guardar</button>
+                        <button type="submit" class="btnJsvm info text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Guardar</button>
                     </form>
 
                     <!-- <div class="card-input buttons-modal">
@@ -226,19 +226,40 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                     </div>
                     <h1 class="font-bold">Registrar Evento</h1>
                     <div class="flex items-center gap-4">
-                        <p class="text-xl">Estado Cliente:
-                        <div id="status-now"></div>
+                        <p class="text-sm">Estado Cliente:
+                            <!-- <div id="status-now"></div> -->
+                    </div>
+                    <div>
+                        <div class="w-full">
+                            <div class="flex items-center space-x-4 border-b-2 pb-4 border-dashed">
+                                <div class="flex-shrink-0">
+                                    <img id="img-now-status" class="w-8 h-8 rounded-full" src="" alt="cliente...">
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p id="name-now-status" class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                                        Neil Sims
+                                    </p>
+                                    <p id="contact-now-status" class="text-sm text-gray-500 truncate dark:text-gray-400">
+                                        email@windster.com
+                                    </p>
+                                </div>
+                                <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                                    <div id="status-now"></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <form id="registerFormEvento">
                         <div class="mb-6">
                             <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tipo de Evento</label>
                             <select id="status-evento" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                                 <option selected value="0">Selecciona una opcion</option>
-                                <option value="VISITA">VISITA</option>
-                                <option value="RESERVA">RESERVA</option>
-                                <option value="AUSENCIA VISITA">AUSENCIA VISITA</option>
                                 <option value="NO RESPONDIO">NO RESPONDIO</option>
-                                <option value="REPROGRAMACION">REPROGRAMACION</option>
+                                <option value="VISITA">VISITA</option>
+                                <option value="AUSENCIA VISITA">AUSENCIA VISITA</option>
+                                <option value="REPROGRAMACION CONTACTO">REPROGRAMACION CONTACTO</option>
+                                <option value="REPROGRAMACION VISITA">REPROGRAMACION VISITA</option>
+                                <option value="SEPARACION">SEPARACION</option>
                                 <option value="NO INTERESADO">NO INTERESADO</option>
                             </select>
 
@@ -262,7 +283,10 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                             <textarea id="observaciones-evento" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="El cliente ..."></textarea>
 
                         </div>
-                        <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Registrar</button>
+                        <div class="flex justify-end w-full">
+
+                            <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 btnJsvm info">Registrar</button>
+                        </div>
                     </form>
 
                     <!-- <div class="card-input buttons-modal">

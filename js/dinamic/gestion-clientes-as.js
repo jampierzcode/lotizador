@@ -37,23 +37,23 @@ $(document).ready(function () {
         data: null,
         render: function (data, type, row) {
           let template_status = imprimirStatus(data?.status); // Cambiar de const a let
-          //           switch (data?.status) {
-          //             case "NO CONTACTADO":
-          //               template_status += `
-          //   <div class="flex-actions">
-          //   <button target="_blank" statusClient="${data.status}" keyClient="${data?.id}" id="" class="btnJsvm default mt-2">Contactar</button>
-          // </div>
-          //   `;
-          //               break;
+          switch (data?.status) {
+            case "NO CONTACTADO":
+              template_status += `
+            <div class="flex-actions">
+            <button target="_blank" statusClient="${data.status}" keyClient="${data?.id}" id="contactarSeguimiento" class="btnJsvm default mt-2">Contactar</button>
+          </div>
+            `;
+              break;
 
-          //             default:
-          template_status += `
+            default:
+              template_status += `
               <div class="flex-actions">
               <button target="_blank" statusClient="${data.status}" keyClient="${data?.id}" id="registerSeguimiento" class="btnJsvm info mt-2">Registrar Evento</button>
             </div>
               `;
-          //     break;
-          // }
+              break;
+          }
 
           return template_status;
         },
@@ -79,12 +79,7 @@ $(document).ready(function () {
     bLengthChange: false,
     dom: '<"top">ct<"top"p><"clear">',
   });
-  // Activar columnas fijas
-  // new $.fn.dataTable.FixedColumns(dataTable, {
-  //   leftColumns: 2, // Número de columnas fijas a la izquierda
-  //   rightColumns: 1, // Número de columnas fijas a la derecha
-  // });
-  // función de animación
+
   function animarProgress() {
     let funcion = "buscar_visitas_programadas";
     $.post(
@@ -130,9 +125,26 @@ $(document).ready(function () {
   }
 
   // funcion de comparar data
+  // const compareDates = (a, b) => {
+  //   const dateA = new Date(`${a.fecha} ${a.hora}`);
+  //   const dateB = new Date(`${b.fecha} ${b.hora}`);
+
+  //   if (dateA > dateB) {
+  //     return -1;
+  //   } else if (dateA < dateB) {
+  //     return 1;
+  //   } else {
+  //     return 0;
+  //   }
+  // };
   const compareDates = (a, b) => {
-    const dateA = new Date(`${a.fecha} ${a.hora}`);
-    const dateB = new Date(`${b.fecha} ${b.hora}`);
+    // Parsear las fechas con el formato "dd/mm/yyyy"
+    const [dayA, monthA, yearA] = a.fecha.split("/");
+    const [dayB, monthB, yearB] = b.fecha.split("/");
+
+    // Crear las instancias de Date con el formato "YYYY-MM-DD"
+    const dateA = new Date(`${yearA}-${monthA}-${dayA} ${a.hora}`);
+    const dateB = new Date(`${yearB}-${monthB}-${dayB} ${b.hora}`);
 
     if (dateA > dateB) {
       return -1;
@@ -142,7 +154,6 @@ $(document).ready(function () {
       return 0;
     }
   };
-
   // show modal de historial de cliente
   $(document).on("click", "#historialCliente", function () {
     let cliente = $(this).attr("keyClient");
@@ -191,7 +202,7 @@ $(document).ready(function () {
   }
 
   // SHOW MODAL registrar seguimiento
-  $(document).on("click", "#changeSeguimiento", function () {
+  $(document).on("click", "#contactarSeguimiento", function () {
     let id_cliente = $(this).attr("keyClient");
     console.log(id_cliente);
 
@@ -207,7 +218,13 @@ $(document).ready(function () {
         break;
 
       case "CONTACTADO":
-        template += `<span class="target_tab info">${status}</span>`;
+        template += `<span class="target_tab info flex items-center gap-2">${status} <div role="status">
+        <svg aria-hidden="true" class="inline w-6 h-6 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-purple-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+            <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+        </svg>
+        <span class="sr-only">Loading...</span>
+    </div></span>`;
 
         break;
       case "NO RESPONDIO":
@@ -222,11 +239,15 @@ $(document).ready(function () {
         template += `<span class="target_tab danger">${status}</span>`;
 
         break;
-      case "REPROGRAMACION":
+      case "REPROGRAMACION CONTACTO":
         template += `<span class="target_tab info">${status}</span>`;
 
         break;
-      case "RESERVA":
+      case "REPROGRAMACION VISITA":
+        template += `<span class="target_tab info">${status}</span>`;
+
+        break;
+      case "SEPARACION":
         template += `<span class="target_tab success">${status}</span>`;
 
         break;
@@ -392,7 +413,13 @@ $(document).ready(function () {
     let status = $(this).attr("statusClient");
     console.log(status);
     let template_status = imprimirStatus(status);
-
+    const result = clientesList.filter(
+      (elemento) => elemento.id === id_cliente
+    );
+    console.log(result);
+    $("#img-now-status").attr("src", "../../img/avatar_default.jpg");
+    $("#name-now-status").html(result[0].nombres + " " + result[0].apellidos);
+    $("#contact-now-status").html(result[0].celular);
     $("#status-now").html(template_status);
     $("#crear-event").removeClass("md-hidden");
     setTimeout(function () {
@@ -428,17 +455,22 @@ $(document).ready(function () {
     console.log(e);
     let tipo = e.target.value;
     console.log(tipo);
-    if (tipo === "VISITA") {
+    if (
+      tipo === "VISITA" ||
+      tipo === "REPROGRAMACION CONTACTO" ||
+      tipo === "REPROGRAMACION VISITA" ||
+      tipo === "SEPARACION"
+    ) {
       $("#fecha_visita").removeClass("hidden");
     } else {
       $("#fecha_visita").addClass("hidden");
     }
   });
-  function registerVisita(fecha, hora, cliente) {
+  function registerVisita(fecha, hora, cliente, tipo) {
     let funcion = "add_visita_cliente";
     $.post(
       "../../controlador/UsuarioController.php",
-      { funcion, fecha, hora, cliente },
+      { funcion, fecha, hora, cliente, tipo },
       (response) => {
         console.log(response);
         if (response.trim() === "add-register-visita") {
@@ -456,11 +488,16 @@ $(document).ready(function () {
     let observaciones = $("#observaciones-evento").val();
     console.log(status, observaciones);
     if (status !== "0") {
-      if (status === "VISITA") {
+      if (
+        status === "VISITA" ||
+        status === "REPROGRAMACION CONTACTO" ||
+        status === "REPROGRAMACION VISITA" ||
+        status === "SEPARACION"
+      ) {
         let fecha = $("#date-visita").val();
         let hora = $("#time-visita").val() + ":00";
         if (fecha && hora) {
-          registerVisita(fecha, hora, idCliente);
+          registerVisita(fecha, hora, idCliente, status);
           $("#date-visita").val(null);
           $("#time-visita").val(null);
         } else {

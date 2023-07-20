@@ -701,7 +701,8 @@ if ($_POST["funcion"] == "add_visita_cliente") {
     $hora = $_POST["hora"];
     $cliente = $_POST["cliente"];
     $user = $_SESSION["id_usuario"];
-    $usuario->add_visita_cliente($fecha, $hora, $cliente, $user);
+    $tipo = $_POST["tipo"];
+    $usuario->add_visita_cliente($fecha, $hora, $cliente, $user, $tipo);
     echo $usuario->mensaje;
 }
 if ($_POST["funcion"] == "add_cliente") {
