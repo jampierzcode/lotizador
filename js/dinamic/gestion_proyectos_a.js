@@ -34,7 +34,7 @@ $(document).ready(function () {
           return `
           <div class="flex-actions">
           <a target="_blank" href="lotizador?id=${data.id}" class="btnLotes"> Ver lotes </a>
-          <button target="_blank" keyProyect="https://lotizador.mccompany.pe/views/Lotizador/Clientes/?proyect=${data.id}" id="rutaEnlace" class="btnLotes"> Copiar Link </button>
+          <button target="_blank" keyProyect="https://lotizador.mcsolucionesti.com/views/Lotizador/Clientes/?proyect=${data.id}" id="rutaEnlace" class="btnLotes"> Copiar Link </button>
           
           </div>
 
