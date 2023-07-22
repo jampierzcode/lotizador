@@ -900,7 +900,7 @@ class Usuario
     }
     // GESTION DE CLIENTES USCAR CLIENTE
 
-    function buscar_clientes()
+    function buscar_clientes($user)
     {
         try {
             $sql = "SELECT
@@ -911,10 +911,10 @@ class Usuario
             cliente AS CLIENTE
             LEFT JOIN user_cliente AS USRCLIENTE ON USRCLIENTE.cliente_id = CLIENTE.id_cliente
             LEFT JOIN usuario AS USUARIO ON USUARIO.id_usuario = USRCLIENTE.user_id
-            LEFT JOIN proyectos AS PROYECTO ON PROYECTO.id = CLIENTE.proyet_id
+            LEFT JOIN proyectos AS PROYECTO ON PROYECTO.id = CLIENTE.proyet_id WHERE CLIENTE.createdBy = :id_usuario
         ";
             $query = $this->conexion->prepare($sql);
-            $query->execute();
+            $query->execute(array(":id_usuario" => $user));
             $this->datos = $query->fetchAll(); // retorna objetos o no
             if (!empty($this->datos)) {
                 return $this->datos;

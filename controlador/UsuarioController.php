@@ -730,7 +730,8 @@ if ($_POST["funcion"] == "delete_cliente_asesor") {
 
 if ($_POST["funcion"] == "buscar_clientes") {
     $json = array();
-    $usuario->buscar_clientes();
+    $user = $_SESSION["id_usuario"];
+    $usuario->buscar_clientes($user);
     if ($usuario->mensaje) {
         echo $usuario->mensaje;
     }
