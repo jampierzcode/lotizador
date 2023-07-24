@@ -37,22 +37,71 @@ $(document).ready(function () {
         data: null,
         render: function (data, type, row) {
           let template_status = imprimirStatus(data?.status); // Cambiar de const a let
-          switch (data?.status) {
-            case "NO CONTACTADO":
-              template_status += `
-            <div class="flex-actions">
-            <button target="_blank" statusClient="${data.status}" keyClient="${data?.id}" id="contactarSeguimiento" class="btnJsvm default mt-2">Contactar</button>
-          </div>
-            `;
-              break;
 
-            default:
-              template_status += `
+          if (data.task_status === "PENDIENTE") {
+            template_status += `
               <div class="flex-actions">
-              <button target="_blank" statusClient="${data.status}" keyClient="${data?.id}" id="registerSeguimiento" class="btnJsvm info mt-2">Registrar Evento</button>
+              <button target="_blank" keyTask="${data.id_task}" statusClient="${data.status}" keyClient="${data?.id}" id="completarTask" class="btnJsvm default mt-2">Completar Actividad</button>
             </div>
               `;
-              break;
+          } else {
+            switch (data.status) {
+              case "NO CONTACTADO":
+                template_status += `
+            <div class="flex-actions">
+            <button target="_blank" keyTask="${data.id_task}" statusClient="${data.status}" keyClient="${data?.id}" id="contactarSeguimiento" class="btnJsvm default mt-2">Contactar</button>
+          </div>
+            `;
+                break;
+              case "REPROGRAMACION CONTACTO":
+                template_status += `COMPLETADO`;
+                template_status += `
+                <div class="flex-actions">
+                <button target="_blank" statusClient="${data.status}" keyClient="${data?.id}" id="registerSeguimiento" class="btnJsvm info mt-2">Registrar Evento</button>
+              </div>
+                `;
+                break;
+              case "REPROGRAMACION VISITA":
+                template_status += `COMPLETADO`;
+                template_status += `
+                <div class="flex-actions">
+                <button target="_blank" statusClient="${data.status}" keyClient="${data?.id}" id="registerSeguimiento" class="btnJsvm info mt-2">Registrar Evento</button>
+              </div>
+                `;
+                break;
+              case "VISITA":
+                template_status += `COMPLETADO`;
+                template_status += `
+                <div class="flex-actions">
+                <button target="_blank" statusClient="${data.status}" keyClient="${data?.id}" id="registerSeguimiento" class="btnJsvm info mt-2">Registrar Evento</button>
+              </div>
+                `;
+                break;
+
+              default:
+                template_status += `
+                <div class="flex-actions">
+                <button target="_blank" statusClient="${data.status}" keyClient="${data?.id}" id="registerSeguimiento" class="btnJsvm info mt-2">Registrar Evento</button>
+              </div>
+                `;
+                break;
+            }
+
+            //   if (data.status == "NO CONTACTADO") {
+            //     template_status += `
+            //   <div class="flex-actions">
+            //   <button target="_blank" keyTask="${data.id_task}" statusClient="${data.status}" keyClient="${data?.id}" id="contactarSeguimiento" class="btnJsvm default mt-2">Contactar</button>
+            // </div>
+            //   `;
+            //   } else {
+            //     template_status += `COMPLETADO`;
+
+            //     template_status += `
+            //       <div class="flex-actions">
+            //       <button target="_blank" statusClient="${data.status}" keyClient="${data?.id}" id="registerSeguimiento" class="btnJsvm info mt-2">Registrar Evento</button>
+            //     </div>
+            //       `;
+            //   }
           }
 
           return template_status;
@@ -80,31 +129,72 @@ $(document).ready(function () {
     dom: '<"top">ct<"top"p><"clear">',
   });
 
+  $(document).on("click", "#completarTask", function () {
+    let id_task = $(this).attr("keyTask");
+    let confirmado = confirm("Esta seguro de completar actividad");
+    if (confirmado) {
+      if (id_task) {
+        let funcion = "completar_tarea";
+        $.post(
+          "../../controlador/UsuarioController.php",
+          { funcion, id_task },
+          (response) => {
+            console.log(response);
+            if (response.trim() == "COMPLETADO") {
+              alert("Tarea completada satisfactoriamente");
+              buscar_clientes();
+              animarProgress();
+            } else {
+              console.log(response);
+            }
+          }
+        );
+      } else {
+        alert(
+          "No es un estado pendiente, al parecer ocurrio un error, contacta al administrado"
+        );
+      }
+      // console.log("Aceptado: " + id_task);
+    }
+  });
+
   function animarProgress() {
     let funcion = "buscar_visitas_programadas";
     $.post(
       "../../controlador/UsuarioController.php",
       { funcion },
       (response) => {
-        console.log(response);
         let count;
+        let pendientes;
         if (response === "") {
           count = 0;
+          pendientes = 0;
         } else {
-          const visitas = JSON.parse(response);
-          count = visitas.length;
+          const interaccion = JSON.parse(response);
+          console.log(interaccion);
+          const pendientesList = interaccion.filter(
+            (data) => data.status === "PENDIENTE"
+          );
+          const visitasList = interaccion.filter(
+            (data) => data.tipo === "VISITA"
+          );
+          count = visitasList.length;
+          pendientes = pendientesList.length;
         }
         let total = 10;
         var progressBar = document.querySelector(".progreessbar .barSize");
         $("#numberVisit").html(count);
         progressBar.style.width = `${(count / total) * 100}%`;
+        $("#menu-pendientes").html("Pendientes: " + pendientes);
       }
     );
   }
 
   // Llamar a la función de animación
   animarProgress();
-
+  function compareDatesDesc(a, b) {
+    return dayjs(b.created_cliente).diff(dayjs(a.created_cliente));
+  }
   // BUSCAR CLIENTES
   function buscar_clientes() {
     funcion = "buscar_clientes_by_asesor";
@@ -118,6 +208,7 @@ $(document).ready(function () {
         } else {
           const clientes = JSON.parse(response);
           clientesList = clientes;
+          clientes.sort(compareDatesDesc);
           dataTable.clear().rows.add(clientes).draw();
         }
       }
@@ -171,6 +262,7 @@ $(document).ready(function () {
           alert("no hay registro alguno, porfavor cree uno");
         } else {
           const historial = JSON.parse(response);
+          console.log(historial);
           const sortedData = historial.sort(compareDates);
           console.log(historial);
           console.log(sortedData);
@@ -186,7 +278,9 @@ $(document).ready(function () {
                               history.status
                             )}</h3>
                             <p class="mb-4 text-base font-normal text-gray-500 dark:text-gray-400">${
-                              history.observacion
+                              history.observacion !== null
+                                ? history.observacion
+                                : "Sin observaciones"
                             }</p>
                             </li>
                             `;
@@ -200,6 +294,20 @@ $(document).ready(function () {
       }
     );
   }
+  // INTERACCION CON CLIENTES
+  buscar_pendientes();
+
+  function buscar_pendientes() {
+    let funcion = "buscar_pendientes";
+    $.post(
+      "../../controlador/UsuarioController.php",
+      { funcion },
+      (response) => {
+        console.log(response);
+      }
+    );
+  }
+  $("#menu-pendientes").click();
 
   // SHOW MODAL registrar seguimiento
   $(document).on("click", "#contactarSeguimiento", function () {
@@ -309,20 +417,28 @@ $(document).ready(function () {
     template += `<option value="Todos">Todos</option>`;
     // console.log(proyectosList);
     proyectosList.forEach((proyecto) => {
-      template += `<option value="${proyecto.id}">${proyecto.nombreProyecto}</option>`;
+      template += `<option value="${proyecto.nombreProyecto}">${proyecto.nombreProyecto}</option>`;
     });
     $("#filter-proyecto").html(template);
   }
   function filtrarProyectos() {
     const nombreProyecto = $("#filter-proyecto").val();
-    const nombreApellido = $("#cliente-search").val().toLowerCase();
-    console.log(nombreProyecto, nombreApellido);
+    const nombreCliente = $("#cliente-search").val().toLowerCase();
+    console.log(nombreProyecto, nombreCliente);
 
-    const clientes = clientesList.filter((proyecto) => {
-      if (nombreProyecto && proyecto.nombreProyecto === "Todos") {
+    const clientes = clientesList.filter((cliente) => {
+      if (
+        nombreProyecto !== "Todos" &&
+        cliente.nombre_proyecto !== nombreProyecto
+      ) {
+        console.log(cliente.nombre_proyecto);
         return false;
       }
-      if (nombreApellido && !contieneNombreApellido(proyecto, nombreApellido)) {
+      if (
+        nombreCliente !== "" &&
+        !contienenombreCliente(cliente, nombreCliente)
+      ) {
+        console.log(nombreCliente);
         return false;
       }
       return true;
@@ -332,10 +448,10 @@ $(document).ready(function () {
   }
 
   // Función auxiliar para verificar si el nombre y apellido coinciden con el filtro
-  function contieneNombreApellido(proyecto, nombreApellido) {
+  function contienenombreCliente(cliente, nombreCliente) {
     const nombreCompleto =
-      `${proyecto.nombres} ${proyecto.apellidos}`.toLowerCase();
-    return nombreCompleto.includes(nombreApellido);
+      `${cliente.nombres} ${cliente.apellidos}`.toLowerCase();
+    return nombreCompleto.includes(nombreCliente);
   }
 
   // Event listeners para los cambios en el select y el input
@@ -466,15 +582,15 @@ $(document).ready(function () {
       $("#fecha_visita").addClass("hidden");
     }
   });
-  function registerVisita(fecha, hora, cliente, tipo) {
+  function registerVisita(fecha, hora, cliente, tipo, pendiente) {
     let funcion = "add_visita_cliente";
     $.post(
       "../../controlador/UsuarioController.php",
-      { funcion, fecha, hora, cliente, tipo },
+      { funcion, fecha, hora, cliente, tipo, pendiente },
       (response) => {
         console.log(response);
         if (response.trim() === "add-register-visita") {
-          alert("Se registro la visita correctamente");
+          alert("Se registro" + tipo + " correctamente");
           animarProgress();
         } else {
           alert("No se registro, contacta al administrador");
@@ -494,10 +610,11 @@ $(document).ready(function () {
         status === "REPROGRAMACION VISITA" ||
         status === "SEPARACION"
       ) {
+        let pendiente = "PENDIENTE";
         let fecha = $("#date-visita").val();
         let hora = $("#time-visita").val() + ":00";
         if (fecha && hora) {
-          registerVisita(fecha, hora, idCliente, status);
+          registerVisita(fecha, hora, idCliente, status, pendiente);
           $("#date-visita").val(null);
           $("#time-visita").val(null);
         } else {
@@ -507,6 +624,7 @@ $(document).ready(function () {
       seguimiento_cliente(observaciones, idCliente, status);
 
       let funcion = "buscar_historial_seguimiento";
+      buscar_clientes();
       buscarHistorial(funcion, idCliente);
       $("#status-evento").val("0");
       $("#observaciones-evento").val("");
@@ -648,7 +766,6 @@ $(document).ready(function () {
       { funcion, cliente, observacion, status, fecha, hora },
       (response) => {
         if (response.trim() == "add-register-contact") {
-          alert("Se registro correctamente");
           buscar_clientes();
         } else {
           alert("Hubo un error contacta con el administrador");
@@ -657,6 +774,8 @@ $(document).ready(function () {
       }
     );
   }
+
+  // filtrado de busqueda para administrador
 
   // filter cliente
   // $("#cliente-search").on("keyup", function () {

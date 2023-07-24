@@ -355,7 +355,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                         </div>
                     </div>
                 </div>
-                <input type="color" value="#5b5b5b">
+                <!-- <input type="color" value="#5b5b5b"> -->
             </div>
             <div>
                 <p>Filter Avanzado:</p>
@@ -390,6 +390,19 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                         <select id="filter-proyecto" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                             <option selected>Sin etiquetas</option>
                         </select>
+                    </div>
+
+                    <div class="relative inline-block text-left">
+
+                        <label for="pendientes-search" class="mb-2 text-sm font-medium text-gray-900  dark:text-white">Pendientes</label>
+                        <button type="button" class="inline-flex items-center w-full justify-center gap-x-1.5 rounded-md bg-red-600 text-white px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-red-700" id="menu-pendientes" aria-expanded="false" aria-haspopup="true">
+
+                            <ion-icon name="warning"></ion-icon>
+
+                            Pendientes: 0
+
+                        </button>
+
                     </div>
                 </div>
                 <!-- </form> -->

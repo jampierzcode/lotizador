@@ -425,6 +425,52 @@ class Usuario
             return $this->mensaje;
         }
     }
+    function buscar_visitas_date($fecha_inicio, $fecha_fin)
+    {
+        try {
+            # code...
+            $sql = "SELECT fecha_visita, COUNT(*) AS cantidad_visitas
+            FROM interaccion_cliente
+            WHERE status = 'COMPLETADO' AND fecha_visita BETWEEN :fecha_inicio AND :fecha_fin
+            GROUP BY fecha_visita
+            ORDER BY fecha_visita;";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(':fecha_inicio' => $fecha_inicio, ':fecha_fin' => $fecha_fin));
+            $this->datos = $query->fetchAll(); // retorna objetos o no
+            if (!empty($this->datos)) {
+                return $this->datos;
+            } else {
+                $this->mensaje = "no-register";
+                return $this->mensaje;
+            }
+        } catch (\Throwable $error) {
+            $this->mensaje = "fatal-error" . $error;
+            return $this->mensaje;
+        }
+    }
+    function buscar_visitas_date_asesor($fecha_inicio, $fecha_fin, $id_usuario)
+    {
+        try {
+            # code...
+            $sql = "SELECT fecha_visita, COUNT(*) AS cantidad_visitas
+            FROM interaccion_cliente
+            WHERE user_id=:id_usuario AND status = 'COMPLETADO' AND fecha_visita BETWEEN :fecha_inicio AND :fecha_fin
+            GROUP BY fecha_visita
+            ORDER BY fecha_visita;";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":id_usuario" => $id_usuario, ':fecha_inicio' => $fecha_inicio, ':fecha_fin' => $fecha_fin));
+            $this->datos = $query->fetchAll(); // retorna objetos o no
+            if (!empty($this->datos)) {
+                return $this->datos;
+            } else {
+                $this->mensaje = "no-register";
+                return $this->mensaje;
+            }
+        } catch (\Throwable $error) {
+            $this->mensaje = "fatal-error" . $error;
+            return $this->mensaje;
+        }
+    }
     function buscar_proyectos_agentes($id_usuario)
     {
         try {
@@ -677,13 +723,13 @@ class Usuario
             echo json_encode($response);
         }
     }
-    function add_visita_cliente($fecha, $hora, $cliente, $usuario, $tipo)
+    function add_visita_cliente($fecha, $hora, $cliente, $usuario, $tipo, $pendiente)
     {
         try {
             # code...
-            $sql = "INSERT INTO interaccion_cliente(fecha_visita, hora_visita, cliente_id, user_id, tipo) VALUES(:fecha, :hora, :cliente, :usuario, :tipo)";
+            $sql = "INSERT INTO interaccion_cliente(fecha_visita, hora_visita, cliente_id, user_id, tipo, status) VALUES(:fecha, :hora, :cliente, :usuario, :tipo, :status)";
             $query = $this->conexion->prepare($sql);
-            $query->execute(array(":fecha" => $fecha, ":hora" => $hora, ":cliente" => $cliente, ":usuario" => $usuario, ":tipo" => $tipo));
+            $query->execute(array(":fecha" => $fecha, ":hora" => $hora, ":cliente" => $cliente, ":usuario" => $usuario, ":tipo" => $tipo, ":status" => $pendiente));
 
             $this->mensaje = "add-register-visita";
             return $this->mensaje;
@@ -898,8 +944,26 @@ class Usuario
             return $this->mensaje;
         }
     }
-    // GESTION DE CLIENTES USCAR CLIENTE
-
+    // GESTION DE CLIENTES BUSCAR CLIENTE
+    function buscar_pendientes($user)
+    {
+        try {
+            $sql = "SELECT count(*) as pendientes FROM interaccion_cliente WHERE user_id = :id_usuario AND status=:status";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":id_usuario" => $user, ":status" => "PENDIENTE"));
+            $this->datos = $query->fetchAll(); // retorna objetos o no
+            if (!empty($this->datos)) {
+                return $this->datos;
+            } else {
+                $this->mensaje = "no-register-clientes";
+                return $this->mensaje;
+            }
+        } catch (\Throwable $error) {
+            $this->mensaje = "fatal_error" . $error;
+            return $this->mensaje;
+            //throw $th;
+        }
+    }
     function buscar_clientes($user)
     {
         try {
@@ -928,16 +992,37 @@ class Usuario
             //throw $th;
         }
     }
+    function completar_tarea($id_task)
+    {
+        try {
+            //code...
+            // ACTUALIZAR ESTADO DE LA RESERVA
+            $sql = "UPDATE interaccion_cliente SET status=:status WHERE id=:id_task";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":status" => "COMPLETADO", ":id_task" => $id_task));
+            $this->mensaje = "COMPLETADO";
+            return $this->mensaje;
+        } catch (\Throwable $th) {
+            //throw $th;
+            $this->mensaje = "fatal_error " . $th;
+            return $this->mensaje;
+        }
+    }
     function buscar_clientes_by_asesor($id_usuario)
     {
         try {
-            $sql = "SELECT c.*, p.nombreProyecto AS nombre_proyecto
-            FROM usuario u
-            JOIN user_cliente uc ON u.id_usuario = uc.user_id
-            JOIN cliente c ON uc.cliente_id = c.id_cliente
-            LEFT JOIN proyectos p ON c.proyet_id = p.id
-            WHERE u.id_usuario = :id_usuario
-            AND u.usuarioRol = 3;
+            $sql = "SELECT c.*, 
+            p.nombreProyecto AS nombre_proyecto,
+            (SELECT ic.id FROM interaccion_cliente ic 
+             WHERE ic.cliente_id = c.id_cliente AND ic.status = 'PENDIENTE') as id_task, 
+            (SELECT ic.status FROM interaccion_cliente ic 
+             WHERE ic.cliente_id = c.id_cliente AND ic.status = 'PENDIENTE') as task_status
+     FROM usuario u
+     JOIN user_cliente uc ON u.id_usuario = uc.user_id
+     JOIN cliente c ON uc.cliente_id = c.id_cliente
+     LEFT JOIN proyectos p ON c.proyet_id = p.id
+     WHERE u.id_usuario = :id_usuario
+     AND u.usuarioRol = 3;
             ";
             $query = $this->conexion->prepare($sql);
             $query->execute(array(":id_usuario" => $id_usuario));

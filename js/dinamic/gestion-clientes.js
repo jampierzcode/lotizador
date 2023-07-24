@@ -2,6 +2,7 @@ $(document).ready(function () {
   var funcion = "";
   var clientesList;
   var idCliente;
+  var proyectosList;
   buscar_clientes();
   var dataTable = $("#usuariosList").DataTable({
     pageLength: 5,
@@ -133,7 +134,9 @@ $(document).ready(function () {
       });
     });
   }
-
+  function compareDatesDesc(a, b) {
+    return dayjs(b.created_cliente).diff(dayjs(a.created_cliente));
+  }
   // BUSCAR CLIENTES
   function buscar_clientes() {
     funcion = "buscar_clientes";
@@ -141,12 +144,14 @@ $(document).ready(function () {
       "../../controlador/UsuarioController.php",
       { funcion },
       (response) => {
+        console.log(response);
         let template = "";
         if (response.trim() == "no-register-clientes") {
           template += "<td>No hay registros</td>";
         } else {
           const clientes = JSON.parse(response);
           clientesList = clientes;
+          clientes.sort(compareDatesDesc);
           dataTable.clear().rows.add(clientes).draw();
         }
       }
@@ -154,25 +159,61 @@ $(document).ready(function () {
   }
   // agregar lead
   buscar_proyectos();
-  function buscar_proyectos() {
+  async function buscar_proyectos() {
     funcion = "buscar_proyectos_agentes";
-    $.post(
-      "../../controlador/UsuarioController.php",
-      { funcion },
-      (response) => {
-        let template = "";
-        if (response.trim() == "no-register") {
-          template += `<option value="0">Seleccione un proyecto</option>`;
-        } else {
-          template += `<option value="0">Seleccione un proyecto</option>`;
-          const proyectos = JSON.parse(response);
-          proyectos.forEach((proyecto) => {
-            template += `<option value="${proyecto.id}">${proyecto.nombreProyecto}</option>`;
-          });
-        }
-        $("#proyecto-lead").html(template);
+    const response = await $.post("../../controlador/UsuarioController.php", {
+      funcion,
+    });
+    const proyectos = JSON.parse(response);
+    proyectosList = proyectos;
+
+    llenarFiltros();
+  }
+
+  // Event listeners para los cambios en el select y el input
+  $("#cliente-search, #filter-proyecto").on("change keyup", filtrarProyectos);
+  function filtrarProyectos() {
+    console.log(clientesList);
+    const nombreProyecto = $("#filter-proyecto").val();
+    const nombreCliente = $("#cliente-search").val().toLowerCase();
+    console.log(nombreProyecto, nombreCliente);
+
+    const clientes = clientesList.filter((cliente) => {
+      if (
+        nombreProyecto !== "Todos" &&
+        cliente.proyecto_id !== nombreProyecto
+      ) {
+        console.log(cliente.nombre_proyecto);
+        return false;
       }
-    );
+      if (
+        nombreCliente !== "" &&
+        !contienenombreCliente(cliente, nombreCliente)
+      ) {
+        console.log(nombreCliente);
+        return false;
+      }
+      return true;
+    });
+
+    dataTable.clear().rows.add(clientes).draw();
+  }
+  // Función auxiliar para verificar si el nombre y apellido coinciden con el filtro
+  function contienenombreCliente(cliente, nombreCliente) {
+    const nombreCompleto =
+      `${cliente.nombres} ${cliente.apellidos}`.toLowerCase();
+    return nombreCompleto.includes(nombreCliente);
+  }
+
+  function llenarFiltros() {
+    let template = "";
+    template += `<option value="Todos">Todos</option>`;
+    console.log(proyectosList);
+    proyectosList.forEach((proyecto) => {
+      template += `<option value="${proyecto.id}">${proyecto.nombreProyecto}</option>`;
+    });
+    $("#filter-proyecto").html(template);
+    $("#proyecto-lead").html(template);
   }
   // filter cliente
   $("#cliente-search").on("keyup", function () {

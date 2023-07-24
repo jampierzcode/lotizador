@@ -70,9 +70,10 @@ body {
   border: 1px solid #00239694;
 }
 .target_tab.success {
-  background: #00664d;
-  color: #fff;
+  background: #bfe3db;
+  color: #043f32;
   font-weight: 600;
+  border: 1px solid #043f32;
 }
 .btnJsvm {
   width: max-content;

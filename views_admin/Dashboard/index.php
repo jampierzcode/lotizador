@@ -57,90 +57,57 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
                 <ion-icon name="cash-outline"></ion-icon>
             </div> -->
             </div>
-            <div>
 
-                <span class="route">
-                    Trabajo de asesores
-                </span>
-                <div class="flex gap-4 w-full">
-                    <div class="w-full md:w-1/2 p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
-                        <div class="flex items-center justify-between mb-4">
-                            <h5 class="text-lg font-bold leading-none text-gray-900 dark:text-white">Seguimiento de clientes</h5>
-                            <a href="#" class="text-sm font-medium text-blue-600 hover:underline dark:text-blue-500">
-                                D--
-                            </a>
-                        </div>
-                        <div class="flow-root">
-                            <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
-                                <li class="py-3 sm:py-4">
-                                    <div class="flex items-center space-x-4">
-                                        <div class="flex-1 min-w-0">
-                                            <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                                                VISITAS
-                                            </p>
+            <span class="route">
+                Trabajo de asesores
+            </span>
+            <div class="grid gap-4 w-full">
+                <div class="sticky top-0 pt-4 w-full md:w-full p-4 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+                    <div class="flex items-center justify-between">
+                        <h5 class="text-lg font-bold leading-none text-gray-900 dark:text-white">Filtros avanzados</h5>
+                    </div>
+                    <div>
+                        <div class="grid grid-cols-4 gap-4">
+                            <div class="h-auto">
+                                <label for="Fecha Inicio">Fecha Inicio</label>
+                                <input type="date" id="fecha-inicio-search" class="block w-full p-2.5 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Buscar por nombre del asesor">
+                            </div>
+                            <div class="h-auto">
+                                <label for="Fecha Inicio">Fecha Termino</label>
+                                <input type="date" id="fecha-fin-search" class="block w-full p-2.5 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Buscar por nombre del asesor">
+                            </div>
+                            <div class="h-auto">
 
-                                            <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                                                <div class="bg-blue-600 h-2.5 rounded-full" style="width: 45%"></div>
-                                            </div>
+                                <label for="Fecha Inicio">Asesor</label>
 
-                                        </div>
-                                        <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-                                            20
-                                        </div>
+
+                                <div class="relative mb-6">
+                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                        <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                                        </svg>
                                     </div>
-                                </li>
-                                <li class="py-3 sm:py-4">
-                                    <div class="flex items-center space-x-4">
-                                        <div class="flex-1 min-w-0">
-                                            <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                                                REPROGRAMACION CONTACTO
-                                            </p>
+                                    <input type="search" id="asesor-search" class="block w-full p-2.5 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Buscar por nombre del asesor">
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button id="search_date_visitas" type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Buscar</button>
+                                <button id="refresh_date_visitas" type="button" class="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700">Reset</button>
 
-                                            <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                                                <div class="bg-blue-600 h-2.5 rounded-full" style="width: 45%"></div>
-                                            </div>
+                            </div>
 
-                                        </div>
-                                        <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-                                            20
-                                        </div>
-                                    </div>
-                                </li>
-                                <li class="py-3 sm:py-4">
-                                    <div class="flex items-center space-x-4">
-                                        <div class="flex-1 min-w-0">
-                                            <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                                                REPROGRAMACION VISITA
-                                            </p>
-
-                                            <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                                                <div class="bg-blue-600 h-2.5 rounded-full" style="width: 45%"></div>
-                                            </div>
-
-                                        </div>
-                                        <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-                                            20
-                                        </div>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
-                        <div>
-
-                            <div id="compare_seguimiento" class="w-full" style="height:400px;"></div>
                         </div>
                     </div>
-                    <div class="w-full md:w-1/2 p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
-                        <div class="flex items-center justify-between mb-4">
-                            <h5 class="text-lg font-bold leading-none text-gray-900 dark:text-white">Visitas para esta semana</h5>
-                            <a href="#" class="text-sm font-medium text-blue-600 hover:underline dark:text-blue-500">
-                                --
-                            </a>
-                        </div>
-                        <div>
-                            <div id="main" class="w-full" style="height:400px;"></div>
-                        </div>
-                        <!-- <div class="flow-root">
+                </div>
+                <div class="w-full md:w-full p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
+                    <div class="flex items-center justify-between mb-4">
+                        <h5 class="text-lg font-bold leading-none text-gray-900 dark:text-white">Visitas concretadas</h5>
+
+                    </div>
+                    <div>
+                        <div id="visitas_graf" class="w-full" style="height:400px;"></div>
+                    </div>
+                    <!-- <div class="flow-root">
                             <ul role="list" class="max-h-[200px] overflow-y-auto divide-y divide-gray-200 dark:divide-gray-700">
                                 <li class="py-3 sm:py-4">
                                     <div class="flex items-center space-x-4">
@@ -294,9 +261,8 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
                                 </li>
                             </ul>
                         </div> -->
-                    </div>
-
                 </div>
+
                 <span class="route mt-6">
                     Clientes Potenciales
                 </span>
@@ -452,22 +418,22 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
                         </div>
                     </div>
                 </div>
-            </div>
-            <span class="route mt-6">
-                Visitas de enlaces de agentes
-            </span>
-            <div class="flex gap-4">
-                <div class="w-full md:w-1/3 max-w-md p-1 bg-white border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
 
-                    <canvas id="visitas" width="150"></canvas>
+                <span class="route mt-6">
+                    Visitas de enlaces de agentes
+                </span>
+                <div class="flex gap-4">
+                    <div class="w-full md:w-1/3 max-w-md p-1 bg-white border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
+
+                        <canvas id="visitas" width="150"></canvas>
+                    </div>
+                    <div class="w-full md:w-2/3 max-w-md p-1 bg-white border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
+
+                        <canvas id="circleVisitas" width="150"></canvas>
+                    </div>
                 </div>
-                <div class="w-full md:w-2/3 max-w-md p-1 bg-white border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
 
-                    <canvas id="circleVisitas" width="150"></canvas>
-                </div>
-            </div>
-
-            <!-- <div class="grid-2-column gap-10">
+                <!-- <div class="grid-2-column gap-10">
 
                 <div class="listAgentes">
 
@@ -476,92 +442,12 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
 
                 </div>
             </div> -->
+            </div>
+
         </div>
     </body>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js" integrity="sha512-EmNxF3E6bM0Xg1zvmkeYD3HDBeGxtsG92IxFt1myNZhXdCav9MzvuH/zNMBU1DmIPN6njrhX1VTbqdJxQ2wHDg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-    <script type="text/javascript">
-        // Initialize the echarts instance based on the prepared dom
-        var myChart = echarts.init(document.getElementById('main'));
-        var myChart2 = echarts.init(document.getElementById('compare_seguimiento'));
-
-        // Specify the configuration items and data for the chart
-        var option = {
-            // title: {
-            //     text: 'ECharts Getting Started Example'
-            // },
-            tooltip: {},
-            legend: {
-                data: ['Visitas']
-            },
-            xAxis: {
-                data: ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo']
-            },
-            yAxis: {},
-            series: [{
-                name: 'Visitas',
-                type: 'bar',
-                data: [5, 20, 36, 10, 10, 20, 14]
-            }]
-        };
-        var option2 = {
-            tooltip: {
-                trigger: 'item'
-            },
-            legend: {
-                top: '5%',
-                left: 'center',
-                // doesn't perfectly work with our tricks, disable it
-                selectedMode: false
-            },
-            series: [{
-                // name: 'Access From',
-                type: 'pie',
-                radius: ['40%', '70%'],
-                center: ['50%', '70%'],
-                // adjust the start angle
-                startAngle: 180,
-                label: {
-                    show: true,
-                    formatter(param) {
-                        // correct the percentage
-                        return param.name + ' (' + param.percent * 2 + '%)';
-                    }
-                },
-                data: [{
-                        value: 1048,
-                        name: 'REPROGRAMACION CONTACTO'
-                    },
-                    {
-                        value: 735,
-                        name: 'REPROGRAMACION VISITA'
-                    },
-                    {
-                        value: 580,
-                        name: 'VISITA'
-                    },
-                    {
-                        // make an record to fill the bottom 50%
-                        value: 1048 + 735 + 580,
-                        itemStyle: {
-                            // stop the chart from rendering this piece
-                            color: 'none',
-                            decal: {
-                                symbol: 'none'
-                            }
-                        },
-                        label: {
-                            show: false
-                        }
-                    }
-                ]
-            }]
-        };
-
-        // Display the chart using the configuration items and data just specified.
-        myChart.setOption(option);
-        myChart2.setOption(option2);
-    </script>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css" integrity="sha512-YWzhKL2whUzgiheMoBFwW8CKV4qpHQAEuvilg9FAn5VJUDwKZZxkJNuGM4XkWuk94WCrrwslk8yWNGmY1EduTA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
@@ -570,6 +456,9 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.5.1/chart.min.js" integrity="sha512-Wt1bJGtlnMtGP0dqNFH1xlkLBNpEodaiQ8ZN5JLA5wpc1sUlk/O5uuOMNgvzddzkpvZ9GLyYNa8w2s7rqiTk5Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="../../js/dinamic/gestion_contabilidad.js"></script>
     <script src="../../js/dinamic/graficos-admin.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.9.4/dayjs.min.js" integrity="sha512-XZSHSEFj4QeE0G4pwy4tToyAhF2VXoEcF9CP0t1PSZMP2XHhEEB9PjM9knsdzcEKbi6GRMazdt8tJadz0JTKIQ==" crossorigin="anonymous"></script>
+    <script src="../../js/dinamic/gestion_filtros.js"></script>
 
     </html>
 <?php } ?>

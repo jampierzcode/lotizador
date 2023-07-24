@@ -389,6 +389,18 @@ if ($_POST["funcion"] == "buscar_asesor_cliente") {
         echo $jsonstring;
     }
 }
+if ($_POST["funcion"] == "buscar_visitas_date") {
+    $fecha_inicio = $_POST["fecha_inicio"];
+    $fecha_fin = $_POST["fecha_fin"];
+    $usuario->buscar_visitas_date($fecha_inicio, $fecha_fin);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+        $jsonstring = json_encode($usuario->datos);
+        echo $jsonstring;
+    }
+}
 if ($_POST["funcion"] == "buscar_proyectos_agentes") {
     $json = array();
     $id_usuario = $_SESSION["id_usuario"];
@@ -702,7 +714,8 @@ if ($_POST["funcion"] == "add_visita_cliente") {
     $cliente = $_POST["cliente"];
     $user = $_SESSION["id_usuario"];
     $tipo = $_POST["tipo"];
-    $usuario->add_visita_cliente($fecha, $hora, $cliente, $user, $tipo);
+    $pendiente = $_POST["pendiente"];
+    $usuario->add_visita_cliente($fecha, $hora, $cliente, $user, $tipo, $pendiente);
     echo $usuario->mensaje;
 }
 if ($_POST["funcion"] == "add_cliente") {
@@ -726,7 +739,18 @@ if ($_POST["funcion"] == "delete_cliente_asesor") {
     echo $usuario->mensaje;
 }
 // BUSCAR CLIENTES
+if ($_POST["funcion"] == "buscar_pendientes") {
 
+    $user = $_SESSION["id_usuario"];
+    $usuario->buscar_pendientes($user);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+        $jsonstring = json_encode($usuario->datos);
+        echo $jsonstring;
+    }
+}
 
 if ($_POST["funcion"] == "buscar_clientes") {
     $json = array();
@@ -756,6 +780,11 @@ if ($_POST["funcion"] == "buscar_clientes") {
         echo $jsonstring;
     }
 }
+if ($_POST["funcion"] == "completar_tarea") {
+    $id_task = $_POST["id_task"];
+    $usuario->completar_tarea($id_task);
+    echo $usuario->mensaje;
+}
 if ($_POST["funcion"] == "buscar_clientes_by_asesor") {
     $json = array();
     $usuario->buscar_clientes_by_asesor($_SESSION["id_usuario"]);
@@ -780,6 +809,8 @@ if ($_POST["funcion"] == "buscar_clientes_by_asesor") {
                 'nombre_proyecto' => $dato->nombre_proyecto,
                 'created_cliente' => $dato->created_cliente,
                 'proyecto_id' => $dato->proyet_id,
+                'id_task' => $dato->id_task,
+                'task_status' => $dato->task_status
             );
         }
         $jsonstring = json_encode($json);
