@@ -208,11 +208,20 @@ $(document).ready(function () {
   function llenarFiltros() {
     let template = "";
     template += `<option value="Todos">Todos</option>`;
-    console.log(proyectosList);
+    // console.log(proyectosList);
     proyectosList.forEach((proyecto) => {
       template += `<option value="${proyecto.id}">${proyecto.nombreProyecto}</option>`;
     });
     $("#filter-proyecto").html(template);
+    llenar_modal_lead();
+  }
+  function llenar_modal_lead() {
+    let template = "";
+    template += `<option value="0">Seleccione un proyecto</option>`;
+    // console.log(proyectosList);
+    proyectosList.forEach((proyecto) => {
+      template += `<option value="${proyecto.id}">${proyecto.nombreProyecto}</option>`;
+    });
     $("#proyecto-lead").html(template);
   }
   // filter cliente
