@@ -39,6 +39,9 @@ $(document).ready(function () {
           let template_status = imprimirStatus(data?.status); // Cambiar de const a let
 
           if (data.task_status === "PENDIENTE") {
+            template_status += `<span>${
+              data.fecha_visita + " Hora: " + data.hora_visita
+            }</span>`;
             template_status += `
               <div class="flex-actions">
               <button target="_blank" keyTask="${data.id_task}" statusClient="${data.status}" keyClient="${data?.id}" id="completarTask" class="btnJsvm default mt-2">Completar Actividad</button>

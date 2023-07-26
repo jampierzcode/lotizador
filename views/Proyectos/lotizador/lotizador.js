@@ -1,8 +1,8 @@
 $(document).ready(function () {
   const urlParams = new URLSearchParams(window.location.search);
   var id = urlParams.get("id");
-  var layersArray = [];
-
+  var layersArray = []; //array para almacenar en el carrito
+  var lotesList = []; //array para guardar los obtenidos actuales
   var imageUrl;
   var lotesArray = [];
   var poligonoSeleccionado = null;
@@ -13,6 +13,7 @@ $(document).ready(function () {
   var loteMz;
   var loteNumero;
   var lotePrecio;
+  var loteEstado;
   var formaActual = null;
   var formaDibujada = null;
   fetchLotes();
@@ -49,6 +50,9 @@ $(document).ready(function () {
         var imageOverlay = L.imageOverlay(imageUrl, imageBounds);
         imageOverlay.addTo(map1);
         map1.fitBounds(imageBounds); // Ajustar los límites del mapa a la imagen
+        setInterval(() => {
+          $("#loading_lotizador").addClass("hidden");
+        }, 2000);
       };
     }
   );
@@ -63,11 +67,13 @@ $(document).ready(function () {
         var template = "";
         if (response.trim() === "no-register") {
           template += `
-          <button class="btnLotizador dragSquare">No hay lotes</button>          
+          <button class="btnLotizador items-center justify-center dragSquare">No hay lotes</button>          
           `;
           $("#listLotes").html(template);
         } else {
           const lotes = JSON.parse(response);
+          lotesList = lotes;
+          console.log(lotes);
           pintarLotes(lotes);
         }
       }
@@ -77,11 +83,7 @@ $(document).ready(function () {
     let template = "";
     lotes.map((lote) => {
       template += `
-      <button id="${
-        lote.mz_zona + "" + lote.numero
-      }" class="btnLotizador dragSquare">MZ: ${lote.mz_zona} NLote: ${
-        lote.numero
-      } Precio: ${lote.precio} Area: ${lote.area}</button>
+      <button id="${lote.id}" class="btnLotizador dragSquare">Manzana: ${lote.mz_zona} Lote: ${lote.numero} Precio: ${lote.precio} Area: ${lote.area}</button>
       `;
     });
     $("#listLotes").html(template);
@@ -99,6 +101,9 @@ $(document).ready(function () {
           break;
         case "OCUPADO":
           fillColor = "#FF0000"; // Rojo
+          break;
+        case "SIN PUBLICAR":
+          fillColor = "#eaeaea"; // Rojo
           break;
         default:
           fillColor = "#a81318"; // Negro (color por defecto en caso de estado no válido)
@@ -119,19 +124,17 @@ $(document).ready(function () {
         ];
         layer = L.rectangle(bounds, estiloPoligono).addTo(map1);
         layer.on("click", function () {
-          // Actualizar los valores en la tarjeta de HTML
-          $(".dragSquare").removeClass("active");
+          toggleLayerEditing(layer);
           $(`#${lote.mz_zona}${lote.numero}`).addClass("active");
         });
       } else if (lote.tipo === "poligono") {
         layer = L.polygon(lote.cordinates, estiloPoligono).addTo(map1);
         layer.on("click", function () {
-          // Actualizar los valores en la tarjeta de HTML
-          $(".dragSquare").removeClass("active");
+          toggleLayerEditing(layer);
           $(`#${lote.mz_zona}${lote.numero}`).addClass("active");
         });
       }
-      layer.options.id = lote.numero.toString() + "" + lote.mz_zona.toString();
+      layer.options.id = lote.id;
       layer
         .bindTooltip(
           `
@@ -142,21 +145,20 @@ $(document).ready(function () {
         .openTooltip();
       drawnItems1.addLayer(layer);
       layersArray.push(layer);
-
-      // console.log(layer.options.id);
-      // layer.on("click", function (e) {
-      //   drawnItems1.addLayer(layer);
-      //   // Deseleccionar la capa previamente seleccionada
-      //   if (selectedLayer) {
-      //     drawnItems1.removeLayer(selectedLayer);
-      //     selectedLayer.editing.disable();
-      //     saveEditedLayer(selectedLayer);
-      //   }
-
-      //   // Seleccionar la capa actual
-      //   selectedLayer = e.target;
-      //   selectedLayer.editing.enable();
-      // });
+    });
+  }
+  // Función para activar/desactivar la edición en los layers
+  function toggleLayerEditing(activeLayer) {
+    layersArray.forEach((layer) => {
+      if (layer === activeLayer) {
+        // Activar edición solo en el layer clicado
+        layer.editing.enable();
+        layer.setStyle({ color: "blue", weight: 2 });
+      } else {
+        // Desactivar edición en el resto de los layers
+        layer.editing.disable();
+        layer.setStyle({ color: "#5b5b5b", weight: 1 });
+      }
     });
   }
 
@@ -223,30 +225,6 @@ $(document).ready(function () {
   var selectedLayer = null;
 
   // Capturar el evento click en el botón "Editar" del controlador
-  map1.on("draw:editstart", function (e) {
-    drawnItems1.eachLayer(function (layer) {
-      layer.setStyle({
-        // Restablecer el estilo del layer
-        color: "blue",
-        fillColor: "blue",
-      });
-    });
-
-    // Obtener las capas editadas
-    const layers = e.layers;
-
-    // Verificar si hay alguna capa editada
-    if (layers && layers.getLayers().length > 0) {
-      // Obtener la capa editada (en este caso se asume que solo se edita una capa a la vez)
-      selectedLayer = layers.getLayers()[0];
-
-      // Establecer un estilo diferente para la capa seleccionada
-      selectedLayer.setStyle({
-        color: "red",
-        fillColor: "red",
-      });
-    }
-  });
 
   // CRUD DE DIBUJO EN EL MAPA
 
@@ -264,7 +242,7 @@ $(document).ready(function () {
 
     if (layer instanceof L.Rectangle) {
       formaActual = {
-        estado: "DISPONIBLE",
+        estado: loteEstado,
         lotePrecio,
         loteArea,
         loteAncho,
@@ -279,7 +257,7 @@ $(document).ready(function () {
       };
     } else if (layer instanceof L.Polygon) {
       formaActual = {
-        estado: "DISPONIBLE",
+        estado: loteEstado,
         lotePrecio,
         loteArea,
         loteAncho,
@@ -293,7 +271,6 @@ $(document).ready(function () {
       };
     }
     console.log(formaActual);
-    lotesArray.push(formaActual);
     $(".showCarrito").addClass("active");
 
     // agregarPoligonos(layer, coordinates);
@@ -302,33 +279,72 @@ $(document).ready(function () {
     map1.addControl(drawControl1);
   });
   // editar la FORMA DIBUJADA en el mapa
-  // map1.on("draw:edited", function (event) {
-  //   const layers = event.layers;
-  //   console.log(formaDibujada);
-  //   console.log(layers);
-  //   layers.eachLayer(function (layer) {
-  //     if (layer === formaDibujada) {
-  //       formaDibujada = layer;
-  //       console.log("forma editada");
-  //       var newCoordinates;
+  map1.on("draw:edited", function (event) {
+    const layers = event.layers;
+    console.log(layers);
+    let newLotes = [];
+    layers.eachLayer(function (layer) {
+      // Obtener el lote asociado al layer (puedes usar algún identificador para relacionarlos)
+      // console.log(layer);
+      const lote = getLoteByLayer(layer);
+      console.log(lote);
+      let coordenadas;
+      if (lote instanceof L.rectangle) {
+        coordenadas = [
+          [lote.getBounds().getNorth(), lote.getBounds().getWest()],
+          [lote.getBounds().getSouth(), lote.getBounds().getEast()],
+        ];
+      } else {
+        coordenadas = lote
+          .getLatLngs()[0]
+          .map((latLng) => [latLng.lat, latLng.lng]); // lng,lat
+      }
 
-  //       if (layer instanceof L.Rectangle) {
-  //         newCoordinates = [
-  //           [layer.getBounds().getNorth(), layer.getBounds().getWest()],
-  //           [layer.getBounds().getSouth(), layer.getBounds().getEast()],
-  //         ];
-  //       } else if (layer instanceof L.Polygon) {
-  //         newCoordinates = layer.getLatLngs()[0].map(function (latLng) {
-  //           return [latLng.lat, latLng.lng];
-  //         });
-  //       }
-
-  //       // Actualizar las coordenadas de formaActual
-  //       formaActual.coordenadas = newCoordinates;
-  //       console.log(formaActual);
-  //     }
-  //   });
-  // });
+      console.log(coordenadas);
+      lotesList.forEach((mylote) => {
+        if (mylote.id === lote.options.id) {
+          const loteEdit = {
+            id: mylote.id,
+            coordenadas: coordenadas,
+          };
+          newLotes.push(loteEdit);
+        }
+      });
+    });
+    console.log(newLotes);
+    editar_lotes(newLotes)
+      .then(() => {
+        // Aquí puedes mostrar el mensaje de éxito o realizar cualquier otra acción necesaria
+        alert("Proceso de envío de lotes completado");
+        drawnItems1.clearLayers();
+        buscarLotes(id);
+        lotesArray = [];
+      })
+      .catch((error) => {
+        // Aquí puedes manejar el error, mostrar un mensaje de error, etc.
+        alert("Error al enviar los lotes:", error);
+      });
+  });
+  async function editar_lotes(newLotes) {
+    await Promise.all(newLotes.map(enviarLote));
+  }
+  function enviarLote(lote) {
+    return new Promise((resolve, reject) => {
+      let funcion = "editar_lotes";
+      $.post(
+        "../../../controlador/UsuarioController.php",
+        { funcion, lote },
+        (response) => {
+          console.log(response);
+          resolve();
+        }
+      );
+    });
+  }
+  function getLoteByLayer(layer) {
+    // Retorna el lote encontrado o null si no se encuentra
+    return layersArray.find((lote) => lote.options.id === layer.options.id);
+  }
 
   // eliminar la FORMA DIBUJADA en el mapa
   // map1.on("draw:deleted", function (event) {
@@ -346,17 +362,17 @@ $(document).ready(function () {
 
   // AGREGAR AL CARRITO DE LOTES
 
-  // $("#addCarritoLotes").click(guardarForma);
-  // function guardarForma() {
-  //   if (formaActual !== null) {
-  //     // Comprobar si la forma es un rectángulo
-  //     lotesArray.push(formaActual);
-  //     formaActual = null;
-  //     fetchLotes();
-  //   } else {
-  //     alert("no hay ninguna forma dibujada");
-  //   }
-  // }
+  $("#addCarritoLotes").click(guardarForma);
+  function guardarForma() {
+    if (formaActual !== null) {
+      // Comprobar si la forma es un rectángulo
+      lotesArray.push(formaActual);
+      formaActual = null;
+      fetchLotes();
+    } else {
+      alert("no hay ninguna forma dibujada");
+    }
+  }
 
   // FUNCION PARA PINTAR LOS LOTES EN EL CARRITO
   function fetchLotes() {
@@ -424,8 +440,12 @@ $(document).ready(function () {
     loteMz = $("#loteMz").val();
     loteNumero = $("#loteNumero").val();
     lotePrecio = $("#lotePrecio").val();
+    loteEstado = $("#loteEstado").val();
     if (
-      (loteArea !== "" && loteMz !== "" && loteNumero > 0, lotePrecio !== "")
+      loteArea !== "" &&
+      loteMz !== "" &&
+      loteNumero > 0 &&
+      loteEstado !== ""
     ) {
       creacionHabilitada = true;
       drawControl1.setDrawingOptions({ polygon: true }); // Habilitar la creación de polígonos
@@ -438,6 +458,15 @@ $(document).ready(function () {
       alert("Te faltan llenar campos para crear el poligono");
     }
   });
+  function calcularArea() {
+    let ancho = $("#loteAncho").val();
+    let largo = $("#loteLargo").val();
+    let suma;
+    suma = Number(ancho) * Number(largo);
+    $("#loteArea").val(suma);
+  }
+  $("#loteAncho").on("keyup", calcularArea);
+  $("#loteLargo").on("keyup", calcularArea);
 
   // FUNCION PARA COPIAR EL POLIGONO DE ACUERDO AL TAMAÑO ETC.
   function copiarPoligono() {

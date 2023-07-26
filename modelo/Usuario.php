@@ -161,6 +161,19 @@ class Usuario
             return $this->mensaje;
         }
     }
+    function editar_lote_coordenadas($id, $coordenadas)
+    {
+        $sql = "UPDATE lotes SET cordinates=:cordinates WHERE id=:id_lote";
+        $query = $this->conexion->prepare($sql);
+        try {
+            $query->execute(array(":id_lote" => $id, ":cordinates" => $coordenadas));
+            $this->mensaje = "update-lote";
+            return $this->mensaje;
+        } catch (\Throwable $error) {
+            $this->mensaje = "no-update-lote" . $error;
+            return $this->mensaje;
+        }
+    }
 
     function buscar_lotes($id)
     {
@@ -1013,16 +1026,17 @@ class Usuario
         try {
             $sql = "SELECT c.*, 
             p.nombreProyecto AS nombre_proyecto,
-            (SELECT ic.id FROM interaccion_cliente ic 
-             WHERE ic.cliente_id = c.id_cliente AND ic.status = 'PENDIENTE') as id_task, 
-            (SELECT ic.status FROM interaccion_cliente ic 
-             WHERE ic.cliente_id = c.id_cliente AND ic.status = 'PENDIENTE') as task_status
+            ic.id AS id_task,
+            ic.status AS task_status, ic.fecha_visita, ic.hora_visita
      FROM usuario u
      JOIN user_cliente uc ON u.id_usuario = uc.user_id
      JOIN cliente c ON uc.cliente_id = c.id_cliente
      LEFT JOIN proyectos p ON c.proyet_id = p.id
+     LEFT JOIN interaccion_cliente ic 
+            ON ic.cliente_id = c.id_cliente AND ic.status = 'PENDIENTE'
      WHERE u.id_usuario = :id_usuario
      AND u.usuarioRol = 3;
+     
             ";
             $query = $this->conexion->prepare($sql);
             $query->execute(array(":id_usuario" => $id_usuario));

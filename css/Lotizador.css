@@ -48,6 +48,7 @@ button {
   border: 1px solid #ececec;
   width: 300px;
   max-width: 400px;
+  box-shadow: 0px 6px 14px -8px #5b5b5b;
 }
 .carrito {
   display: flex;
@@ -89,6 +90,23 @@ button {
   width: 100%;
   padding: 10px;
 }
+/* controladores */
+.leaflet-bar {
+  border: none !important;
+  overflow: hidden !important;
+}
+.leaflet-control-zoom-in {
+  background: #310ecd !important;
+  border: none !important;
+  border-style: none !important;
+  color: #fff !important;
+}
+/* .leaflet-draw-edit-edit {
+  background: #f5cf00 !important;
+  border: none !important;
+  border-style: none !important;
+  color: #393737 !important;
+} */
 
 /* LOTES LISTA */
 .containerLotes {
@@ -98,8 +116,8 @@ button {
   border: 1px solid #ececec;
   width: 250px;
   position: fixed;
-  bottom: 40px;
-  right: 20px;
+  bottom: 30px;
+  right: 30px;
   max-height: 600px;
   display: flex;
   flex-direction: column;
@@ -127,6 +145,9 @@ button {
   border-radius: 10px;
   color: #fff;
   font-size: 10px;
+}
+.status.sinpublicar {
+  background-color: #575757;
 }
 .status.disponible {
   background-color: #71bf44;

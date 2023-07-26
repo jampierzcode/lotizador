@@ -48,6 +48,9 @@ $(document).ready(function () {
         var imageOverlay = L.imageOverlay(imageUrl, imageBounds);
         imageOverlay.addTo(map1);
         map1.fitBounds(imageBounds); // Ajustar los límites del mapa a la imagen
+        setInterval(() => {
+          $("#loading_lotizador").addClass("hidden");
+        }, 2000);
       };
     }
   );
@@ -78,7 +81,7 @@ $(document).ready(function () {
       template += `
         <button id="${
           lote.mz_zona + "" + lote.numero
-        }" class="btnLotizador dragSquare">MZ: ${lote.mz_zona} NLote: ${
+        }" class="btnLotizador dragSquare">Manzana: ${lote.mz_zona} Lote: ${
         lote.numero
       } Precio: ${lote.precio} Area: ${lote.area}</button>
         `;
@@ -110,6 +113,10 @@ $(document).ready(function () {
           fillColor = "#FF0000"; // Rojo
           estado = "ocupado";
           break;
+        case "SIN PUBLICAR":
+          fillColor = "#eaeaea"; // Rojo
+          estado = "sinpublicar";
+          break;
         default:
           fillColor = "#a81318"; // Negro (color por defecto en caso de estado no válido)
       }
@@ -131,7 +138,7 @@ $(document).ready(function () {
         rectangle
           .bindTooltip(
             `
-        Lote: ${lote.numero} ${lote.mz_zona} <br> Precio: ${lote.precio}  <br> Area: ${lote.area}
+        Manzana: ${lote.mz_zona} Lote: ${lote.numero} <br> Precio: ${lote.precio}  <br> Area: ${lote.area}
         
         `
           )
@@ -141,7 +148,8 @@ $(document).ready(function () {
           Estado: <span key_status="${lote.estado}" class="status ${estado}" id="estado">${lote.estado}</span> <button id="editEstate">Editar</button>
           `;
           // Actualizar los valores en la tarjeta de HTML
-          $("#lote").text(lote.numero + lote.mz_zona);
+          $("#manzana").text(lote.mz_zona);
+          $("#lote").text(lote.numero);
           $("#lote").attr("key", lote.numero + lote.mz_zona);
           $("#lote").attr("numberKey", lote.id);
           $("#ancho").text(lote.ancho);
@@ -157,7 +165,7 @@ $(document).ready(function () {
         poligono
           .bindTooltip(
             `
-        Lote: ${lote.numero} ${lote.mz_zona} <br> Precio: ${lote.precio}  <br> Area: ${lote.area}
+        Manzana: ${lote.mz_zona} Lote: ${lote.numero}<br> Precio: ${lote.precio}  <br> Area: ${lote.area}
         
         `
           )
@@ -167,7 +175,8 @@ $(document).ready(function () {
           Estado: <span key_status="${lote.estado}" class="status ${estado}" id="estado">${lote.estado}</span> <button id="editEstate">Editar</button>
           `;
           // Actualizar los valores en la tarjeta de HTML
-          $("#lote").text(lote.numero + lote.mz_zona);
+          $("#manzana").text(lote.mz_zona);
+          $("#lote").text(lote.numero);
           $("#lote").attr("key", lote.numero + lote.mz_zona);
           $("#lote").attr("numberKey", lote.id);
           $("#ancho").text(lote.ancho);
@@ -360,7 +369,7 @@ $(document).ready(function () {
     if (lotesArray.length > 0) {
       lotesArray.map((lote) => {
         template += `
-          <button class="btnLotizador dragSquare">MZ: ${lote.loteMz} NLote: ${lote.loteNumero} Precio: ${lote.lotePrecio} Area: ${lote.loteArea}</button>
+          <button class="btnLotizador dragSquare">Manzana: ${lote.loteMz} Lote: ${lote.loteNumero} Precio: ${lote.lotePrecio} Area: ${lote.loteArea}</button>
           `;
       });
     } else {

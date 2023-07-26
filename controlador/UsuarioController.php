@@ -569,7 +569,7 @@ if ($_POST["funcion"] == "buscar-imagen-proyect") {
     }
 }
 if ($_POST["funcion"] == "agregar_lotes") {
-    $id = $_POST['id'];
+    $id = $_POST['id']; //id del ptoyecto
     $lotes = $_POST['lotes'];
     $lotesArray = json_decode($lotes, true);
     // $usuario->crear_lote($id, $lote);
@@ -587,6 +587,13 @@ if ($_POST["funcion"] == "agregar_lotes") {
         $usuario->crear_lote($id, $loteAncho, $loteLargo, $loteArea, $loteMz, $loteNumero, $lotePrecio, $tipo, $estado, $coordenadas);
         echo $usuario->mensaje;
     }
+}
+if ($_POST["funcion"] == "editar_lotes") {
+    $lote = $_POST["lote"];
+    $id_lote = $lote["id"];
+    $coordenadas = json_encode($lote["coordenadas"]);
+    $usuario->editar_lote_coordenadas($id_lote, $coordenadas);
+    echo $usuario->mensaje;
 }
 if ($_POST["funcion"] == "buscar_lotes") {
     $id = $_POST["id"];
@@ -810,7 +817,9 @@ if ($_POST["funcion"] == "buscar_clientes_by_asesor") {
                 'created_cliente' => $dato->created_cliente,
                 'proyecto_id' => $dato->proyet_id,
                 'id_task' => $dato->id_task,
-                'task_status' => $dato->task_status
+                'task_status' => $dato->task_status,
+                'fecha_visita' => $dato->fecha_visita,
+                'hora_visita' => $dato->hora_visita
             );
         }
         $jsonstring = json_encode($json);
