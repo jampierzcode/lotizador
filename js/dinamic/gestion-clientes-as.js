@@ -7,6 +7,8 @@ $(document).ready(function () {
 
   var dataTable = $("#usuariosList").DataTable({
     // scrollY: "160px",
+    // scrollY: "500px",
+    stateSave: true,
     lengthMenu: [5, 10, 25, 50],
     language: {
       lengthMenu: "Mostrar _MENU_ registros por página",
@@ -274,8 +276,9 @@ $(document).ready(function () {
         } else {
           const clientes = JSON.parse(response);
           clientesList = clientes;
-          clientes.sort(compareDatesDesc);
-          dataTable.clear().rows.add(clientes).draw();
+          clientesList.sort(compareDatesDesc);
+
+          filtrarProyectos();
         }
       }
     );
@@ -500,8 +503,37 @@ $(document).ready(function () {
       }
       return true;
     });
+    var estadoActual = {
+      page: dataTable.page(), // Página actual
+      scrollLeft: $("#usuariosList").parent().scrollLeft(), // Posición de scroll horizontal
+      bodyScroll: $("body").parent().scrollTop(),
+    };
 
-    dataTable.clear().rows.add(clientes).draw();
+    // Limpiar la tabla (eliminar las filas sin nueva carga)
+
+    dataTable.clear().draw(false);
+
+    // Agregar las nuevas filas
+    dataTable.rows.add(clientes).draw(false);
+    // Restaurar el número de página previo
+    var pageInfo = dataTable.page.info();
+    var totalPaginas = pageInfo.pages;
+    console.log(totalPaginas);
+    if (estadoActual.page < totalPaginas) {
+      console.log(estadoActual.page);
+      dataTable.page(estadoActual.page);
+    } else {
+      dataTable.clear().draw();
+
+      // Agregar las nuevas filas
+      dataTable.rows.add(clientes).draw();
+      console.log(totalPaginas - 1);
+      dataTable.page(totalPaginas - 1);
+    }
+
+    // Restaurar la posición de scroll horizontal
+    $("#usuariosList").parent().scrollLeft(estadoActual.scrollLeft);
+    $("body").parent().scrollTop(estadoActual.bodyScroll);
   }
   function filtrarPendientes() {
     let fecha_inicio = dayjs(
@@ -526,9 +558,10 @@ $(document).ready(function () {
           return false;
         }
         if (
-          cliente.fecha_visita > fecha_fin &&
-          cliente.fecha_visita < fecha_inicio
+          dayjs(cliente.fecha_visita).isAfter(fecha_fin) ||
+          dayjs(cliente.fecha_visita).isBefore(fecha_inicio)
         ) {
+          console.log("entro");
           return false;
         }
         return true;
