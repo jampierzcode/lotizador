@@ -101,7 +101,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
                 </div>
                 <div class="w-full md:w-full p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
                     <div class="flex items-center justify-between mb-4">
-                        <h5 class="text-lg font-bold leading-none text-gray-900 dark:text-white">Visitas concretadas</h5>
+                        <h5 class="text-lg font-bold leading-none text-center text-gray-900 dark:text-white">Resumen de Visitas</h5>
 
                     </div>
                     <div>

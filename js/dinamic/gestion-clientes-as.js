@@ -7,6 +7,21 @@ $(document).ready(function () {
 
   var dataTable = $("#usuariosList").DataTable({
     // scrollY: "160px",
+    lengthMenu: [5, 10, 25, 50],
+    language: {
+      lengthMenu: "Mostrar _MENU_ registros por página",
+      zeroRecords: "No se encontraron resultados",
+      info: "Mostrando página _PAGE_ de _PAGES_",
+      infoEmpty: "No hay registros disponibles",
+      infoFiltered: "(filtrado de _MAX_ registros totales)",
+      search: "Buscar:",
+      paginate: {
+        first: "Primero",
+        last: "Último",
+        next: "Siguiente",
+        previous: "Anterior",
+      },
+    },
     pageLength: 5,
     scrollX: true,
     // scrollCollapse: true,
@@ -15,12 +30,12 @@ $(document).ready(function () {
       leftColumns: 2, //Le indico que deje fijas solo las 2 primeras columnas
       // rightColumns: 1,
     },
-    aoColumnDefs: [
-      {
-        bSortable: false,
-        aTargets: ["nosort"],
-      },
-    ],
+    // aoColumnDefs: [
+    //   {
+    //     bSortable: false,
+    //     aTargets: ["nosort"],
+    //   },
+    // ],
 
     columns: [
       // { data: "id" },
@@ -42,11 +57,24 @@ $(document).ready(function () {
             template_status += `<span>${
               data.fecha_visita + " Hora: " + data.hora_visita
             }</span>`;
-            template_status += `
-              <div class="flex-actions">
-              <button target="_blank" keyTask="${data.id_task}" statusClient="${data.status}" keyClient="${data?.id}" id="completarTask" class="btnJsvm default mt-2">Completar Actividad</button>
-            </div>
-              `;
+
+            if (
+              data.status == "VISITA" ||
+              data.status == "REPROGRAMACION VISITA"
+            ) {
+              template_status += `
+                <div class="flex-actions">
+                <button target="_blank" keyTask="${data.id_task}" statusClient="ASISTIO" keyClient="${data?.id}" id="asistenciaYes" class="btnJsvm success mt-2">ASISTIO</button>
+                <button target="_blank" keyTask="${data.id_task}" statusClient="NO ASISTIO" keyClient="${data?.id}" id="asistenciaNot" class="btnJsvm danger mt-2">NO ASISTIO</button>
+              </div>
+                `;
+            } else {
+              template_status += `
+                <div class="flex-actions">
+                <button target="_blank" keyTask="${data.id_task}" statusClient="${data.status}" keyClient="${data?.id}" id="completarTask" class="btnJsvm default mt-2">Completar Actividad</button>
+                </div>
+                `;
+            }
           } else {
             switch (data.status) {
               case "NO CONTACTADO":
@@ -127,37 +155,72 @@ $(document).ready(function () {
       },
     ],
     // columnDefs: [{ type: "date-dd-mm-yyyy", aTargets: [5] }],
-    order: false,
-    bLengthChange: false,
-    dom: '<"top">ct<"top"p><"clear">',
+    // order: false,
+    // bLengthChange: false,
+    // dom: '<"top">ct<"top"p><"clear">',
   });
+
+  // -------register asistencia
+  function register_visita_agenda(task, cliente, status) {
+    let funcion = "register_visita_agenda";
+    $.post(
+      "../../controlador/UsuarioController.php",
+      { funcion, task, cliente, status },
+      (response) => {
+        if (response.trim() === "register") {
+          alert("Se paso asistencia al cliente");
+        } else {
+          console.log(response);
+        }
+      }
+    );
+  }
+
+  $(document).on("click", "#asistenciaNot, #asistenciaYes", function () {
+    let observacion = "";
+    let cliente = $(this).attr("keyClient");
+    let task = $(this).attr("keyTask");
+    let status = $(this).attr("statusClient");
+    // console.log(status, task, cliente);
+    let confirmado = confirm("Esta seguro de esta eleccion");
+    if (confirmado) {
+      // console.log("yes");
+      seguimiento_cliente(observacion, cliente, status);
+      completarTask(task, cliente, status);
+      register_visita_agenda(task, cliente, status);
+    } else {
+      console.log("rechazo");
+    }
+  });
+  function completarTask(id_task) {
+    if (id_task) {
+      let funcion = "completar_tarea";
+      $.post(
+        "../../controlador/UsuarioController.php",
+        { funcion, id_task },
+        (response) => {
+          console.log(response);
+          if (response.trim() == "COMPLETADO") {
+            alert("Tarea completada satisfactoriamente");
+            buscar_clientes();
+            animarProgress();
+          } else {
+            console.log(response);
+          }
+        }
+      );
+    } else {
+      alert(
+        "No es un estado pendiente, al parecer ocurrio un error, contacta al administrado"
+      );
+    }
+  }
 
   $(document).on("click", "#completarTask", function () {
     let id_task = $(this).attr("keyTask");
     let confirmado = confirm("Esta seguro de completar actividad");
     if (confirmado) {
-      if (id_task) {
-        let funcion = "completar_tarea";
-        $.post(
-          "../../controlador/UsuarioController.php",
-          { funcion, id_task },
-          (response) => {
-            console.log(response);
-            if (response.trim() == "COMPLETADO") {
-              alert("Tarea completada satisfactoriamente");
-              buscar_clientes();
-              animarProgress();
-            } else {
-              console.log(response);
-            }
-          }
-        );
-      } else {
-        alert(
-          "No es un estado pendiente, al parecer ocurrio un error, contacta al administrado"
-        );
-      }
-      // console.log("Aceptado: " + id_task);
+      completarTask(id_task);
     }
   });
 
@@ -218,19 +281,6 @@ $(document).ready(function () {
     );
   }
 
-  // funcion de comparar data
-  // const compareDates = (a, b) => {
-  //   const dateA = new Date(`${a.fecha} ${a.hora}`);
-  //   const dateB = new Date(`${b.fecha} ${b.hora}`);
-
-  //   if (dateA > dateB) {
-  //     return -1;
-  //   } else if (dateA < dateB) {
-  //     return 1;
-  //   } else {
-  //     return 0;
-  //   }
-  // };
   const compareDates = (a, b) => {
     // Parsear las fechas con el formato "dd/mm/yyyy"
     const [dayA, monthA, yearA] = a.fecha.split("/");
@@ -329,7 +379,7 @@ $(document).ready(function () {
         break;
 
       case "CONTACTADO":
-        template += `<span class="target_tab info flex items-center gap-2">${status} <div role="status">
+        template += `<span class="target_tab info flex items-center gap-2">CONTACTANDO <div role="status">
         <svg aria-hidden="true" class="inline w-6 h-6 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-purple-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
             <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
@@ -346,7 +396,11 @@ $(document).ready(function () {
         template += `<span class="target_tab success">${status}</span>`;
 
         break;
-      case "AUSENCIA VISITA":
+      case "ASISTIO":
+        template += `<span class="target_tab success">${status} a la visita</span>`;
+
+        break;
+      case "NO ASISTIO":
         template += `<span class="target_tab danger">${status}</span>`;
 
         break;
@@ -449,6 +503,41 @@ $(document).ready(function () {
 
     dataTable.clear().rows.add(clientes).draw();
   }
+  function filtrarPendientes() {
+    let fecha_inicio = dayjs(
+      $("#fecha-inicio-pendients").val(),
+      "DD/MM/YYYY"
+    ).format("YYYY-MM-DD");
+    let fecha_fin = dayjs($("#fecha-fin-pendients").val(), "DD/MM/YYYY").format(
+      "YYYY-MM-DD"
+    );
+    console.log(fecha_inicio, fecha_fin);
+    if (fecha_inicio !== "Invalid Date" && fecha_fin !== "Invalid Date") {
+      const clientes = clientesList.filter((cliente) => {
+        // console.log(cliente);
+        // if (
+        //   nombreProyecto !== "Todos" &&
+        //   cliente.nombre_proyecto !== nombreProyecto
+        // ) {
+        //   console.log(cliente.nombre_proyecto);
+        //   return false;
+        // }
+        if (cliente.fecha_visita === null) {
+          return false;
+        }
+        if (
+          cliente.fecha_visita > fecha_fin &&
+          cliente.fecha_visita < fecha_inicio
+        ) {
+          return false;
+        }
+        return true;
+      });
+      console.log(clientes);
+
+      dataTable.clear().rows.add(clientes).draw();
+    }
+  }
 
   // Función auxiliar para verificar si el nombre y apellido coinciden con el filtro
   function contienenombreCliente(cliente, nombreCliente) {
@@ -460,7 +549,34 @@ $(document).ready(function () {
   // Event listeners para los cambios en el select y el input
   $("#cliente-search, #filter-proyecto").on("change keyup", filtrarProyectos);
 
+  // filtro de pendientes
+  $("#menu-pendientes").click(function () {
+    const clientes = clientesList.filter((e) => e.task_status === "PENDIENTE");
+    dataTable.clear().rows.add(clientes).draw();
+  });
+
+  // --------reset filters
+  $("#reset_filtros").click(function () {
+    $("#cliente-search").val("");
+    $("#filter-proyecto").val("Todos");
+    $("#fecha-inicio-pendients").val(null);
+    $("#fecha-fin-pendients").val(null);
+    dataTable.clear().rows.add(clientesList).draw();
+  });
+
+  $("#fecha-inicio-pendients").on("change", function () {
+    const fechaInicio = dayjs($(this).val());
+
+    // Habilitar "fechaFin"
+    $("#fecha-fin-pendients").prop("disabled", false);
+
+    // Establecer el valor mínimo para "fechaFin" como un día después de "fechaInicio"
+    $("#fecha-fin-pendients").attr("min", fechaInicio.format("YYYY-MM-DD"));
+  });
+  $("#fecha-fin-pendients").on("change", filtrarPendientes);
+
   // Llama a la función inicialmente para mostrar todos los proyectos
+
   // filtrarProyectos();
 
   $("#editar-lead #editLead").submit((e) => {

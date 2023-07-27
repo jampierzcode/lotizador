@@ -442,11 +442,7 @@ class Usuario
     {
         try {
             # code...
-            $sql = "SELECT fecha_visita, COUNT(*) AS cantidad_visitas
-            FROM interaccion_cliente
-            WHERE status = 'COMPLETADO' AND fecha_visita BETWEEN :fecha_inicio AND :fecha_fin
-            GROUP BY fecha_visita
-            ORDER BY fecha_visita;";
+            $sql = "SELECT fecha_visita, cliente_id, cantidad_visitas, status FROM ( SELECT IC.fecha_visita, IC.cliente_id, COUNT(*) AS cantidad_visitas, 'ASISTIO' AS status FROM visitas_agenda AS VA INNER JOIN interaccion_cliente AS IC ON VA.interaccion_id = IC.id WHERE IC.fecha_visita BETWEEN :fecha_inicio AND :fecha_fin AND VA.status = 'ASISTIO' GROUP BY IC.fecha_visita UNION ALL SELECT IC.fecha_visita, IC.cliente_id, COUNT(*) AS cantidad_visitas, 'NO ASISTIO' AS status FROM visitas_agenda AS VA INNER JOIN interaccion_cliente AS IC ON VA.interaccion_id = IC.id WHERE IC.fecha_visita BETWEEN :fecha_inicio AND :fecha_fin AND VA.status = 'NO ASISTIO' GROUP BY IC.fecha_visita ) AS subquery ORDER BY fecha_visita DESC, status";
             $query = $this->conexion->prepare($sql);
             $query->execute(array(':fecha_inicio' => $fecha_inicio, ':fecha_fin' => $fecha_fin));
             $this->datos = $query->fetchAll(); // retorna objetos o no
@@ -1014,6 +1010,22 @@ class Usuario
             $query = $this->conexion->prepare($sql);
             $query->execute(array(":status" => "COMPLETADO", ":id_task" => $id_task));
             $this->mensaje = "COMPLETADO";
+            return $this->mensaje;
+        } catch (\Throwable $th) {
+            //throw $th;
+            $this->mensaje = "fatal_error " . $th;
+            return $this->mensaje;
+        }
+    }
+    function register_visita_agenda($id_task, $cliente, $status)
+    {
+        try {
+            //code...
+            // ACTUALIZAR ESTADO DE LA RESERVA
+            $sql = "INSERT INTO visitas_agenda(cliente_id, interaccion_id, status) VALUES (:cliente, :task, :status)";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":status" => $status, ":task" => $id_task, ":cliente" => $cliente));
+            $this->mensaje = "register";
             return $this->mensaje;
         } catch (\Throwable $th) {
             //throw $th;

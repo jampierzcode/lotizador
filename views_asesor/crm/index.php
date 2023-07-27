@@ -358,13 +358,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                 <!-- <input type="color" value="#5b5b5b"> -->
             </div>
             <div>
-                <p>Filter Avanzado:</p>
-                <!-- <div class="flex-actions mb-3">
-                    <button target="_blank" keyClient="${data?.id}" id="changeSeguimiento" class="btnJsvm info text-xs">CONTACTADO</button>
-                    <button target="_blank" keyClient="${data?.id}" id="changeSeguimiento" class="btnJsvm warning text-xs">SIN RESPUESTA </button>
-                    <button target="_blank" keyClient="${data?.id}" id="changeSeguimiento" class="btnJsvm danger text-xs">FINALIZADO</button>
-                    <button target="_blank" keyClient="${data?.id}" id="changeSeguimiento" class="btnJsvm success text-xs">REPROGRAMACION</button>
-                </div> -->
+                <p class="text-lg text-black">Filtro Avanzado:</p>
             </div>
             <div class="main-datatable">
                 <!-- <form> -->
@@ -392,6 +386,41 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                         </select>
                     </div>
 
+                    <div class="relative inline-block">
+                        <label for="pendientes-search" class="mb-2 text-sm font-medium text-gray-900  dark:text-white">-</label> <br>
+                        <button type="button" class="inline-blockmax-w-max items-center justify-center gap-x-1.5 rounded-md text-white px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 bg-emerald-800 hover:bg-lime-900" id="reset_filtros" aria-expanded="false" aria-haspopup="true">
+
+                            <ion-icon name="refresh"></ion-icon>
+
+                            Resetear
+
+                        </button>
+
+                    </div>
+                </div>
+
+                <p class="mt-4 text-lg text-black">Filtro de Pendientes:</p>
+
+                <!-- <form> -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                    <div class="h-auto">
+                        <label for="Fecha Inicio">Del: </label>
+                        <input type="date" id="fecha-inicio-pendients" class="block w-full p-2.5 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Buscar por nombre del asesor">
+                    </div>
+                    <div class="h-auto">
+                        <label for="pendientes-search" class="mb-2 text-sm font-medium text-gray-900  dark:text-white">Al:</label>
+                        <input disabled type="date" id="fecha-fin-pendients" class="block w-full p-2.5 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Buscar por nombre del asesor">
+                    </div>
+                    <div>
+                        <label for="default-search" class="mb-2 text-sm font-medium text-gray-900  dark:text-white">Status(Estado)</label>
+                        <select id="filter-status-pendients" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                            <option value="Todas" selected>Todas</option>
+                            <option value="VISITA">VISITA</option>
+                            <option value="REPROGRAMACION CONTACTO">REPROGRAMACION CONTACTO</option>
+                            <option value="REPROGRAMACION VISITA">REPROGRAMACION VISITA</option>
+                        </select>
+                    </div>
+
                     <div class="relative inline-block text-left">
 
                         <label for="pendientes-search" class="mb-2 text-sm font-medium text-gray-900  dark:text-white">Pendientes</label>
@@ -405,14 +434,6 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
 
                     </div>
                 </div>
-                <!-- </form> -->
-                <!-- <div class="overflow-x"> -->
-                <!-- <div class="section-search">
-                        <input type="text" placeholder="Ingrese el nombre del cliente">
-                        <ion-icon id="search-btn" name="search-sharp"></ion-icon>
-                    </div> -->
-
-
 
                 <table id="usuariosList" class="table cust-datatable dataTable no-footer" style="width:100%;">
                     <thead>

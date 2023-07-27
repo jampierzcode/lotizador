@@ -18,14 +18,17 @@ $(document).ready(function () {
       "../../controlador/UsuarioController.php",
       { funcion, fecha_inicio, fecha_fin },
       (response) => {
-        console.log(response);
         var data = JSON.parse(response);
+        console.log(data);
         // Inicializar el gráfico
         var myChart = echarts.init(document.getElementById("visitas_graf"));
 
         // Configurar el gráfico
         var xAxisData = [];
         var seriesData = [];
+
+        var seriesAsistioData = []; // Datos para la barra de ASISTIO
+        var seriesNoAsistioData = []; // Datos para la barra de NO ASISTIO
 
         // Obtener el rango de fechas de inicio y fin
         var fechaInicio = fecha_inicio;
@@ -39,17 +42,23 @@ $(document).ready(function () {
           var currentGroupStartDate = fechaInicio;
           var currentGroupEndDate = fechaFin;
           while (currentGroupEndDate >= currentGroupStartDate) {
-            var groupVisits = 0;
+            var groupVisitsAsistio = 0;
+            var groupVisitsNoAsistio = 0;
             data.forEach((item) => {
               var fechaVisita = item.fecha_visita;
               if (fechaVisita === currentGroupStartDate) {
-                groupVisits += Number(item.cantidad_visitas);
+                if (item.status === "ASISTIO") {
+                  groupVisitsAsistio += Number(item.cantidad_visitas);
+                } else {
+                  groupVisitsNoAsistio += Number(item.cantidad_visitas);
+                }
               }
             });
             xAxisData.push(
               getTimeLabel(currentGroupStartDate, currentGroupStartDate)
             );
-            seriesData.push(groupVisits);
+            seriesAsistioData.push(groupVisitsAsistio);
+            seriesNoAsistioData.push(groupVisitsNoAsistio);
             currentGroupStartDate = dayjs(currentGroupStartDate)
               .add(1, "day")
               .format("YYYY-MM-DD");
@@ -61,20 +70,26 @@ $(document).ready(function () {
             .add(6, "day")
             .format("YYYY-MM-DD");
           while (currentGroupStartDate <= fechaFin) {
-            var groupVisits = 0;
+            var groupVisitsAsistio = 0;
+            var groupVisitsNoAsistio = 0;
             data.forEach((item) => {
               var fechaVisita = item.fecha_visita;
               if (
                 fechaVisita >= currentGroupStartDate &&
                 fechaVisita <= currentGroupEndDate
               ) {
-                groupVisits += Number(item.cantidad_visitas);
+                if (item.status === "ASISTIO") {
+                  groupVisitsAsistio += Number(item.cantidad_visitas);
+                } else {
+                  groupVisitsNoAsistio += Number(item.cantidad_visitas);
+                }
               }
             });
             xAxisData.push(
               getTimeLabel(currentGroupStartDate, currentGroupEndDate)
             );
-            seriesData.push(groupVisits);
+            seriesAsistioData.push(groupVisitsAsistio);
+            seriesNoAsistioData.push(groupVisitsNoAsistio);
             currentGroupStartDate = dayjs(currentGroupEndDate)
               .add(1, "day")
               .format("YYYY-MM-DD");
@@ -90,20 +105,26 @@ $(document).ready(function () {
             .format("YYYY-MM-DD");
           console.log(currentGroupStartDate, currentGroupEndDate);
           while (currentGroupStartDate <= fechaFin) {
-            var groupVisits = 0;
+            var groupVisitsAsistio = 0;
+            var groupVisitsNoAsistio = 0;
             data.forEach((item) => {
               var fechaVisita = item.fecha_visita;
               if (
                 fechaVisita >= currentGroupStartDate &&
                 fechaVisita <= currentGroupEndDate
               ) {
-                groupVisits += Number(item.cantidad_visitas);
+                if (item.status === "ASISTIO") {
+                  groupVisitsAsistio += Number(item.cantidad_visitas);
+                } else {
+                  groupVisitsNoAsistio += Number(item.cantidad_visitas);
+                }
               }
             });
             xAxisData.push(
               getTimeLabel(currentGroupStartDate, currentGroupEndDate)
             );
-            seriesData.push(groupVisits);
+            seriesAsistioData.push(groupVisitsAsistio);
+            seriesNoAsistioData.push(groupVisitsNoAsistio);
             currentGroupStartDate = dayjs(currentGroupEndDate)
               .add(1, "day")
               .format("YYYY-MM-DD");
@@ -113,11 +134,45 @@ $(document).ready(function () {
           }
         }
         // Configurar opciones del gráfico
-        var option = {
-          title: {
-            text: "Visitas ASISTIO",
-          },
+        // var option = {
+        //   title: {
+        //     text: "Visitas ASISTIO",
+        //   },
 
+        //   tooltip: {},
+        //   xAxis: {
+        //     type: "category",
+        //     data: xAxisData,
+        //   },
+        //   yAxis: {
+        //     type: "value",
+        //   },
+        //   series: [
+        //     {
+        //       name: "visitas",
+        //       type: "bar",
+        //       data: seriesData,
+        //     },
+        //   ],
+        // };
+        // data.forEach((item) => {
+        //   var fechaVisita = item.fecha_visita;
+        //   var groupVisits = Number(item.cantidad_visitas);
+
+        //   if (item.status === "ASISTIO") {
+        //     seriesAsistioData.push(groupVisits);
+        //     seriesNoAsistioData.push(null); // Insertar null para NO ASISTIO (no se mostrará en la barra)
+        //   } else if (item.status === "NO ASISTIO") {
+        //     seriesAsistioData.push(null); // Insertar null para ASISTIO (no se mostrará en la barra)
+        //     seriesNoAsistioData.push(groupVisits);
+        //   }
+        // });
+
+        // Configurar opciones del gráfico
+        var option = {
+          // title: {
+          //   text: "Visitas ASISTIO y NO ASISTIO",
+          // },
           tooltip: {},
           xAxis: {
             type: "category",
@@ -126,11 +181,19 @@ $(document).ready(function () {
           yAxis: {
             type: "value",
           },
+          legend: {
+            data: ["ASISTIO", "NO ASISTIO"],
+          },
           series: [
             {
-              name: "visitas",
+              name: "ASISTIO",
               type: "bar",
-              data: seriesData,
+              data: seriesAsistioData,
+            },
+            {
+              name: "NO ASISTIO",
+              type: "bar",
+              data: seriesNoAsistioData,
             },
           ],
         };

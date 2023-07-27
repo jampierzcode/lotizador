@@ -792,6 +792,13 @@ if ($_POST["funcion"] == "completar_tarea") {
     $usuario->completar_tarea($id_task);
     echo $usuario->mensaje;
 }
+if ($_POST["funcion"] == "register_visita_agenda") {
+    $id_task = $_POST["task"];
+    $cliente = $_POST["cliente"];
+    $status = $_POST["status"];
+    $usuario->register_visita_agenda($id_task, $cliente, $status);
+    echo $usuario->mensaje;
+}
 if ($_POST["funcion"] == "buscar_clientes_by_asesor") {
     $json = array();
     $usuario->buscar_clientes_by_asesor($_SESSION["id_usuario"]);
