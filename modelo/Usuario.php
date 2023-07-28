@@ -984,18 +984,18 @@ class Usuario
             $sql = "SELECT
             CLIENTE.*,
             CASE
-                WHEN UC.user_id IS NULL THEN 'No asignado'
+                WHEN UC.cliente_id IS NULL THEN 'No asignado'
                 ELSE CONCAT(USUARIO.nombre, ' ', USUARIO.apellido)
             END AS asignado_usuario,
             PROYECTO.nombreProyecto AS nombre_proyecto
         FROM
             cliente AS CLIENTE
-            INNER JOIN user_proyect AS UP ON CLIENTE.proyet_id = UP.proyecto_id
-            LEFT JOIN usuario AS USUARIO ON UP.user_id = USUARIO.id_usuario
+            INNER JOIN user_proyect AS UP ON CLIENTE.proyet_id = UP.proyecto_id    
+            LEFT JOIN user_cliente AS UC ON CLIENTE.id_cliente = UC.cliente_id
+            LEFT JOIN usuario AS USUARIO ON UC.user_id = USUARIO.id_usuario
             LEFT JOIN proyectos AS PROYECTO ON CLIENTE.proyet_id = PROYECTO.id
-            LEFT JOIN user_cliente AS UC ON CLIENTE.id_cliente = UC.cliente_id AND UC.user_id = :id_usuario
         WHERE
-            UP.user_id = :id_usuario OR UC.user_id = :id_usuario;
+            UP.user_id = :id_usuario;
         ";
             $query = $this->conexion->prepare($sql);
             $query->execute(array(":id_usuario" => $user));

@@ -256,10 +256,10 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                                 <option selected value="0">Selecciona una opcion</option>
                                 <option value="NO RESPONDIO">NO RESPONDIO</option>
                                 <option value="VISITA">VISITA</option>
-                                <option value="AUSENCIA VISITA">AUSENCIA VISITA</option>
                                 <option value="REPROGRAMACION CONTACTO">REPROGRAMACION CONTACTO</option>
                                 <option value="REPROGRAMACION VISITA">REPROGRAMACION VISITA</option>
                                 <option value="SEPARACION">SEPARACION</option>
+                                <option value="VENTA">VENTA</option>
                                 <option value="NO INTERESADO">NO INTERESADO</option>
                             </select>
 

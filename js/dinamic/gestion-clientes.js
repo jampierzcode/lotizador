@@ -5,6 +5,23 @@ $(document).ready(function () {
   var proyectosList;
   buscar_clientes();
   var dataTable = $("#usuariosList").DataTable({
+    select: true,
+    stateSave: true,
+    lengthMenu: [5, 10, 25, 50],
+    language: {
+      lengthMenu: "Mostrar _MENU_ registros por página",
+      zeroRecords: "No se encontraron resultados",
+      info: "Mostrando página _PAGE_ de _PAGES_",
+      infoEmpty: "No hay registros disponibles",
+      infoFiltered: "(filtrado de _MAX_ registros totales)",
+      search: "Buscar:",
+      paginate: {
+        first: "Primero",
+        last: "Último",
+        next: "Siguiente",
+        previous: "Anterior",
+      },
+    },
     pageLength: 5,
     scrollX: true,
     // scrollCollapse: true,
@@ -13,12 +30,12 @@ $(document).ready(function () {
       leftColumns: 3, //Le indico que deje fijas solo las 2 primeras columnas
       // rightColumns: 1,
     },
-    aoColumnDefs: [
-      {
-        bSortable: false,
-        aTargets: ["nosort"],
-      },
-    ],
+    // aoColumnDefs: [
+    //   {
+    //     bSortable: false,
+    //     aTargets: ["nosort"],
+    //   },
+    // ],
 
     columns: [
       {
@@ -66,9 +83,9 @@ $(document).ready(function () {
       },
     ],
     // columnDefs: [{ type: "date-dd-mm-yyyy", aTargets: [5] }],
-    order: false,
-    bLengthChange: false,
-    dom: '<"top">ct<"top"p><"clear">',
+    // order: false,
+    // bLengthChange: false,
+    // dom: '<"top">ct<"top"p><"clear">',
   });
 
   var datatablesAsesores = $("#proyectsAsigned").DataTable({
