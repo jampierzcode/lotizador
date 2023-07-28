@@ -752,7 +752,8 @@ class Usuario
     {
         try {
             # code...
-            $sql = "SELECT * from interaccion_cliente WHERE user_id = :usuario";
+            $sql = "SELECT * FROM interaccion_cliente ic INNER JOIN user_cliente uc ON ic.cliente_id = uc.cliente_id WHERE uc.user_id = :usuario;
+            ";
             $query = $this->conexion->prepare($sql);
             $query->execute(array(":usuario" => $usuario));
             $this->datos = $query->fetchAll();
@@ -957,7 +958,11 @@ class Usuario
     function buscar_pendientes($user)
     {
         try {
-            $sql = "SELECT count(*) as pendientes FROM interaccion_cliente WHERE user_id = :id_usuario AND status=:status";
+            $sql = "SELECT COUNT(*) AS pendientes
+            FROM interaccion_cliente ic
+            INNER JOIN user_cliente uc ON ic.cliente_id = uc.cliente_id
+            WHERE ic.status = :status AND uc.user_id = :id_usuario;
+            ";
             $query = $this->conexion->prepare($sql);
             $query->execute(array(":id_usuario" => $user, ":status" => "PENDIENTE"));
             $this->datos = $query->fetchAll(); // retorna objetos o no
@@ -978,13 +983,19 @@ class Usuario
         try {
             $sql = "SELECT
             CLIENTE.*,
-            CASE WHEN USRCLIENTE.user_id IS NULL THEN 'No asignado' ELSE CONCAT(USUARIO.nombre, ' ', USUARIO.apellido) END AS asignado_usuario,
+            CASE
+                WHEN UC.user_id IS NULL THEN 'No asignado'
+                ELSE CONCAT(USUARIO.nombre, ' ', USUARIO.apellido)
+            END AS asignado_usuario,
             PROYECTO.nombreProyecto AS nombre_proyecto
         FROM
             cliente AS CLIENTE
-            LEFT JOIN user_cliente AS USRCLIENTE ON USRCLIENTE.cliente_id = CLIENTE.id_cliente
-            LEFT JOIN usuario AS USUARIO ON USUARIO.id_usuario = USRCLIENTE.user_id
-            LEFT JOIN proyectos AS PROYECTO ON PROYECTO.id = CLIENTE.proyet_id WHERE CLIENTE.createdBy = :id_usuario
+            INNER JOIN user_proyect AS UP ON CLIENTE.proyet_id = UP.proyecto_id
+            LEFT JOIN usuario AS USUARIO ON UP.user_id = USUARIO.id_usuario
+            LEFT JOIN proyectos AS PROYECTO ON CLIENTE.proyet_id = PROYECTO.id
+            LEFT JOIN user_cliente AS UC ON CLIENTE.id_cliente = UC.cliente_id AND UC.user_id = :id_usuario
+        WHERE
+            UP.user_id = :id_usuario OR UC.user_id = :id_usuario;
         ";
             $query = $this->conexion->prepare($sql);
             $query->execute(array(":id_usuario" => $user));

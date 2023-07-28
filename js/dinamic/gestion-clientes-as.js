@@ -3,7 +3,6 @@ $(document).ready(function () {
   var clientesList;
   var idCliente;
   var proyectosList = [];
-  buscar_clientes();
 
   var dataTable = $("#usuariosList").DataTable({
     // scrollY: "160px",
@@ -239,7 +238,7 @@ $(document).ready(function () {
           pendientes = 0;
         } else {
           const interaccion = JSON.parse(response);
-          console.log(interaccion);
+          // console.log(interaccion);
           const pendientesList = interaccion.filter(
             (data) => data.status === "PENDIENTE"
           );
@@ -257,12 +256,26 @@ $(document).ready(function () {
       }
     );
   }
+  // registrar lead indiidual
+  buscar_proyectos();
+  async function buscar_proyectos() {
+    funcion = "buscar_proyectos_agentes";
+    const response = await $.post("../../controlador/UsuarioController.php", {
+      funcion,
+    });
+    const proyectos = JSON.parse(response);
+    proyectosList = proyectos;
+
+    llenarFiltros();
+  }
 
   // Llamar a la función de animación
   animarProgress();
   function compareDatesDesc(a, b) {
     return dayjs(b.created_cliente).diff(dayjs(a.created_cliente));
   }
+
+  buscar_clientes();
   // BUSCAR CLIENTES
   function buscar_clientes() {
     funcion = "buscar_clientes_by_asesor";
@@ -271,10 +284,11 @@ $(document).ready(function () {
       { funcion },
       (response) => {
         $("#spin-load").html("");
-        if (response.trim() == "no-register-clientes") {
+        if (response.trim() === "no-register-clientes") {
           dataTable.clear().draw();
         } else {
           const clientes = JSON.parse(response);
+          console.log(clientes);
           clientesList = clientes;
           clientesList.sort(compareDatesDesc);
 
@@ -351,18 +365,6 @@ $(document).ready(function () {
     );
   }
   // INTERACCION CON CLIENTES
-  buscar_pendientes();
-
-  function buscar_pendientes() {
-    let funcion = "buscar_pendientes";
-    $.post(
-      "../../controlador/UsuarioController.php",
-      { funcion },
-      (response) => {
-        console.log(response);
-      }
-    );
-  }
   $("#menu-pendientes").click();
 
   // SHOW MODAL registrar seguimiento
@@ -474,7 +476,7 @@ $(document).ready(function () {
 
   function llenarFiltros() {
     let template = "";
-    template += `<option value="Todos">Todos</option>`;
+    template += `<option selected value="Todos">Todos</option>`;
     // console.log(proyectosList);
     proyectosList.forEach((proyecto) => {
       template += `<option value="${proyecto.nombreProyecto}">${proyecto.nombreProyecto}</option>`;
@@ -503,6 +505,7 @@ $(document).ready(function () {
       }
       return true;
     });
+    console.log(clientes);
     var estadoActual = {
       page: dataTable.page(), // Página actual
       scrollLeft: $("#usuariosList").parent().scrollLeft(), // Posición de scroll horizontal
@@ -710,6 +713,7 @@ $(document).ready(function () {
           if (response.trim() === "delete-user-cliente") {
             alert("Se archivo correctamente");
             buscar_clientes();
+            animarProgress();
           } else {
             alert("Ocurrio un error, contacta al administrador");
           }
@@ -788,19 +792,7 @@ $(document).ready(function () {
       showToast();
     }
   });
-  // registrar lead indiidual
-  buscar_proyectos();
-  async function buscar_proyectos() {
-    funcion = "buscar_proyectos_agentes";
-    const response = await $.post("../../controlador/UsuarioController.php", {
-      funcion,
-    });
-    const proyectos = JSON.parse(response);
-    proyectosList = proyectos;
 
-    llenarFiltros();
-    filtrarProyectos();
-  }
   // registrar lead
   $("#registerLead").submit((e) => {
     e.preventDefault();
