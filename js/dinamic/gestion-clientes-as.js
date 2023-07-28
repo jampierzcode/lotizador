@@ -243,15 +243,15 @@ $(document).ready(function () {
             (data) => data.status === "PENDIENTE"
           );
           const visitasList = interaccion.filter(
-            (data) => data.tipo === "VISITA"
+            (data) => data.tipo === "ASISTIO"
           );
           count = visitasList.length;
           pendientes = pendientesList.length;
         }
         let total = 10;
-        var progressBar = document.querySelector(".progreessbar .barSize");
-        $("#numberVisit").html(count);
-        progressBar.style.width = `${(count / total) * 100}%`;
+        // var progressBar = document.querySelector(".progreessbar .barSize");
+        $("#visits_concretadas").html(count);
+        // progressBar.style.width = `${(count / total) * 100}%`;
         $("#menu-pendientes").html("Pendientes: " + pendientes);
       }
     );

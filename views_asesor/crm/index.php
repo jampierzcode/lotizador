@@ -82,14 +82,14 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                     </div>
                 </div>
             </div>
-            <div class="progreessbar" keyTop="10">
+            <!-- <div class="progreessbar" keyTop="10">
                 <span>Visitas</span>
                 <div class="bar">
                     <div class="barSize">
                     </div>
                 </div>
                 <p><span id="numberVisit"></span> visitas</p>
-            </div>
+            </div> -->
             <div id="crear-lead" class="modal-create md-hidden">
                 <div class="form-create">
                     <!-- <form id="form_producto_add"> -->
@@ -311,6 +311,20 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                     <ol id="list-historial" class="relative border-l border-gray-200 dark:border-gray-700">
                     </ol>
 
+                </div>
+            </div>
+            <div class="justify-center flex gap-4">
+                <div class="flex bg-blue-600 p-2 rounded-lg gap-4 items-center text-white">
+                    <h1>Visitas Concretadas</h1>
+                    <span id="visits_concretadas" class="text-white">0</span>
+                </div>
+                <div class="flex bg-yellow-600 p-2 rounded-lg gap-4 items-center text-white">
+                    <h1>Separaciones</h1>
+                    <span class="text-white">0</span>
+                </div>
+                <div class="flex bg-green-600 p-2 rounded-lg gap-4 items-center text-white">
+                    <h1>Ventas</h1>
+                    <span class="text-white">0</span>
                 </div>
             </div>
             <div style="display: flex; gap:10px; margin-bottom: 20px">
