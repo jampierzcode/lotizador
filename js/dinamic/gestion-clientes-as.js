@@ -231,6 +231,7 @@ $(document).ready(function () {
       "../../controlador/UsuarioController.php",
       { funcion },
       (response) => {
+        console.log(response);
         let count;
         let pendientes;
         if (response === "") {
@@ -243,7 +244,7 @@ $(document).ready(function () {
             (data) => data.status === "PENDIENTE"
           );
           const visitasList = interaccion.filter(
-            (data) => data.tipo === "ASISTIO"
+            (data) => data.asistio === "ASISTIO"
           );
           count = visitasList.length;
           pendientes = pendientesList.length;

@@ -253,7 +253,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                     <input type="file" id="fileExcel">
                     <button id="upload-clients-fields" class="btn-add">Subir Data</button>
                 </div>
-                <a class="btnLotizador" href="../Crm/">Volver</a>
+                <a class="btnLotizador" href="../crm/">Volver</a>
 
             </div>
             <div class="container-asignedTables md-hidden">

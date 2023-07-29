@@ -752,7 +752,7 @@ class Usuario
     {
         try {
             # code...
-            $sql = "SELECT * FROM interaccion_cliente ic INNER JOIN user_cliente uc ON ic.cliente_id = uc.cliente_id WHERE uc.user_id = :usuario;
+            $sql = "SELECT ic.*, uc.*, va.status as asistio FROM interaccion_cliente ic INNER JOIN user_cliente uc ON ic.cliente_id = uc.cliente_id LEFT JOIN visitas_agenda va ON ic.id = va.interaccion_id WHERE ic.user_id =:usuario;
             ";
             $query = $this->conexion->prepare($sql);
             $query->execute(array(":usuario" => $usuario));
