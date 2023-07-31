@@ -231,27 +231,39 @@ $(document).ready(function () {
       "../../controlador/UsuarioController.php",
       { funcion },
       (response) => {
-        console.log(response);
         let count;
         let pendientes;
+        let separaciones;
+        let ventas;
         if (response === "") {
           count = 0;
           pendientes = 0;
         } else {
           const interaccion = JSON.parse(response);
-          // console.log(interaccion);
+          console.log(interaccion);
           const pendientesList = interaccion.filter(
             (data) => data.status === "PENDIENTE"
           );
           const visitasList = interaccion.filter(
             (data) => data.asistio === "ASISTIO"
           );
+          const separacionesList = interaccion.filter(
+            (data) => data.tipo === "SEPARACION"
+          );
+          const ventasList = interaccion.filter(
+            (data) => data.tipo === "VENTA"
+          );
+          console.log(ventasList);
+          ventas = ventasList.length;
+          separaciones = separacionesList.length;
           count = visitasList.length;
           pendientes = pendientesList.length;
         }
         let total = 10;
         // var progressBar = document.querySelector(".progreessbar .barSize");
         $("#visits_concretadas").html(count);
+        $("#separaciones_count").html(separaciones);
+        $("#ventas_count").html(ventas);
         // progressBar.style.width = `${(count / total) * 100}%`;
         $("#menu-pendientes").html("Pendientes: " + pendientes);
       }
@@ -420,6 +432,11 @@ $(document).ready(function () {
         break;
       case "SEPARACION":
         template += `<span class="target_tab success">${status}</span>`;
+
+        break;
+      case "VENTA":
+        template += `<span style="display: flex; gap: 10px; align-items: center" class="target_tab success"> 
+        <img style="width: 20px;" src="../../img/corona.png" alt=""> ${status}</span>`;
 
         break;
 
@@ -777,6 +794,8 @@ $(document).ready(function () {
         } else {
           return;
         }
+      } else if (status === "VENTA") {
+        console.log("VENTA");
       }
       seguimiento_cliente(observaciones, idCliente, status);
 

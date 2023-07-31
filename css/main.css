@@ -281,7 +281,7 @@ ul {
 p {
   line-height: 1.8;
 }
-.proyectos_cards_link {
+.proyectos_cards_link > a {
   margin-top: 4px;
   border-radius: 20px;
   background-color: #fff;

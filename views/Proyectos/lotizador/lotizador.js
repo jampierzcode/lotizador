@@ -113,7 +113,7 @@ $(document).ready(function () {
       const estiloPoligono = {
         color: "#5b5b5b", // Color del borde (negro en este ejemplo)
         fillColor: fillColor, // Color de relleno según el estado del lote
-        fillOpacity: 0.5, // Opacidad del fondo
+        fillOpacity: 0.25, // Opacidad del fondo
         weight: 1,
       };
       let layer;
