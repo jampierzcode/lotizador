@@ -96,17 +96,17 @@ $(document).ready(function () {
         case "DISPONIBLE":
           fillColor = "#71bf44"; // Verde
           estado = "disponible";
-          fillOpacit = 0.8;
+          fillOpacit = 0.5;
           break;
         case "SEPARADO":
           fillColor = "#e8db49"; // Amarillo
           estado = "separado";
-          fillOpacit = 0.8;
+          fillOpacit = 0.5;
           break;
         case "OCUPADO":
           fillColor = "#FF0000"; // Rojo
           estado = "ocupado";
-          fillOpacit = 0.8;
+          fillOpacit = 0.5;
           break;
         case "SIN PUBLICAR":
           fillColor = "#eaeaea"; // Rojo
