@@ -63,6 +63,9 @@ $(document).ready(function () {
           var imageOverlay = L.imageOverlay(imageUrl, imageBounds);
           imageOverlay.addTo(map1);
           map1.fitBounds(imageBounds); // Ajustar los límites del mapa a la imagen
+          setInterval(() => {
+            $("#loading_lotizador").addClass("hidden");
+          }, 2000);
         };
       }
     );
