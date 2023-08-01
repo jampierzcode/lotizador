@@ -111,6 +111,10 @@ $(document).ready(function () {
             fillColor = "#FF0000"; // Rojo
             estado = "ocupado";
             break;
+          case "SIN PUBLICAR":
+            fillColor = "#eaeaea"; // Rojo
+            estado = "sinpublicar";
+            break;
           default:
             fillColor = "#a81318"; // Negro (color por defecto en caso de estado no válido)
         }
