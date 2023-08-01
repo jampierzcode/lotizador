@@ -98,23 +98,28 @@ $(document).ready(function () {
       });
       lotes.map((lote) => {
         let fillColor;
+        let fillOpacit;
         let estado;
         switch (lote.estado) {
           case "DISPONIBLE":
             fillColor = "#71bf44"; // Verde
             estado = "disponible";
+            fillOpacit: 0.8;
             break;
           case "SEPARADO":
             fillColor = "#e8db49"; // Amarillo
             estado = "separado";
+            fillOpacit: 0.8;
             break;
           case "OCUPADO":
             fillColor = "#FF0000"; // Rojo
             estado = "ocupado";
+            fillOpacit: 0.8;
             break;
           case "SIN PUBLICAR":
             fillColor = "#eaeaea"; // Rojo
             estado = "sinpublicar";
+            fillOpacit: 0.2;
             break;
           default:
             fillColor = "#a81318"; // Negro (color por defecto en caso de estado no válido)
@@ -124,7 +129,7 @@ $(document).ready(function () {
         const estiloPoligono = {
           color: "#5b5b5b", // Color del borde (negro en este ejemplo)
           fillColor: fillColor, // Color de relleno según el estado del lote
-          fillOpacity: 0.25, // Opacidad del fondo
+          fillOpacity: fillOpacit, // Opacidad del fondo
           weight: 1,
         };
         // map1.clearLayers();
