@@ -53,15 +53,49 @@ $(document).ready(function () {
           </button>
           <ul class="dropdown-menu">
             <li><button id="asigned_proyect" class="dropdown-item" href="#" key_asesor=${data.id_usuario}>+ Asigar a proyectos</button></li>
-            <li><button class="dropdown-item" href="#" key_proyect=${data.id_usuario}>+ Desactivar Agente</button></li>
-            <li><button class="dropdown-item" href="#"><ion-icon key_hab=${data.id_usuario} id="remove-hab" name="trash-outline"></ion-icon> Eliminar Usuario</button></li>
-          </ul>
+             <li><button class="dropdown-item" keyUsuario=${data.id_usuario} id="remove-usuario"><ion-icon name="trash-outline"></ion-icon> Eliminar Usuario</button></li>
+            </ul>
         </div>
           </div>`;
         },
       },
     ],
   });
+
+  // ELIMINAR USUARIO
+  $(document).on("click", "#remove-usuario", function () {
+    let id_usuario = $(this).attr("keyUsuario");
+    console.log(id_usuario);
+    idCliente = id_usuario;
+    $("#confirm-delete-usuario").removeClass("hidden");
+  });
+  $("#cancel-modal-confirm").click(() => {
+    $("#confirm-delete-usuario").addClass("hidden");
+  });
+  $("#cancel-delete-response").click(() => {
+    $("#confirm-delete-usuario").addClass("hidden");
+  });
+
+  $("#confirm-delete-response").click(() => {
+    let funcion = "delete_user";
+    $.post(
+      "../../controlador/UsuarioController.php",
+      {
+        funcion,
+        id: Number(idCliente),
+      },
+      (response) => {
+        console.log(response);
+        if (response.trim() === "delete-usuario") {
+          $("#confirm-delete-usuario").addClass("hidden");
+          buscar_usuarios();
+        } else {
+          console.log("error");
+        }
+      }
+    );
+  });
+  // ---------
 
   buscar_usuarios();
 
@@ -288,45 +322,6 @@ $(document).ready(function () {
     order: false,
     bLengthChange: false,
     dom: '<"top">ct<"top"p><"clear">',
-  });
-  // REMOVE PRODUCTOS
-  $(document).on("click", "#remove_usuario", function () {
-    let id_cliente = $(this).attr("key_user");
-    idCliente = id_cliente;
-    console.log(id_cliente);
-    $(".confirm-popup").removeClass("md-hidden");
-    setTimeout(function () {
-      $(".confirm-popup .formConfirm").addClass("modal-show");
-    }, 10);
-  });
-
-  $("#cancelConfirm").click(() => {
-    setTimeout(function () {
-      $(".confirm-popup .formConfirm").removeClass("modal-show");
-    }, 10);
-    $(".confirm-popup").addClass("md-hidden");
-  });
-  $("#okConfirm").click(() => {
-    let funcion = "delete_user";
-    $.post(
-      "../../controlador/UsuarioController.php",
-      {
-        funcion,
-        id: Number(idCliente),
-      },
-      (response) => {
-        console.log(response);
-        if (response.trim() === "delete-usuario") {
-          setTimeout(function () {
-            $(".confirm-popup .formConfirm").removeClass("modal-show");
-          }, 10);
-          $(".confirm-popup").addClass("md-hidden");
-          buscar_usuarios();
-        } else {
-          console.log("error");
-        }
-      }
-    );
   });
 
   //   //  EDIT CLIENTES
