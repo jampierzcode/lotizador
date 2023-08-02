@@ -350,6 +350,17 @@ if ($_POST["funcion"] == "buscar_proyectos") {
         echo $jsonstring;
     }
 }
+if ($_POST["funcion"] == "buscar_lotes_by_proyecto") {
+    $id_proyecto = $_POST["id_proyecto"];
+    $usuario->buscar_lotes_by_proyecto($id_proyecto);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+        $jsonstring = json_encode($usuario->datos);
+        echo $jsonstring;
+    }
+}
 if ($_POST["funcion"] == "buscar_proyectos_user") {
     $json = array();
     $id_usuario = $_POST["id_cliente"];
@@ -593,6 +604,19 @@ if ($_POST["funcion"] == "editar_lotes") {
     $id_lote = $lote["id"];
     $coordenadas = json_encode($lote["coordenadas"]);
     $usuario->editar_lote_coordenadas($id_lote, $coordenadas);
+    echo $usuario->mensaje;
+}
+if ($_POST["funcion"] == "editar_lote_info") {
+    $data = json_decode($_POST['data'], true);
+    $id = $data['id'];
+    $numero = $data['numero'];
+    $precio = $data['precio'];
+    $area = $data['area'];
+    $ancho = $data['ancho'];
+    $largo = $data['largo'];
+    $mz_zona = $data['mz_zona'];
+    $estado = $data['estado'];
+    $usuario->editar_lote_info($id, $numero, $precio, $ancho, $largo, $area, $mz_zona, $estado);
     echo $usuario->mensaje;
 }
 if ($_POST["funcion"] == "buscar_lotes") {

@@ -174,6 +174,19 @@ class Usuario
             return $this->mensaje;
         }
     }
+    function editar_lote_info($id, $numero, $precio, $ancho, $largo, $area, $mz_zona, $estado)
+    {
+        $sql = "UPDATE lotes SET numero = :numero, precio = :precio, mz_zona = :mz_zona, ancho = :ancho, largo = :largo, area = :area, estado = :estado WHERE id=:id_lote";
+        $query = $this->conexion->prepare($sql);
+        try {
+            $query->execute(array(":id_lote" => $id, ":numero" => $numero, ":precio" => $precio, ":mz_zona" => $mz_zona, ":ancho" => $ancho, ":largo" => $largo, ":area" => $area, ":estado" => $estado));
+            $this->mensaje = "edit-sucess";
+            return $this->mensaje;
+        } catch (\Throwable $error) {
+            $this->mensaje = "no-edit-sucess" . $error;
+            return $this->mensaje;
+        }
+    }
 
     function buscar_lotes($id)
     {
@@ -352,6 +365,19 @@ class Usuario
         $sql = "SELECT PRO.id, PRO.nombreProyecto as nombre_proyecto, PRO.imgUrl as img_url, PRO.proyectStatus as proyect_status, CREATOR.nombre as creador_nombre, CREATOR.apellido as creador_apellido FROM proyectos as PRO inner join usuario as CREATOR on PRO.createdBy=CREATOR.id_usuario";
         $query = $this->conexion->prepare($sql);
         $query->execute();
+        $this->datos = $query->fetchAll(); // retorna objetos o no
+        if (!empty($this->datos)) {
+            return $this->datos;
+        } else {
+            $this->mensaje = "no-register";
+            return $this->mensaje;
+        }
+    }
+    function buscar_lotes_by_proyecto($id_proyecto)
+    {
+        $sql = "SELECT * FROM lotes WHERE proyectoID = :proyecto_id";
+        $query = $this->conexion->prepare($sql);
+        $query->execute(array(":proyecto_id" => $id_proyecto));
         $this->datos = $query->fetchAll(); // retorna objetos o no
         if (!empty($this->datos)) {
             return $this->datos;
