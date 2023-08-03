@@ -39,7 +39,7 @@ class Usuario
     }
     function Loguearse($username, $password)
     {
-        $sql = "SELECT id_usuario, nombre, apellido, createdBy as creator, usuarioRol as tipo FROM usuario WHERE user=:username and password=:password";
+        $sql = "SELECT id_usuario, nombre, apellido, createdBy as creator, usuarioRol as tipo FROM usuario WHERE user=:username and password=:password and usuarioStatus = 1";
         $query = $this->conexion->prepare($sql);
         $query->execute(array(':username' => $username, ':password' => $password));
         $this->datos = $query->fetchAll(); // retorna objetos o no
@@ -76,7 +76,7 @@ class Usuario
     }
     function buscar_usuarios_admin()
     {
-        $sql = "SELECT ADMIN.id_usuario, ADMIN.nombre, ADMIN.apellido, ADMIN.dni, ADMIN.correo, ADMIN.user, CREATOR.nombre as creator FROM usuario as ADMIN inner join usuario as CREATOR on ADMIN.createdBy=CREATOR.id_usuario WHERE ADMIN.usuarioRol=2";
+        $sql = "SELECT ADMIN.id_usuario, ADMIN.nombre, ADMIN.apellido, ADMIN.dni, ADMIN.correo, ADMIN.user, CREATOR.nombre as creator FROM usuario as ADMIN inner join usuario as CREATOR on ADMIN.createdBy=CREATOR.id_usuario WHERE ADMIN.usuarioRol=2 AND ADMIN.usuarioStatus = 1";
         $query = $this->conexion->prepare($sql);
         $query->execute();
         $this->datos = $query->fetchAll(); // retorna objetos o no
@@ -90,7 +90,7 @@ class Usuario
     }
     function buscar_usuarios_asesores($id_usuario)
     {
-        $sql = "SELECT id_usuario, nombre, apellido, dni, correo, phone_number, user, usuarioStatus as status FROM usuario WHERE createdBy=:id_usuario";
+        $sql = "SELECT id_usuario, nombre, apellido, dni, correo, phone_number, user, usuarioStatus as status FROM usuario WHERE createdBy=:id_usuario AND usuarioStatus = 1";
         $query = $this->conexion->prepare($sql);
         $query->execute(array(":id_usuario" => $id_usuario));
         $this->datos = $query->fetchAll(); // retorna objetos o no
@@ -283,7 +283,7 @@ class Usuario
     }
     function delete_user($id)
     {
-        $sql = "DELETE FROM usuario WHERE id_usuario=:id_usuario";
+        $sql = "UPDATE usuario SET usuarioStatus = 0 WHERE id_usuario=:id_usuario";
         $query = $this->conexion->prepare($sql);
         try {
             $query->execute(array(":id_usuario" => $id));
