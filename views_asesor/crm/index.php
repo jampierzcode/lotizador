@@ -154,6 +154,83 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                     <!-- </form> -->
                 </div>
             </div>
+            <div id="crear-etiqueta" class="modal-create md-hidden">
+                <div class="form-create">
+                    <!-- <form id="form_producto_add"> -->
+                    <div class="close-modal">
+                        <ion-icon name="close-outline"></ion-icon>
+                    </div>
+                    <h1 class="font-bold">Crear etiqueta</h1>
+                    <form id="registerEtiqueta">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="mb-6">
+                                <label for="nombre" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nombre</label>
+                                <input type="text" id="nombre-etiqueta" placeholder="Escribe un nombre para la etiqueta" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                            </div>
+
+                        </div>
+                        <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Registrar</button>
+                    </form>
+                    <table id="etiquetasList" class="table cust-datatable dataTable no-footer" style="width:100%;">
+
+                        <thead>
+                            <tr>
+                                <th>Nombres</th>
+                                <th>Acciones</th>
+                                <!-- <th>
+                                <div style="width: 200px !important">Acciones</div>
+                            </th> -->
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+
+
+                <!-- <div class="card-input buttons-modal">
+                        <button id="cancel-form" class="btn-cancel">Cancelar</button>
+                        <button id="add-user-form" class="btn-create">Crear</button>
+                    </div> -->
+                <!-- </form> -->
+
+            </div>
+            <div id="ver-etiquetas-clientes" class="modal-create md-hidden">
+                <div class="form-create">
+                    <!-- <form id="form_producto_add"> -->
+                    <div class="close-modal">
+                        <ion-icon name="close-outline"></ion-icon>
+                    </div>
+                    <h1 class="font-bold">Mis etiquetas</h1>
+                    <div id="list-etiquetas" style="display: flex; flex-direction: row; gap: 15px">
+                        <select name="etiquetas[]" multiple="multiple" id="etiquetas-user" style="width: 100%" class="users_proyect" name="state">
+
+                        </select>
+                        <button id="update-asigned-etiqueta" class="btn-add">Agregar</button>
+                    </div>
+                    <div class="main-datatable">
+                        <table id="etiquetasClienteList" class="" style="width:100%;">
+
+                            <thead>
+                                <tr>
+                                    <th>Nombres</th>
+                                    <th>Asignacion</th>
+                                    <th>Acciones</th>
+                                    <!-- <th>
+                                <div style="width: 200px !important">Acciones</div>
+                            </th> -->
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+
+
+                <!-- <div class="card-input buttons-modal">
+                        <button id="cancel-form" class="btn-cancel">Cancelar</button>
+                        <button id="add-user-form" class="btn-create">Crear</button>
+                    </div> -->
+                <!-- </form> -->
+
+            </div>
             <div id="editar-lead" class="modal-create md-hidden">
                 <div class="form-create">
                     <!-- <form id="form_producto_add"> -->
@@ -364,7 +441,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
 
                     <div id="expand-etiqueta" class="absolute left-0 z-10 mt-2 w-56 origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none hidden" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
                         <div class="py-1" role="none">
-                            <li id="modal-lead" class="flex items-center gap-2 cursor-pointer hover:bg-slate-200 text-gray-700 block px-4 py-2 text-sm" role="menuitem" tabindex="-1" id="menu-item-0"><ion-icon name="add-outline"></ion-icon> Crear etiqueta</li>
+                            <li id="modal-etiqueta" class="flex items-center gap-2 cursor-pointer hover:bg-slate-200 text-gray-700 block px-4 py-2 text-sm" role="menuitem" tabindex="-1" id="menu-item-0"><ion-icon name="add-outline"></ion-icon> Crear etiqueta</li>
 
                         </div>
                     </div>
@@ -396,8 +473,8 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                     </div>
                     <div>
                         <label for="default-search" class="mb-2 text-sm font-medium text-gray-900  dark:text-white">Etiquetas</label>
-                        <select id="filter-proyecto" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                            <option selected>Sin etiquetas</option>
+                        <select id="filter-etiqueta" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                            <option value="Todos" selected>Todos</option>
                         </select>
                     </div>
 
@@ -463,6 +540,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                             </th> -->
                             <th>Nombres</th>
                             <th>Apellidos</th>
+                            <th>Etiquetas</th>
                             <th>Fecha Hora Creacion</th>
                             <!-- <th>Correo</th> -->
                             <th>Celular</th>

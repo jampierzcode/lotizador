@@ -112,6 +112,13 @@ if ($_POST["funcion"] == "add_user_proyect") {
     $usuario->add_user_proyect($id_usuario, $proyectos);
     echo $usuario->mensaje;
 }
+if ($_POST["funcion"] == "update_asigned_etiqueta") {
+    $etiquetas = $_POST["etiquetas"];
+    $id_cliente = $_POST["cliente"];
+    $fecha = $_POST["fecha"];
+    $usuario->update_asigned_etiqueta($etiquetas, $fecha, $id_cliente);
+    echo $usuario->mensaje;
+}
 if ($_POST["funcion"] == "add_user_cliente") {
     $asesor = $_POST["asesor"];
     $id_cliente = $_POST["id"];
@@ -378,6 +385,17 @@ if ($_POST["funcion"] == "buscar_proyectos_user") {
         }
         $jsonstring = json_encode($json);
         echo $jsonstring;
+    }
+}
+if ($_POST["funcion"] == "buscar_etiquetas_cliente") {
+    $json = array();
+    $id_cliente = $_POST["id_cliente"];
+    $usuario->buscar_etiquetas_cliente($id_cliente);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+        echo json_encode($usuario->datos);
     }
 }
 if ($_POST["funcion"] == "buscar_asesor_cliente") {
@@ -739,6 +757,18 @@ if ($_POST["funcion"] == "buscar_visitas_programadas") {
     echo json_encode($usuario->datos);
     // echo $usuario->mensaje;
 }
+if ($_POST["funcion"] == "buscar_etiquetas") {
+    $user = $_SESSION["id_usuario"];
+    $usuario->buscar_etiquetas($user);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+
+        echo json_encode($usuario->datos);
+    }
+    // echo $usuario->mensaje;
+}
 if ($_POST["funcion"] == "add_visita_cliente") {
     $fecha = $_POST["fecha"];
     $hora = $_POST["hora"];
@@ -753,6 +783,12 @@ if ($_POST["funcion"] == "add_cliente") {
     $resultado = $_POST["result"];
     $proyect_id = $_POST["proyecto_id"];
     $usuario->add_cliente($resultado, $proyect_id, $_SESSION["id_usuario"]);
+    echo $usuario->mensaje;
+}
+if ($_POST["funcion"] == "add_etiqueta") {
+    $nombre = $_POST["nombre"];
+    $fecha = $_POST["fecha"];
+    $usuario->add_etiqueta($nombre, $fecha,  $id_usuario);
     echo $usuario->mensaje;
 }
 if ($_POST["funcion"] == "edit_cliente") {
@@ -850,7 +886,8 @@ if ($_POST["funcion"] == "buscar_clientes_by_asesor") {
                 'id_task' => $dato->id_task,
                 'task_status' => $dato->task_status,
                 'fecha_visita' => $dato->fecha_visita,
-                'hora_visita' => $dato->hora_visita
+                'hora_visita' => $dato->hora_visita,
+                'etiquetas' => $dato->etiquetas
             );
         }
         $jsonstring = json_encode($json);
@@ -858,6 +895,12 @@ if ($_POST["funcion"] == "buscar_clientes_by_asesor") {
     }
 }
 // funciones de seguimiento
+if ($_POST["funcion"] == "remove_etiqueta_lead") {
+    $id_etiqueta = $_POST["id_etiqueta"];
+    $cliente = $_POST["cliente"];
+    $usuario->remove_etiqueta_lead($id_etiqueta, $cliente);
+    echo $usuario->mensaje;
+}
 if ($_POST["funcion"] == "seguimiento_cliente") {
     $observacion = $_POST["observacion"];
     $user = intVal($_SESSION["id_usuario"]);

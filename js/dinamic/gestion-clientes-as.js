@@ -3,10 +3,10 @@ $(document).ready(function () {
   var clientesList;
   var idCliente;
   var proyectosList = [];
-
   var dataTable = $("#usuariosList").DataTable({
     // scrollY: "160px",
     // scrollY: "500px",
+    // ordering: false,
     stateSave: true,
     lengthMenu: [5, 10, 25, 50],
     language: {
@@ -42,6 +42,30 @@ $(document).ready(function () {
       // { data: "id" },
       { data: "nombres" },
       { data: "apellidos" },
+      {
+        data: null,
+        render: function (data) {
+          let template = "";
+          template += `<div class="flex flex-col gap-2 ">`;
+          if (data.etiquetas === null) {
+            template += `<p>Sin etiquetas</p>`;
+          } else {
+            // Convertir la cadena a un array
+            const etiquetas = JSON.parse(data.etiquetas);
+            console.log(etiquetas);
+            const etiquetasArray = etiquetas[0].nombre.split(",");
+            etiquetasArray.forEach((e) => {
+              template += `<div class="p-2 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400" role="alert">
+              <span class="font-medium whitespace-nowrap">${e}</span> </div>`;
+            });
+          }
+          template += `</div>`;
+          template += `
+          <button id="verEtiquetasCliente" keyCliente=${data.id} type="button" class="focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm p-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900"><ion-icon name="eye"></ion-icon></button>
+          `;
+          return template;
+        },
+      },
       { data: "created_cliente" },
       // { data: "correo" },
       { data: "celular" },
@@ -159,6 +183,84 @@ $(document).ready(function () {
     // order: false,
     // bLengthChange: false,
     // dom: '<"top">ct<"top"p><"clear">',
+  });
+  var dataTableEtiquetas = $("#etiquetasList").DataTable({
+    // scrollY: "160px",
+    // scrollY: "500px",
+    stateSave: true,
+    lengthMenu: [5, 10, 25, 50],
+    language: {
+      lengthMenu: "Mostrar _MENU_ registros por página",
+      zeroRecords: "No se encontraron resultados",
+      info: "Mostrando página _PAGE_ de _PAGES_",
+      infoEmpty: "No hay registros disponibles",
+      infoFiltered: "(filtrado de _MAX_ registros totales)",
+      search: "Buscar:",
+      paginate: {
+        first: "Primero",
+        last: "Último",
+        next: "Siguiente",
+        previous: "Anterior",
+      },
+    },
+    pageLength: 5,
+    scrollX: true,
+
+    columns: [
+      // { data: "id" },
+      { data: "nombre" },
+      {
+        data: null,
+        render: function (data, type, row) {
+          return `
+              <div class="flex-actions">
+              <button target="_blank" keyClient="${data?.id}" id="editClient" class="btnJsvm normal"><ion-icon name="create-sharp"></ion-icon></button>
+              <button target="_blank" keyClient="${data?.id}" id="removeClient" class="btnJsvm danger"><ion-icon name="trash"></ion-icon></button>
+              </div>
+    
+              `;
+        },
+      },
+    ],
+  });
+  var etiquetasClienteList = $("#etiquetasClienteList").DataTable({
+    // scrollY: "160px",
+    // scrollY: "500px",
+    stateSave: true,
+    lengthMenu: [5, 10, 25, 50],
+    language: {
+      lengthMenu: "Mostrar _MENU_ registros por página",
+      zeroRecords: "No se encontraron resultados",
+      info: "Mostrando página _PAGE_ de _PAGES_",
+      infoEmpty: "No hay registros disponibles",
+      infoFiltered: "(filtrado de _MAX_ registros totales)",
+      search: "Buscar:",
+      paginate: {
+        first: "Primero",
+        last: "Último",
+        next: "Siguiente",
+        previous: "Anterior",
+      },
+    },
+    pageLength: 5,
+    scrollX: true,
+
+    columns: [
+      // { data: "id" },
+      { data: "nombre" },
+      { data: "asignado_cliente" },
+      {
+        data: null,
+        render: function (data, type, row) {
+          return `
+              <div class="flex-actions">
+              <button target="_blank" keyEtiqueta="${data?.id}" id="removeEtiqueta" class="btnJsvm danger"><ion-icon name="trash"></ion-icon></button>
+              </div>
+    
+              `;
+        },
+      },
+    ],
   });
 
   // -------register asistencia
@@ -301,7 +403,7 @@ $(document).ready(function () {
           dataTable.clear().draw();
         } else {
           const clientes = JSON.parse(response);
-          console.log(clientes);
+          // console.log(clientes);
           clientesList = clientes;
           clientesList.sort(compareDatesDesc);
 
@@ -504,9 +606,30 @@ $(document).ready(function () {
   function filtrarProyectos() {
     const nombreProyecto = $("#filter-proyecto").val();
     const nombreCliente = $("#cliente-search").val().toLowerCase();
-    console.log(nombreProyecto, nombreCliente);
+    const nombreEtiqueta = $("#filter-etiqueta").val();
+    console.log(nombreProyecto, nombreCliente, nombreEtiqueta);
 
     const clientes = clientesList.filter((cliente) => {
+      let etiquetasList;
+      console.log(cliente.etiquetas);
+      let etiquetas = JSON.parse(cliente.etiquetas);
+      if (etiquetas === null) {
+        etiquetasList = [];
+      } else {
+        etiquetasList = etiquetas[0].nombre.split(",");
+      }
+      console.log(etiquetasList);
+      let count = 0;
+      etiquetasList.forEach((etiqueta) => {
+        if (etiqueta === nombreEtiqueta) {
+          count = count + 1;
+        }
+      });
+      console.log(count);
+      console.log(nombreEtiqueta);
+      if (count === 0 && nombreEtiqueta !== "Todos") {
+        return false;
+      }
       if (
         nombreProyecto !== "Todos" &&
         cliente.nombre_proyecto !== nombreProyecto
@@ -602,6 +725,7 @@ $(document).ready(function () {
 
   // Event listeners para los cambios en el select y el input
   $("#cliente-search, #filter-proyecto").on("change keyup", filtrarProyectos);
+  $("#filter-etiqueta").on("change", filtrarProyectos);
 
   // filtro de pendientes
   $("#menu-pendientes").click(function () {
@@ -613,6 +737,7 @@ $(document).ready(function () {
   $("#reset_filtros").click(function () {
     $("#cliente-search").val("");
     $("#filter-proyecto").val("Todos");
+    $("#filter-etiqueta").val("Todos");
     $("#fecha-inicio-pendients").val(null);
     $("#fecha-fin-pendients").val(null);
     dataTable.clear().rows.add(clientesList).draw();
@@ -628,6 +753,8 @@ $(document).ready(function () {
     $("#fecha-fin-pendients").attr("min", fechaInicio.format("YYYY-MM-DD"));
   });
   $("#fecha-fin-pendients").on("change", filtrarPendientes);
+
+  // filtro de etiquetas
 
   // Llama a la función inicialmente para mostrar todos los proyectos
 
@@ -939,30 +1066,204 @@ $(document).ready(function () {
     );
   }
 
-  // filtrado de busqueda para administrador
+  // remover etiqueta de lead
+  $(document).on("click", "#removeEtiqueta", function () {
+    let id_etiqueta = $(this).attr("keyEtiqueta");
+    console.log(id_etiqueta);
+    let funcion = "remove_etiqueta_lead";
+    $.post(
+      "../../controlador/UsuarioController.php",
+      { funcion, id_etiqueta, cliente: idCliente },
+      async (response) => {
+        if (response.trim() === "remove-asigned") {
+          buscar_clientes();
+          const etiquetas = await buscar_etiquetas_cliente(idCliente);
+          console.log(etiquetas);
+          let template;
+          // let template = `<option value="" selected></option>`;
+          let etiquetasAsigned = [];
+          etiquetas.forEach((etiqueta) => {
+            let option = `<option value=${etiqueta.id}>${etiqueta.nombre}</option>`;
+            if (etiqueta.asignado_cliente === "asignado") {
+              etiquetasAsigned.push(etiqueta);
+              option = `<option value=${etiqueta.id} disabled>${etiqueta.nombre}</option>`;
+            }
+            template += option;
+          });
+          etiquetasClienteList.clear().rows.add(etiquetasAsigned).draw();
 
-  // filter cliente
-  // $("#cliente-search").on("keyup", function () {
-  //   var nombre = $(this).val();
-  //   console.log(clientesList);
-  //   console.log(nombre);
-  //   if (nombre !== "") {
-  //     const result = clientesList.filter(function (persona) {
-  //       var nombreCompleto = (
-  //         persona.nombres +
-  //         " " +
-  //         persona.apellidos
-  //       ).toLowerCase();
-  //       return nombreCompleto.includes(nombre);
-  //     });
+          $("#etiquetas-user").html(template);
+          $("#etiquetas-user").select2({
+            allowClear: true,
+            placeholder: "Selecciona una etiqueta",
+          });
+        } else {
+          alert("Ocurrio un error, contacta al administrador");
+        }
+        console.log(response);
+      }
+    );
+  });
 
-  //     dataTable.clear().rows.add(result).draw();
-  //   } else {
-  //     dataTable.clear().rows.add(clientesList).draw();
-  //   }
-  // });
+  // modal crear etiqueta
+  $("#modal-etiqueta").click(() => {
+    $("#crear-etiqueta").removeClass("md-hidden");
+    setTimeout(function () {
+      $("#crear-etiqueta .form-create").addClass("modal-show");
+    }, 10);
+  });
+  $("#crear-etiqueta .close-modal").click(() => {
+    $("#crear-etiqueta .form-create").removeClass("modal-show");
+    setTimeout(function () {
+      $("#crear-etiqueta").addClass("md-hidden");
+    }, 500);
+  });
+  $("#registerEtiqueta").submit(function (e) {
+    e.preventDefault();
+    let nombre = $("#nombre-etiqueta").val();
+    if (nombre !== "") {
+      console.log(nombre);
+      let funcion = "add_etiqueta";
+      let fecha = dayjs().format("YYYY-MM-DD");
+      $.post(
+        "../../controlador/UsuarioController.php",
+        { funcion, nombre, fecha },
+        (response) => {
+          console.log(response);
+          if (response.trim() === "add-etiqueta") {
+            $("#nombre-etiqueta").val("");
+            buscar_etiquetas();
+            alert("La etiqueta se creo correctamente");
+          } else {
+            alert("Hubo un error contacta con el administrador");
+          }
+        }
+      );
+    } else {
+      alert("El nombre de la etiqueta no puede estar vacio");
+    }
+  });
+  buscar_etiquetas();
+  function buscar_etiquetas() {
+    let funcion = "buscar_etiquetas";
+    $.post(
+      "../../controlador/UsuarioController.php",
+      { funcion },
+      (response) => {
+        console.log(response);
+        if (response !== "") {
+          const etiquetas = JSON.parse(response);
+          let template = `<option value="Todos">Todos</option>`;
+          etiquetas.forEach((e) => {
+            template += `<option value="${e.nombre}">${e.nombre}</option>`;
+          });
+          $("#filter-etiqueta").html(template);
 
-  // FIN DE MODAL ASIGNES
+          dataTableEtiquetas.clear().rows.add(etiquetas).draw();
+        }
+      }
+    );
+  }
+  function buscar_etiquetas_cliente(id_cliente) {
+    return new Promise((resolve, reject) => {
+      let funcion = "buscar_etiquetas_cliente";
+      $.post(
+        "../../controlador/UsuarioController.php",
+        { funcion, id_cliente },
+        (response) => {
+          console.log(response);
+          if (response.trim() == "no-register") {
+            resolve(null);
+          } else {
+            const etiquetas = JSON.parse(response);
+            resolve(etiquetas);
+          }
+        }
+      ).fail((error) => {
+        reject(error);
+      });
+    });
+  }
+  $(document).on("click", "#verEtiquetasCliente", async function () {
+    let id_cliente = $(this).attr("keyCliente");
+    console.log(id_cliente);
+    idCliente = id_cliente;
+    try {
+      const etiquetas = await buscar_etiquetas_cliente(id_cliente);
+      console.log(etiquetas);
+      let template;
+      // let template = `<option value="" selected></option>`;
+      let etiquetasAsigned = [];
+      etiquetas.forEach((etiqueta) => {
+        let option = `<option value=${etiqueta.id}>${etiqueta.nombre}</option>`;
+        if (etiqueta.asignado_cliente === "asignado") {
+          etiquetasAsigned.push(etiqueta);
+          option = `<option value=${etiqueta.id} disabled>${etiqueta.nombre}</option>`;
+        }
+        template += option;
+      });
+      etiquetasClienteList.clear().rows.add(etiquetasAsigned).draw();
+
+      $("#etiquetas-user").html(template);
+      $("#etiquetas-user").select2({
+        allowClear: true,
+        placeholder: "Selecciona una etiqueta",
+      });
+    } catch (error) {
+      console.log(error);
+    }
+    $("#ver-etiquetas-clientes").removeClass("md-hidden");
+    setTimeout(function () {
+      $("#ver-etiquetas-clientes .form-create").addClass("modal-show");
+    }, 10);
+  });
+  $("#ver-etiquetas-clientes .close-modal").click(() => {
+    $("#ver-etiquetas-clientes .form-create").removeClass("modal-show");
+    setTimeout(function () {
+      $("#ver-etiquetas-clientes").addClass("md-hidden");
+    }, 500);
+  });
+  $("#update-asigned-etiqueta").click(function () {
+    let funcion = "update_asigned_etiqueta";
+    let etiquetas = $("#etiquetas-user").val();
+    let fecha = dayjs().format("YYYY-MM-DD");
+    console.log(etiquetas);
+    $.post(
+      "../../controlador/UsuarioController.php",
+      { funcion, etiquetas, cliente: idCliente, fecha },
+      async (response) => {
+        if (response.trim() === "add-etiquetas-lead") {
+          alert("Se asigno correctamente");
+          buscar_clientes();
+          const etiquetas = await buscar_etiquetas_cliente(idCliente);
+          console.log(etiquetas);
+          let template;
+          // let template = `<option value="" selected></option>`;
+          let etiquetasAsigned = [];
+          etiquetas.forEach((etiqueta) => {
+            let option = `<option value=${etiqueta.id}>${etiqueta.nombre}</option>`;
+            if (etiqueta.asignado_cliente === "asignado") {
+              etiquetasAsigned.push(etiqueta);
+              option = `<option value=${etiqueta.id} disabled>${etiqueta.nombre}</option>`;
+            }
+            template += option;
+          });
+          etiquetasClienteList.clear().rows.add(etiquetasAsigned).draw();
+
+          $("#etiquetas-user").html(template);
+          $("#etiquetas-user").select2({
+            allowClear: true,
+            placeholder: "Selecciona una etiqueta",
+          });
+        } else {
+          alert("Hubo un error contacta con el administrador");
+          console.log(response);
+        }
+      }
+    );
+  });
+  // -----------------------------------------------
+
   $("#crear-event .form-create .close-modal").click(() => {
     $("#tipo-documento-modal").val(0);
     $("#documento-modal").val("");

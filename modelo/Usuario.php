@@ -281,6 +281,19 @@ class Usuario
             return $this->mensaje;
         }
     }
+    function remove_etiqueta_lead($id_etiqueta, $cliente)
+    {
+        $sql = "DELETE FROM etiqueta_cliente WHERE etiqueta_id = :etiqueta AND cliente_id = :cliente";
+        $query = $this->conexion->prepare($sql);
+        try {
+            $query->execute(array(":etiqueta" => $id_etiqueta, ":cliente" => $cliente));
+            $this->mensaje = "remove-asigned";
+            return $this->mensaje;
+        } catch (\Throwable $error) {
+            $this->mensaje = "no-remove-asigned" . $error;
+            return $this->mensaje;
+        }
+    }
     function delete_user($id)
     {
         $sql = "UPDATE usuario SET usuarioStatus = 0 WHERE id_usuario=:id_usuario";
@@ -423,6 +436,26 @@ class Usuario
             }
         } catch (\Throwable $error) {
             $this->mensaje = "no-proyectos" . $error;
+            return $this->mensaje;
+        }
+    }
+    function buscar_etiquetas_cliente($id_cliente)
+    {
+        try {
+            # code...
+            $sql = "SELECT et.*, CASE WHEN ec.cliente_id IS NOT NULL THEN 'asignado' ELSE 'no asignado' END AS asignado_cliente FROM etiqueta et LEFT JOIN ( SELECT DISTINCT etiqueta_id, cliente_id FROM etiqueta_cliente WHERE cliente_id = :id_cliente ) ec ON et.id = ec.etiqueta_id WHERE et.user_id = :id_usuario
+            ";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":id_cliente" => $id_cliente, ":id_usuario" => $_SESSION['id_usuario']));
+            $this->datos = $query->fetchAll(); // retorna objetos o no
+            if (!empty($this->datos)) {
+                return $this->datos;
+            } else {
+                $this->mensaje = "no-register";
+                return $this->mensaje;
+            }
+        } catch (\Throwable $error) {
+            $this->mensaje = "no-register" . $error;
             return $this->mensaje;
         }
     }
@@ -758,6 +791,20 @@ class Usuario
             echo json_encode($response);
         }
     }
+    function add_etiqueta($nombre, $fecha, $id_usuario)
+    {
+        try {
+            # code...
+            $sql = "INSERT INTO etiqueta(nombre, user_id, fecha_created) VALUES(:nombre, :usuario, :fecha)";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":nombre" => $nombre, ":usuario" => $id_usuario, ":fecha" => $fecha));
+            $this->mensaje = "add-etiqueta";
+            return $this->mensaje;
+        } catch (\Throwable $error) {
+            $this->mensaje = "no-add-etiqueta" . $error;
+            return $this->mensaje;
+        }
+    }
     function add_visita_cliente($fecha, $hora, $cliente, $usuario, $tipo, $pendiente)
     {
         try {
@@ -779,6 +826,22 @@ class Usuario
         try {
             # code...
             $sql = "SELECT ic.*, uc.*, va.status as asistio FROM interaccion_cliente ic INNER JOIN user_cliente uc ON ic.cliente_id = uc.cliente_id LEFT JOIN visitas_agenda va ON ic.id = va.interaccion_id WHERE ic.user_id =:usuario AND uc.user_id=:usuario;
+            ";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":usuario" => $usuario));
+            $this->datos = $query->fetchAll();
+            return $this->datos;
+        } catch (\Throwable $error) {
+            // Devolver un mensaje de error en caso de excepción
+            $this->mensaje = $error;
+            return $this->mensaje;
+        }
+    }
+    function buscar_etiquetas($usuario)
+    {
+        try {
+            # code...
+            $sql = "SELECT * FROM etiqueta WHERE user_id =:usuario
             ";
             $query = $this->conexion->prepare($sql);
             $query->execute(array(":usuario" => $usuario));
@@ -939,6 +1002,22 @@ class Usuario
         $this->mensaje = "add-user-proyects";
         return $this->mensaje;
     }
+    function update_asigned_etiqueta($etiquetas, $fecha, $id_cliente)
+    {
+        foreach ($etiquetas as $etiqueta) {
+            try {
+                # code...
+                $sql = "INSERT INTO etiqueta_cliente(etiqueta_id, cliente_id, fecha_created) VALUES (:etiqueta, :cliente, :fecha)";
+                $query = $this->conexion->prepare($sql);
+                $query->execute(array(":etiqueta" => $etiqueta, ':cliente' => $id_cliente, ":fecha" => $fecha));
+            } catch (\Throwable $error) {
+                $this->mensaje = "no-add-etiquetas" . $error;
+                return $this->mensaje;
+            }
+        }
+        $this->mensaje = "add-etiquetas-lead";
+        return $this->mensaje;
+    }
     function add_user_cliente($id_cliente, $asesor)
     {
         try {
@@ -1073,18 +1152,31 @@ class Usuario
     function buscar_clientes_by_asesor($id_usuario)
     {
         try {
-            $sql = "SELECT c.*, 
+            $sql = "SELECT
+            c.*,
             p.nombreProyecto AS nombre_proyecto,
             ic.id AS id_task,
-            ic.status AS task_status, ic.fecha_visita, ic.hora_visita
-     FROM usuario u
-     JOIN user_cliente uc ON u.id_usuario = uc.user_id
-     JOIN cliente c ON uc.cliente_id = c.id_cliente
-     LEFT JOIN proyectos p ON c.proyet_id = p.id
-     LEFT JOIN interaccion_cliente ic 
-            ON ic.cliente_id = c.id_cliente AND ic.status = 'PENDIENTE'
-     WHERE u.id_usuario = :id_usuario
-     AND u.usuarioRol = 3;
+            ic.status AS task_status,
+            ic.fecha_visita,
+            ic.hora_visita,
+            CONCAT('[', GROUP_CONCAT(CONCAT('{\"nombre\":\"', et.nombre, '\"}') SEPARATOR ', '), ']') AS etiquetas
+FROM
+            usuario u
+        JOIN user_cliente uc ON u.id_usuario = uc.user_id
+        JOIN cliente c ON uc.cliente_id = c.id_cliente
+        LEFT JOIN proyectos p ON c.proyet_id = p.id
+        LEFT JOIN interaccion_cliente ic ON ic.cliente_id = c.id_cliente AND ic.status = 'PENDIENTE'
+        LEFT JOIN (
+            SELECT ec.cliente_id, GROUP_CONCAT(et.nombre SEPARATOR ', ') AS nombre
+            FROM etiqueta_cliente ec
+            JOIN etiqueta et ON ec.etiqueta_id = et.id AND et.user_id = :id_usuario
+            GROUP BY ec.cliente_id
+        ) et ON c.id_cliente = et.cliente_id
+        WHERE
+            u.id_usuario = :id_usuario
+            AND u.usuarioRol = 3
+        GROUP BY c.id_cliente, p.nombreProyecto, ic.id, ic.status, ic.fecha_visita, ic.hora_visita;
+        
      
             ";
             $query = $this->conexion->prepare($sql);
