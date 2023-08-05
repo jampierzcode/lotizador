@@ -214,11 +214,12 @@ $(document).ready(function () {
         render: function (data, type, row) {
           return `
               <div class="flex-actions">
-              <button target="_blank" keyClient="${data?.id}" id="editClient" class="btnJsvm normal"><ion-icon name="create-sharp"></ion-icon></button>
-              <button target="_blank" keyClient="${data?.id}" id="removeClient" class="btnJsvm danger"><ion-icon name="trash"></ion-icon></button>
+              
+              <button target="_blank" keyClient="${data?.id}" id="removeEtiquetaUser" class="btnJsvm danger"><ion-icon name="trash"></ion-icon></button>
               </div>
     
               `;
+          // <button target="_blank" keyClient="${data?.id}" id="editEtiquetaUser" class="btnJsvm normal"><ion-icon name="create-sharp"></ion-icon></button>
         },
       },
     ],

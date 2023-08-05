@@ -183,6 +183,24 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
                     <!-- </form> -->
                 </div>
             </div>
+            <div id="historial-event" class="modal-create md-hidden">
+                <div class="form-create">
+                    <!-- <form id="form_producto_add"> -->
+                    <div class="close-modal">
+                        <ion-icon name="close-outline"></ion-icon>
+                    </div>
+                    <h1 class="font-bold">Historial de Eventos</h1>
+                    <div class="flex items-center gap-4">
+                        <p class="text-xl">Estado Actual:
+                        <div id="status-now"></div>
+                    </div>
+
+                    <ol id="list-historial" class="relative border-l border-gray-200 dark:border-gray-700">
+                    </ol>
+
+                </div>
+            </div>
+
             <div id="crear-users" class="modal-create md-hidden">
                 <div class="form-create">
                     <!-- <form id="form_producto_add"> -->
@@ -262,6 +280,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
                     <!-- </form> -->
                 </div>
             </div>
+
             <div id="asigned_asesores" class="modal-create md-hidden">
                 <div class="form-create">
                     <!-- <form id="form_producto_add"> -->
@@ -376,6 +395,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
                             <th>Ciudad</th>
                             <th>Proyecto</th>
                             <th>Agente</th>
+                            <th>Status</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>

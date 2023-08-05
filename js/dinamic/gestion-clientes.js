@@ -70,12 +70,21 @@ $(document).ready(function () {
       {
         data: null,
         render: function (data, type, row) {
+          let template_status = imprimirStatus(data?.status);
+          return template_status;
+        },
+      },
+      {
+        data: null,
+        render: function (data, type, row) {
           return `
           <div class="flex-actions">
           <button target="_blank" keyClient="${data?.id}" id="asignedClient" class="btnJsvm default"><ion-icon name="add-circle-sharp"></ion-icon></button>
           <button target="_blank" keyClient="${data?.id}" id="editClient" class="btnJsvm normal"><ion-icon name="create-sharp"></ion-icon></button>
           <button target="_blank" keyClient="${data?.id}" id="deleteClient" class="btnJsvm danger"><ion-icon name="trash"></ion-icon></button>
-          
+           
+          <button target="_blank" keyClient="${data?.id}" id="historialCliente" class="btnJsvm normal">Historial</button>
+           
           </div>
 
           `;
@@ -155,13 +164,135 @@ $(document).ready(function () {
     return dayjs(b.created_cliente).diff(dayjs(a.created_cliente));
   }
   // BUSCAR CLIENTES
+  function imprimirStatus(status) {
+    let template = "";
+    switch (status) {
+      case "NO CONTACTADO":
+        template += `<span class="target_tab warning">${status}</span>`;
+        break;
+
+      case "CONTACTADO":
+        template += `<span class="target_tab info flex items-center gap-2">CONTACTANDO <div role="status">
+        <svg aria-hidden="true" class="inline w-6 h-6 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-purple-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+            <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+        </svg>
+        <span class="sr-only">Loading...</span>
+    </div></span>`;
+
+        break;
+      case "NO RESPONDIO":
+        template += `<span class="target_tab warning">${status}</span>`;
+
+        break;
+      case "VISITA":
+        template += `<span class="target_tab success">${status}</span>`;
+
+        break;
+      case "ASISTIO":
+        template += `<span class="target_tab success">${status} a la visita</span>`;
+
+        break;
+      case "NO ASISTIO":
+        template += `<span class="target_tab danger">${status}</span>`;
+
+        break;
+      case "REPROGRAMACION CONTACTO":
+        template += `<span class="target_tab info">${status}</span>`;
+
+        break;
+      case "REPROGRAMACION VISITA":
+        template += `<span class="target_tab info">${status}</span>`;
+
+        break;
+      case "SEPARACION":
+        template += `<span class="target_tab success">${status}</span>`;
+
+        break;
+      case "VENTA":
+        template += `<span style="display: flex; gap: 10px; align-items: center" class="target_tab success"> 
+        <img style="width: 20px;" src="../../img/corona.png" alt=""> ${status}</span>`;
+
+        break;
+
+      default:
+        break;
+    }
+    return template;
+  }
+  const compareDates = (a, b) => {
+    // Parsear las fechas con el formato "dd/mm/yyyy"
+    const [dayA, monthA, yearA] = a.fecha.split("/");
+    const [dayB, monthB, yearB] = b.fecha.split("/");
+
+    // Crear las instancias de Date con el formato "YYYY-MM-DD"
+    const dateA = new Date(`${yearA}-${monthA}-${dayA} ${a.hora}`);
+    const dateB = new Date(`${yearB}-${monthB}-${dayB} ${b.hora}`);
+
+    if (dateA > dateB) {
+      return -1;
+    } else if (dateA < dateB) {
+      return 1;
+    } else {
+      return 0;
+    }
+  };
+  // show modal de historial de cliente
+  $(document).on("click", "#historialCliente", function () {
+    let cliente = $(this).attr("keyClient");
+    idCliente = cliente;
+    let funcion = "buscar_historial_seguimiento";
+    buscarHistorial(funcion, cliente);
+  });
+  function buscarHistorial(funcion, cliente) {
+    $.post(
+      "../../controlador/UsuarioController.php",
+      { funcion, cliente },
+      (response) => {
+        console.log(response);
+        if (response.trim() === "no-data") {
+          alert("no hay registro alguno, porfavor cree uno");
+        } else {
+          const historial = JSON.parse(response);
+          console.log(historial);
+          const sortedData = historial.sort(compareDates);
+          console.log(historial);
+          console.log(sortedData);
+          let template = "";
+          sortedData.forEach((history) => {
+            template += `
+          <li class="mb-10 ml-4">
+          <div class="absolute w-3 h-3 bg-gray-200 rounded-full mt-1.5 -left-1.5 border border-white dark:border-gray-900 dark:bg-gray-700"></div>
+          <time class="mb-1 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">${
+            history.fecha + " " + history.hora
+          }</time>
+                          <h3 class="flex items-center gap-4 text-lg font-semibold text-gray-900 dark:text-white">Estado Registrado: ${imprimirStatus(
+                            history.status
+                          )}</h3>
+                          <p class="mb-4 text-base font-normal text-gray-500 dark:text-gray-400">${
+                            history.observacion !== null
+                              ? history.observacion
+                              : "Sin observaciones"
+                          }</p>
+                          </li>
+                          `;
+          });
+          $("#list-historial").html(template);
+          $("#historial-event").removeClass("md-hidden");
+          setTimeout(function () {
+            $("#historial-event .form-create").addClass("modal-show");
+          }, 10);
+        }
+      }
+    );
+  }
+
   function buscar_clientes() {
     funcion = "buscar_clientes";
     $.post(
       "../../controlador/UsuarioController.php",
       { funcion },
       (response) => {
-        console.log(response);
         let template = "";
         if (response.trim() == "no-register-clientes") {
           template += "<td>No hay registros</td>";

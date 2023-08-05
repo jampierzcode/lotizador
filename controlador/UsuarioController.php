@@ -840,7 +840,8 @@ if ($_POST["funcion"] == "buscar_clientes") {
                 'nombre_proyecto' => $dato->nombre_proyecto,
                 'created_cliente' => $dato->created_cliente,
                 'proyecto_id' => $dato->proyet_id,
-                'asignado_usuario' => $dato->asignado_usuario
+                'asignado_usuario' => $dato->asignado_usuario,
+                'status' => $dato->status
             );
         }
         $jsonstring = json_encode($json);
