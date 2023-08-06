@@ -327,7 +327,25 @@ $(document).ready(function () {
       completarTask(id_task);
     }
   });
-
+  encontrar_ventas();
+  function encontrar_ventas() {
+    let funcion = "buscar_resumen_eficiencia_usuario";
+    $.post(
+      "../../controlador/UsuarioController.php",
+      { funcion },
+      (response) => {
+        console.log(response);
+        let template;
+        if (response.trim() === "no-register") {
+          template = 0;
+        } else {
+          let resumen = JSON.parse(response);
+          template = resumen[0].ventas;
+        }
+        $("#ventas_count").html(template);
+      }
+    );
+  }
   function animarProgress() {
     let funcion = "buscar_visitas_programadas";
     $.post(

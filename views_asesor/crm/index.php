@@ -401,7 +401,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                 </div>
                 <div class="flex bg-green-600 p-2 rounded-lg gap-4 items-center text-white">
                     <h1>Ventas</h1>
-                    <span class="text-white">0</span>
+                    <span id="ventas_count" class="text-white">0</span>
                 </div>
             </div>
             <div style="display: flex; gap:10px; margin-bottom: 20px">

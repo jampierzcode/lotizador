@@ -522,7 +522,7 @@ class Usuario
             # code...
             $sql = "SELECT
             SUM(CASE WHEN va.status = 'ASISTIO' THEN 1 ELSE 0 END) AS visitas_concretadas,
-            (SELECT COUNT(*) FROM interaccion_cliente ic WHERE ic.tipo = 'SEPARACION' AND ic.fecha_visita BETWEEN :fecha_inicio AND :fecha_fin AND ic.user_id IN (SELECT id_usuario FROM usuario WHERE createdBy = 10)) AS separaciones,
+            (SELECT COUNT(*) FROM interaccion_cliente ic WHERE ic.tipo = 'SEPARACION' AND ic.fecha_visita BETWEEN :fecha_inicio AND :fecha_fin AND ic.user_id IN (SELECT id_usuario FROM usuario WHERE createdBy = :id_usuario)) AS separaciones,
             COUNT(DISTINCT v.id) AS ventas
         FROM
             visitas_agenda va
@@ -540,6 +540,68 @@ class Usuario
         ";
             $query = $this->conexion->prepare($sql);
             $query->execute(array(':fecha_inicio' => $fecha_inicio, ':fecha_fin' => $fecha_fin, ":id_usuario" => $_SESSION["id_usuario"]));
+            $this->datos = $query->fetchAll(); // retorna objetos o no
+            if (!empty($this->datos)) {
+                return $this->datos;
+            } else {
+                $this->mensaje = "no-register";
+                return $this->mensaje;
+            }
+        } catch (\Throwable $error) {
+            $this->mensaje = "fatal-error" . $error;
+            return $this->mensaje;
+        }
+    }
+    function buscar_resumen_eficiencia_asesor($fecha_inicio, $fecha_fin, $id_usuario)
+    {
+        try {
+            # code...
+            $sql = "SELECT
+            SUM(CASE WHEN va.status = 'ASISTIO' THEN 1 ELSE 0 END) AS visitas_concretadas,
+            (SELECT COUNT(*) FROM interaccion_cliente ic WHERE ic.tipo = 'SEPARACION' AND ic.fecha_visita BETWEEN :fecha_inicio AND :fecha_fin AND ic.user_id=:id_usuario) AS separaciones,
+            COUNT(DISTINCT v.id) AS ventas
+        FROM
+            visitas_agenda va
+        JOIN
+            interaccion_cliente ic ON va.interaccion_id = ic.id
+        LEFT JOIN
+            ventas v ON ic.cliente_id = v.cliente_id AND v.fecha_venta BETWEEN :fecha_inicio AND :fecha_fin
+        WHERE
+            ic.fecha_visita BETWEEN :fecha_inicio AND :fecha_fin
+            AND ic.user_id = :id_usuario
+        ";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(':fecha_inicio' => $fecha_inicio, ':fecha_fin' => $fecha_fin, ":id_usuario" => $id_usuario));
+            $this->datos = $query->fetchAll(); // retorna objetos o no
+            if (!empty($this->datos)) {
+                return $this->datos;
+            } else {
+                $this->mensaje = "no-register";
+                return $this->mensaje;
+            }
+        } catch (\Throwable $error) {
+            $this->mensaje = "fatal-error" . $error;
+            return $this->mensaje;
+        }
+    }
+    function buscar_resumen_eficiencia_usuario($id_usuario)
+    {
+        try {
+            # code...
+            $sql = "SELECT
+            SUM(CASE WHEN va.status = 'ASISTIO' THEN 1 ELSE 0 END) AS visitas_concretadas,
+            (SELECT COUNT(*) FROM interaccion_cliente ic WHERE ic.tipo = 'SEPARACION' AND ic.user_id=:id_usuario) AS separaciones,
+            COUNT(DISTINCT v.id) AS ventas
+        FROM
+            visitas_agenda va
+        JOIN
+            interaccion_cliente ic ON va.interaccion_id = ic.id
+        LEFT JOIN
+            ventas v ON ic.cliente_id = v.cliente_id
+        WHERE ic.user_id = :id_usuario
+        ";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":id_usuario" => $id_usuario));
             $this->datos = $query->fetchAll(); // retorna objetos o no
             if (!empty($this->datos)) {
                 return $this->datos;

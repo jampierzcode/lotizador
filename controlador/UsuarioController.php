@@ -442,6 +442,31 @@ if ($_POST["funcion"] == "buscar_resumen_eficiencia") {
         echo $jsonstring;
     }
 }
+if ($_POST["funcion"] == "buscar_resumen_eficiencia_asesor") {
+    $fecha_inicio = $_POST["fecha_inicio"];
+    $fecha_fin = $_POST["fecha_fin"];
+    $user = $id_usuario;
+    $usuario->buscar_resumen_eficiencia_asesor($fecha_inicio, $fecha_fin, $user);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+        $jsonstring = json_encode($usuario->datos);
+        echo $jsonstring;
+    }
+}
+if ($_POST["funcion"] == "buscar_resumen_eficiencia_usuario") {
+
+    $user = $id_usuario;
+    $usuario->buscar_resumen_eficiencia_usuario($user);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+        $jsonstring = json_encode($usuario->datos);
+        echo $jsonstring;
+    }
+}
 if ($_POST["funcion"] == "buscar_proyectos_agentes") {
     $json = array();
     $id_usuario = $_SESSION["id_usuario"];
