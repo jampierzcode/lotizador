@@ -29,11 +29,11 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
         include_once "../../components/Sidebar_admin.php"
         ?>
 
-        <div class="container-dashboard">
+        <div class="container-dashboard h-screen">
             <span class="route">
                 > Home
             </span>
-            <div class="cards-admin">
+            <div style="margin: 0px !important;" class="cards-admin">
                 <div class="card-count">
                     <div class="left-card">
                         <h1>N° Proyectos</h1>
@@ -58,221 +58,137 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
             </div> -->
             </div>
 
-            <span class="route">
-                Trabajo de asesores
-            </span>
             <div class="grid gap-4 w-full">
-                <div class="sticky top-0 pt-4 w-full md:w-full p-4 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-                    <div class="flex items-center justify-between">
-                        <h5 class="text-lg font-bold leading-none text-gray-900 dark:text-white">Filtros avanzados</h5>
-                    </div>
-                    <div>
-                        <div class="grid grid-cols-4 gap-4">
-                            <div class="h-auto">
-                                <label for="Fecha Inicio">Fecha Inicio</label>
-                                <input type="date" id="fecha-inicio-search" class="block w-full p-2.5 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Buscar por nombre del asesor">
-                            </div>
-                            <div class="h-auto">
-                                <label for="Fecha Inicio">Fecha Termino</label>
-                                <input type="date" id="fecha-fin-search" class="block w-full p-2.5 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Buscar por nombre del asesor">
-                            </div>
-                            <div class="h-auto">
-
-                                <label for="Fecha Inicio">Asesor</label>
-
-
-                                <div class="relative mb-6">
-                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                        <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
-                                        </svg>
-                                    </div>
-                                    <input type="search" id="asesor-search" class="block w-full p-2.5 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Buscar por nombre del asesor">
+                <div style="z-index: 5000; padding-top:40px" class="sticky top-[-40px] bg-[#f5f7fb]">
+                    <div class="pt-4 w-full md:w-full p-4 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <h5 class="text-lg font-bold leading-none text-gray-900 dark:text-white">Filtros avanzados</h5>
+                        </div>
+                        <div>
+                            <div class="grid grid-cols-4 gap-4">
+                                <div class="h-auto">
+                                    <label for="Fecha Inicio">Fecha Inicio</label>
+                                    <input type="date" id="fecha-inicio-search" class="block w-full p-2.5 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Buscar por nombre del asesor">
                                 </div>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <button id="search_date_visitas" type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Buscar</button>
-                                <button id="refresh_date_visitas" type="button" class="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700">Reset</button>
+                                <div class="h-auto">
+                                    <label for="Fecha Inicio">Fecha Termino</label>
+                                    <input type="date" id="fecha-fin-search" class="block w-full p-2.5 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Buscar por nombre del asesor">
+                                </div>
+                                <div class="h-auto">
+
+                                    <label for="Fecha Inicio">Asesor</label>
+
+
+                                    <div class="relative mb-6">
+                                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                            <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                                            </svg>
+                                        </div>
+                                        <input type="search" id="asesor-search" class="block w-full p-2.5 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Buscar por nombre del asesor">
+
+                                        <div id="listUsuarios" class="hidden absolute top-full w-full max-w-md p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
+
+                                            <div class="flow-root">
+                                                <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
+                                                    <li class="py-3 sm:py-4">
+                                                        <div class="flex items-center space-x-4">
+                                                            <div class="flex-shrink-0">
+                                                                <img class="w-8 h-8 rounded-full" src="/docs/images/people/profile-picture-1.jpg" alt="Neil image">
+                                                            </div>
+                                                            <div class="flex-1 min-w-0">
+                                                                <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                                                                    Neil Sims
+                                                                </p>
+                                                                <p class="text-sm text-gray-500 truncate dark:text-gray-400">
+                                                                    email@windster.com
+                                                                </p>
+                                                            </div>
+                                                            <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                                                                $320
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    <li class="py-3 sm:py-4">
+                                                        <div class="flex items-center space-x-4">
+                                                            <div class="flex-shrink-0">
+                                                                <img class="w-8 h-8 rounded-full" src="/docs/images/people/profile-picture-3.jpg" alt="Bonnie image">
+                                                            </div>
+                                                            <div class="flex-1 min-w-0">
+                                                                <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                                                                    Bonnie Green
+                                                                </p>
+                                                                <p class="text-sm text-gray-500 truncate dark:text-gray-400">
+                                                                    email@windster.com
+                                                                </p>
+                                                            </div>
+                                                            <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                                                                $3467
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    <li class="py-3 sm:py-4">
+                                                        <div class="flex items-center space-x-4">
+                                                            <div class="flex-shrink-0">
+                                                                <img class="w-8 h-8 rounded-full" src="/docs/images/people/profile-picture-2.jpg" alt="Michael image">
+                                                            </div>
+                                                            <div class="flex-1 min-w-0">
+                                                                <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                                                                    Michael Gough
+                                                                </p>
+                                                                <p class="text-sm text-gray-500 truncate dark:text-gray-400">
+                                                                    email@windster.com
+                                                                </p>
+                                                            </div>
+                                                            <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                                                                $67
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    <li class="py-3 sm:py-4">
+                                                        <div class="flex items-center space-x-4">
+                                                            <div class="flex-shrink-0">
+                                                                <img class="w-8 h-8 rounded-full" src="/docs/images/people/profile-picture-4.jpg" alt="Lana image">
+                                                            </div>
+                                                            <div class="flex-1 min-w-0">
+                                                                <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                                                                    Lana Byrd
+                                                                </p>
+                                                                <p class="text-sm text-gray-500 truncate dark:text-gray-400">
+                                                                    email@windster.com
+                                                                </p>
+                                                            </div>
+                                                            <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                                                                $367
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <button id="search_date_visitas" type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Buscar</button>
+                                    <button id="refresh_date_visitas" type="button" class="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700">Reset</button>
+
+                                </div>
 
                             </div>
-
                         </div>
                     </div>
                 </div>
-                <div class="w-full md:w-full p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
-                    <div class="flex items-center justify-between mb-4">
-                        <h5 class="text-lg font-bold leading-none text-center text-gray-900 dark:text-white">Resumen de Visitas</h5>
 
-                    </div>
-                    <div>
-                        <div id="visitas_graf" class="w-full" style="height:400px;"></div>
-                    </div>
-                    <!-- <div class="flow-root">
-                            <ul role="list" class="max-h-[200px] overflow-y-auto divide-y divide-gray-200 dark:divide-gray-700">
-                                <li class="py-3 sm:py-4">
-                                    <div class="flex items-center space-x-4">
-                                        <div class="flex-shrink-0">
-                                            <img class="w-8 h-8 rounded-full" src="/docs/images/people/profile-picture-1.jpg" alt="Neil image">
-                                        </div>
-                                        <div class="flex-1 min-w-0">
-                                            <div class="flex items-center space-x-4">
-                                                <div class="flex-1 min-w-0">
-                                                    <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                                                        Maicol Bohorquez
-                                                    </p>
-
-                                                    <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                                                        <div class="bg-blue-600 h-2.5 rounded-full" style="width: 45%"></div>
-                                                    </div>
-
-                                                </div>
-                                                <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-                                                    20
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                </li>
-                                <li class="py-3 sm:py-4">
-                                    <div class="flex items-center space-x-4">
-                                        <div class="flex-shrink-0">
-                                            <img class="w-8 h-8 rounded-full" src="/docs/images/people/profile-picture-1.jpg" alt="Neil image">
-                                        </div>
-                                        <div class="flex-1 min-w-0">
-                                            <div class="flex items-center space-x-4">
-                                                <div class="flex-1 min-w-0">
-                                                    <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                                                        Maicol Bohorquez
-                                                    </p>
-
-                                                    <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                                                        <div class="bg-blue-600 h-2.5 rounded-full" style="width: 45%"></div>
-                                                    </div>
-
-                                                </div>
-                                                <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-                                                    20
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                </li>
-                                <li class="py-3 sm:py-4">
-                                    <div class="flex items-center space-x-4">
-                                        <div class="flex-shrink-0">
-                                            <img class="w-8 h-8 rounded-full" src="/docs/images/people/profile-picture-1.jpg" alt="Neil image">
-                                        </div>
-                                        <div class="flex-1 min-w-0">
-                                            <div class="flex items-center space-x-4">
-                                                <div class="flex-1 min-w-0">
-                                                    <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                                                        Maicol Bohorquez
-                                                    </p>
-
-                                                    <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                                                        <div class="bg-blue-600 h-2.5 rounded-full" style="width: 45%"></div>
-                                                    </div>
-
-                                                </div>
-                                                <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-                                                    20
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                </li>
-                                <li class="py-3 sm:py-4">
-                                    <div class="flex items-center space-x-4">
-                                        <div class="flex-shrink-0">
-                                            <img class="w-8 h-8 rounded-full" src="/docs/images/people/profile-picture-1.jpg" alt="Neil image">
-                                        </div>
-                                        <div class="flex-1 min-w-0">
-                                            <div class="flex items-center space-x-4">
-                                                <div class="flex-1 min-w-0">
-                                                    <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                                                        Maicol Bohorquez
-                                                    </p>
-
-                                                    <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                                                        <div class="bg-blue-600 h-2.5 rounded-full" style="width: 45%"></div>
-                                                    </div>
-
-                                                </div>
-                                                <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-                                                    20
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                </li>
-                                <li class="py-3 sm:py-4">
-                                    <div class="flex items-center space-x-4">
-                                        <div class="flex-shrink-0">
-                                            <img class="w-8 h-8 rounded-full" src="/docs/images/people/profile-picture-1.jpg" alt="Neil image">
-                                        </div>
-                                        <div class="flex-1 min-w-0">
-                                            <div class="flex items-center space-x-4">
-                                                <div class="flex-1 min-w-0">
-                                                    <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                                                        Maicol Bohorquez
-                                                    </p>
-
-                                                    <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                                                        <div class="bg-blue-600 h-2.5 rounded-full" style="width: 45%"></div>
-                                                    </div>
-
-                                                </div>
-                                                <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-                                                    20
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                </li>
-                                <li class="py-3 sm:py-4">
-                                    <div class="flex items-center space-x-4">
-                                        <div class="flex-shrink-0">
-                                            <img class="w-8 h-8 rounded-full" src="/docs/images/people/profile-picture-1.jpg" alt="Neil image">
-                                        </div>
-                                        <div class="flex-1 min-w-0">
-                                            <div class="flex items-center space-x-4">
-                                                <div class="flex-1 min-w-0">
-                                                    <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                                                        Maicol Bohorquez
-                                                    </p>
-
-                                                    <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                                                        <div class="bg-blue-600 h-2.5 rounded-full" style="width: 45%"></div>
-                                                    </div>
-
-                                                </div>
-                                                <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-                                                    20
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div> -->
-                </div>
 
                 <span class="route mt-6">
-                    Clientes Potenciales
+                    Trabajo de asesores
                 </span>
-                <div class="flex gap-4">
-                    <div class="w-full md:w-1/3 max-w-md p-2 bg-white border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
+                <div class="flex flex-wrap md:flex-nowrap gap-4">
+                    <div class="w-full p-2 bg-white border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
                         <div class="flex items-center justify-between mb-4">
-                            <h5 class="text-lg font-bold leading-none text-gray-900 dark:text-white">Proyectos Vendidos</h5>
-                            <a href="#" class="text-sm font-medium text-blue-600 hover:underline dark:text-blue-500">
-                                D--
-                            </a>
+                            <h5 class="text-lg font-bold leading-none text-gray-900 dark:text-white">Cuadro de Eficiencia</h5>
+
                         </div>
                         <div class="flow-root">
                             <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
@@ -280,16 +196,13 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
                                     <div class="flex items-center space-x-4">
                                         <div class="flex-1 min-w-0">
                                             <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                                                VISITAS
+                                                VISITAS CONCRETADAS
                                             </p>
 
-                                            <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                                                <div class="bg-blue-600 h-2.5 rounded-full" style="width: 45%"></div>
-                                            </div>
 
                                         </div>
-                                        <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-                                            20
+                                        <div id="resumen-visitas" class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                                            0
                                         </div>
                                     </div>
                                 </li>
@@ -297,16 +210,13 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
                                     <div class="flex items-center space-x-4">
                                         <div class="flex-1 min-w-0">
                                             <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                                                REPROGRAMACION CONTACTO
+                                                SEPARACIONES
                                             </p>
 
-                                            <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                                                <div class="bg-blue-600 h-2.5 rounded-full" style="width: 45%"></div>
-                                            </div>
 
                                         </div>
-                                        <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-                                            20
+                                        <div id="resumen-separaciones" class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                                            0
                                         </div>
                                     </div>
                                 </li>
@@ -314,35 +224,33 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
                                     <div class="flex items-center space-x-4">
                                         <div class="flex-1 min-w-0">
                                             <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                                                REPROGRAMACION VISITA
+                                                VENTAS
                                             </p>
 
-                                            <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                                                <div class="bg-blue-600 h-2.5 rounded-full" style="width: 45%"></div>
-                                            </div>
 
                                         </div>
-                                        <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-                                            20
+                                        <div id="resumen-ventas" class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                                            0
                                         </div>
                                     </div>
                                 </li>
                             </ul>
                         </div>
+                        <div id="resumen-vsv" class="w-full" style="height:400px;"></div>
+
                     </div>
-                    <div class="w-full md:w-2/3 max-w-md p-2 bg-white border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
+                    <!-- <div class="w-full p-2 bg-white border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
                         <div class="flex items-center justify-between mb-4">
-                            <h5 class="text-lg font-bold leading-none text-gray-900 dark:text-white">Seguimiento de clientes por asesor</h5>
-                            <a href="#" class="text-sm font-medium text-blue-600 hover:underline dark:text-blue-500">
-                                --
-                            </a>
+                            <h5 class="text-lg font-bold leading-none text-gray-900 dark:text-white">Detalle de eficiencia por asesor</h5>
+
                         </div>
                         <div class="flow-root">
                             <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
+
                                 <li class="py-3 sm:py-4">
                                     <div class="flex items-center space-x-4">
                                         <div class="flex-shrink-0">
-                                            <img class="w-8 h-8 rounded-full" src="/docs/images/people/profile-picture-1.jpg" alt="Neil image">
+                                            <img class="w-8 h-8 rounded-full" src="../../img/avatar_default.jpg" alt="Neil image">
                                         </div>
                                         <div class="flex-1 min-w-0">
                                             <div class="flex items-center space-x-4">
@@ -357,57 +265,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
 
                                                 </div>
                                                 <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-                                                    20
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                </li>
-                                <li class="py-3 sm:py-4">
-                                    <div class="flex items-center space-x-4">
-                                        <div class="flex-shrink-0">
-                                            <img class="w-8 h-8 rounded-full" src="/docs/images/people/profile-picture-1.jpg" alt="Neil image">
-                                        </div>
-                                        <div class="flex-1 min-w-0">
-                                            <div class="flex items-center space-x-4">
-                                                <div class="flex-1 min-w-0">
-                                                    <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                                                        Maicol Bohorquez
-                                                    </p>
-
-                                                    <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                                                        <div class="bg-blue-600 h-2.5 rounded-full" style="width: 45%"></div>
-                                                    </div>
-
-                                                </div>
-                                                <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-                                                    20
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                </li>
-                                <li class="py-3 sm:py-4">
-                                    <div class="flex items-center space-x-4">
-                                        <div class="flex-shrink-0">
-                                            <img class="w-8 h-8 rounded-full" src="/docs/images/people/profile-picture-1.jpg" alt="Neil image">
-                                        </div>
-                                        <div class="flex-1 min-w-0">
-                                            <div class="flex items-center space-x-4">
-                                                <div class="flex-1 min-w-0">
-                                                    <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                                                        Maicol Bohorquez
-                                                    </p>
-
-                                                    <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                                                        <div class="bg-blue-600 h-2.5 rounded-full" style="width: 45%"></div>
-                                                    </div>
-
-                                                </div>
-                                                <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-                                                    20
+                                                    1er puesto
                                                 </div>
                                             </div>
 
@@ -416,6 +274,16 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
                                 </li>
                             </ul>
                         </div>
+                    </div> -->
+                    <div class="w-full md:w-full p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
+                        <div class="flex items-center justify-between mb-4">
+                            <h5 class="text-lg font-bold leading-none text-center text-gray-900 dark:text-white">Asistencia de Visitas</h5>
+
+                        </div>
+                        <div>
+                            <div id="visitas_graf" class="w-full" style="height:400px;"></div>
+                        </div>
+
                     </div>
                 </div>
 

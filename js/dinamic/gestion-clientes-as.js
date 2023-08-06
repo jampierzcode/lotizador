@@ -900,6 +900,21 @@ $(document).ready(function () {
       }
     );
   }
+  function register_venta(fecha, cliente) {
+    let funcion = "register_venta";
+    $.post(
+      "../../controlador/UsuarioController.php",
+      { funcion, fecha, cliente },
+      (response) => {
+        if (response.trim() === "add-register-venta") {
+          alert("Se registro correctamente la venta");
+        } else {
+          alert("Hubo un error Contacta al administrador");
+        }
+        console.log(response);
+      }
+    );
+  }
   $("#registerFormEvento").submit((e) => {
     e.preventDefault();
     let status = $("#status-evento").val();
@@ -924,6 +939,8 @@ $(document).ready(function () {
         }
       } else if (status === "VENTA") {
         console.log("VENTA");
+        let fecha = dayjs().format("YYYY-MM-DD");
+        register_venta(fecha, idCliente);
       }
       seguimiento_cliente(observaciones, idCliente, status);
 

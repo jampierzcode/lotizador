@@ -501,9 +501,45 @@ class Usuario
     {
         try {
             # code...
-            $sql = "SELECT fecha_visita, cliente_id, cantidad_visitas, status FROM ( SELECT IC.fecha_visita, IC.cliente_id, COUNT(*) AS cantidad_visitas, 'ASISTIO' AS status FROM visitas_agenda AS VA INNER JOIN interaccion_cliente AS IC ON VA.interaccion_id = IC.id WHERE IC.fecha_visita BETWEEN :fecha_inicio AND :fecha_fin AND VA.status = 'ASISTIO' GROUP BY IC.fecha_visita UNION ALL SELECT IC.fecha_visita, IC.cliente_id, COUNT(*) AS cantidad_visitas, 'NO ASISTIO' AS status FROM visitas_agenda AS VA INNER JOIN interaccion_cliente AS IC ON VA.interaccion_id = IC.id WHERE IC.fecha_visita BETWEEN :fecha_inicio AND :fecha_fin AND VA.status = 'NO ASISTIO' GROUP BY IC.fecha_visita ) AS subquery ORDER BY fecha_visita DESC, status";
+            $sql = "SELECT fecha_visita, cliente_id, cantidad_visitas, status FROM ( SELECT IC.fecha_visita, IC.cliente_id, COUNT(*) AS cantidad_visitas, 'ASISTIO' AS status FROM visitas_agenda AS VA INNER JOIN interaccion_cliente AS IC ON VA.interaccion_id = IC.id INNER JOIN usuario as US on IC.user_id=US.id_usuario WHERE US.createdBy=:id_usuario AND IC.fecha_visita BETWEEN :fecha_inicio AND :fecha_fin AND VA.status = 'ASISTIO' GROUP BY IC.fecha_visita UNION ALL SELECT IC.fecha_visita, IC.cliente_id, COUNT(*) AS cantidad_visitas, 'NO ASISTIO' AS status FROM visitas_agenda AS VA INNER JOIN interaccion_cliente AS IC ON VA.interaccion_id = IC.id WHERE IC.fecha_visita BETWEEN :fecha_inicio AND :fecha_fin AND VA.status = 'NO ASISTIO' GROUP BY IC.fecha_visita ) AS subquery ORDER BY fecha_visita DESC, status";
             $query = $this->conexion->prepare($sql);
-            $query->execute(array(':fecha_inicio' => $fecha_inicio, ':fecha_fin' => $fecha_fin));
+            $query->execute(array(':fecha_inicio' => $fecha_inicio, ':fecha_fin' => $fecha_fin, ":id_usuario" => $_SESSION["id_usuario"]));
+            $this->datos = $query->fetchAll(); // retorna objetos o no
+            if (!empty($this->datos)) {
+                return $this->datos;
+            } else {
+                $this->mensaje = "no-register";
+                return $this->mensaje;
+            }
+        } catch (\Throwable $error) {
+            $this->mensaje = "fatal-error" . $error;
+            return $this->mensaje;
+        }
+    }
+    function buscar_resumen_eficiencia($fecha_inicio, $fecha_fin)
+    {
+        try {
+            # code...
+            $sql = "SELECT
+            SUM(CASE WHEN va.status = 'ASISTIO' THEN 1 ELSE 0 END) AS visitas_concretadas,
+            (SELECT COUNT(*) FROM interaccion_cliente ic WHERE ic.tipo = 'SEPARACION' AND ic.fecha_visita BETWEEN :fecha_inicio AND :fecha_fin AND ic.user_id IN (SELECT id_usuario FROM usuario WHERE createdBy = 10)) AS separaciones,
+            COUNT(DISTINCT v.id) AS ventas
+        FROM
+            visitas_agenda va
+        JOIN
+            interaccion_cliente ic ON va.interaccion_id = ic.id
+        LEFT JOIN
+            ventas v ON ic.cliente_id = v.cliente_id AND v.fecha_venta BETWEEN :fecha_inicio AND :fecha_fin
+        WHERE
+            ic.fecha_visita BETWEEN :fecha_inicio AND :fecha_fin
+            AND ic.user_id IN (
+                SELECT id_usuario
+                FROM usuario
+                WHERE createdBy = :id_usuario
+            );
+        ";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(':fecha_inicio' => $fecha_inicio, ':fecha_fin' => $fecha_fin, ":id_usuario" => $_SESSION["id_usuario"]));
             $this->datos = $query->fetchAll(); // retorna objetos o no
             if (!empty($this->datos)) {
                 return $this->datos;
@@ -818,6 +854,22 @@ class Usuario
         } catch (\Throwable $error) {
             // Devolver un mensaje de error en caso de excepción
             $this->mensaje = "no-gesiter-visita" . $error;
+            return $this->mensaje;
+        }
+    }
+    function register_venta($fecha, $cliente, $user)
+    {
+        try {
+            # code...
+            $sql = "INSERT INTO ventas(cliente_id, user_id, fecha_venta) VALUES(:cliente, :usuario, :fecha)";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":cliente" => $cliente, ":usuario" => $user, ":fecha" => $fecha));
+
+            $this->mensaje = "add-register-venta";
+            return $this->mensaje;
+        } catch (\Throwable $error) {
+            // Devolver un mensaje de error en caso de excepción
+            $this->mensaje = "no-gesiter-venta" . $error;
             return $this->mensaje;
         }
     }

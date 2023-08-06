@@ -430,6 +430,18 @@ if ($_POST["funcion"] == "buscar_visitas_date") {
         echo $jsonstring;
     }
 }
+if ($_POST["funcion"] == "buscar_resumen_eficiencia") {
+    $fecha_inicio = $_POST["fecha_inicio"];
+    $fecha_fin = $_POST["fecha_fin"];
+    $usuario->buscar_resumen_eficiencia($fecha_inicio, $fecha_fin);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+        $jsonstring = json_encode($usuario->datos);
+        echo $jsonstring;
+    }
+}
 if ($_POST["funcion"] == "buscar_proyectos_agentes") {
     $json = array();
     $id_usuario = $_SESSION["id_usuario"];
@@ -777,6 +789,13 @@ if ($_POST["funcion"] == "add_visita_cliente") {
     $tipo = $_POST["tipo"];
     $pendiente = $_POST["pendiente"];
     $usuario->add_visita_cliente($fecha, $hora, $cliente, $user, $tipo, $pendiente);
+    echo $usuario->mensaje;
+}
+if ($_POST["funcion"] == "register_venta") {
+    $fecha = $_POST["fecha"];
+    $cliente = $_POST["cliente"];
+    $user = $id_usuario;
+    $usuario->register_venta($fecha, $cliente, $user);
     echo $usuario->mensaje;
 }
 if ($_POST["funcion"] == "add_cliente") {
