@@ -48,28 +48,16 @@ if ($_POST["funcion"] == "buscar_lotes") {
     }
 }
 if ($_POST["funcion"] == "buscar_proyectos") {
-    $json = array();
-    $usuario->buscar_proyectos();
+    $proyecto = $_POST["proyecto"];
+    $usuario->buscar_proyectos_mapa($proyecto);
     if ($usuario->mensaje) {
         echo $usuario->mensaje;
     }
     if ($usuario->datos) {
-        foreach ($usuario->datos as $dato) {
-            $json[] = array(
-                'id' => $dato->id,
-                'nombreProyecto' => $dato->nombre_proyecto,
-                'creadorNombre' => $dato->creador_nombre,
-                'creadorApellido' => $dato->creador_apellido,
-                'imgUrl' => $dato->img_url,
-                'status' => $dato->proyect_status
-            );
-        }
-        $jsonstring = json_encode($json);
-        echo $jsonstring;
+        echo json_encode($usuario->datos);
     }
 }
 if ($_POST["funcion"] == "register_visitas") {
     $agente = $_POST["agent"];
     $usuario->register_visitas($agente);
 }
-?>

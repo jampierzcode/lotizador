@@ -31,10 +31,11 @@ $(document).ready(function () {
       let funcion = "buscar_proyectos";
       $.post(
         "../../controlador/MapaController.php",
-        { funcion },
+        { funcion, proyecto: id },
         (response) => {
           const proyecto = JSON.parse(response);
-          nameProyecto = proyecto[0].nombreProyecto;
+          console.log(proyecto);
+          nameProyecto = proyecto[0].nombreproyecto;
         }
       );
     }

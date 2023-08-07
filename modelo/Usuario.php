@@ -656,19 +656,19 @@ class Usuario
             return $this->mensaje;
         }
     }
-    // function buscar_proyectos()
-    // {
-    //     $sql = "SELECT PRO.id, PRO.nombreProyecto as nombre_proyecto, PRO.imgUrl as img_url, PRO.proyectStatus as proyect_status ,CLIENTE.nombre as cliente_nombre, CLIENTE.apellido as cliente_apellido, CREATOR.nombre as creador_nombre, CREATOR.apellido as creador_apellido FROM proyectos as PRO inner join usuario as CLIENTE on PRO.clienteID=CLIENTE.id_usuario inner join usuario as CREATOR on PRO.createdBy=CREATOR.id_usuario";
-    //     $query = $this->conexion->prepare($sql);
-    //     $query->execute();
-    //     $this->datos = $query->fetchAll(); // retorna objetos o no
-    //     if (!empty($this->datos)) {
-    //         return $this->datos;
-    //     } else {
-    //         $this->mensaje = "no-register";
-    //         return $this->mensaje;
-    //     }
-    // }
+    function buscar_proyectos_mapa($proyecto)
+    {
+        $sql = "SELECT * FROM proyectos WHERE id=:id_proyecto";
+        $query = $this->conexion->prepare($sql);
+        $query->execute(array(":id_proyecto" => $proyecto));
+        $this->datos = $query->fetchAll(); // retorna objetos o no
+        if (!empty($this->datos)) {
+            return $this->datos;
+        } else {
+            $this->mensaje = "no-register";
+            return $this->mensaje;
+        }
+    }
     function buscar_proyectos_admin()
     {
         $sql = "SELECT PRO.id, PRO.nombreProyecto as nombre_proyecto, PRO.imgUrl as img_url, PRO.proyectStatus as proyect_status, USER.nombre as cliente_nombre, USER.apellido as cliente_apellido FROM user_proyect as USPRO inner join proyectos as PRO on USPRO.proyecto_id=PRO.id inner join usuario as USER on USPRO.user_id=USER.id_usuario WHERE USPRO.user_id=:id";
