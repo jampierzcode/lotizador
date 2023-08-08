@@ -384,7 +384,6 @@ $(document).ready(function () {
         // var progressBar = document.querySelector(".progreessbar .barSize");
         $("#visits_concretadas").html(count);
         $("#separaciones_count").html(separaciones);
-        $("#ventas_count").html(ventas);
         // progressBar.style.width = `${(count / total) * 100}%`;
         $("#menu-pendientes").html("Pendientes: " + pendientes);
       }
