@@ -618,11 +618,7 @@ class Usuario
     {
         try {
             # code...
-            $sql = "SELECT fecha_visita, COUNT(*) AS cantidad_visitas
-            FROM interaccion_cliente
-            WHERE user_id=:id_usuario AND status = 'COMPLETADO' AND fecha_visita BETWEEN :fecha_inicio AND :fecha_fin
-            GROUP BY fecha_visita
-            ORDER BY fecha_visita;";
+            $sql = "SELECT fecha_visita, cliente_id, cantidad_visitas, status FROM ( SELECT IC.fecha_visita, IC.cliente_id, COUNT(*) AS cantidad_visitas, 'ASISTIO' AS status FROM visitas_agenda AS VA INNER JOIN interaccion_cliente AS IC ON VA.interaccion_id = IC.id  WHERE IC.user_id=:id_usuario AND IC.fecha_visita BETWEEN :fecha_inicio AND :fecha_fin AND VA.status = 'ASISTIO' GROUP BY IC.fecha_visita UNION ALL SELECT IC.fecha_visita, IC.cliente_id, COUNT(*) AS cantidad_visitas, 'NO ASISTIO' AS status FROM visitas_agenda AS VA INNER JOIN interaccion_cliente AS IC ON VA.interaccion_id = IC.id WHERE IC.user_id=:id_usuario AND IC.fecha_visita BETWEEN :fecha_inicio AND :fecha_fin AND VA.status = 'NO ASISTIO' GROUP BY IC.fecha_visita ) AS subquery ORDER BY fecha_visita DESC, status";
             $query = $this->conexion->prepare($sql);
             $query->execute(array(":id_usuario" => $id_usuario, ':fecha_inicio' => $fecha_inicio, ':fecha_fin' => $fecha_fin));
             $this->datos = $query->fetchAll(); // retorna objetos o no

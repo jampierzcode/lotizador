@@ -430,6 +430,19 @@ if ($_POST["funcion"] == "buscar_visitas_date") {
         echo $jsonstring;
     }
 }
+if ($_POST["funcion"] == "buscar_visitas_date_asesor") {
+    $fecha_inicio = $_POST["fecha_inicio"];
+    $fecha_fin = $_POST["fecha_fin"];
+    $user = $_POST["usuario"];
+    $usuario->buscar_visitas_date_asesor($fecha_inicio, $fecha_fin, $user);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+        $jsonstring = json_encode($usuario->datos);
+        echo $jsonstring;
+    }
+}
 if ($_POST["funcion"] == "buscar_resumen_eficiencia") {
     $fecha_inicio = $_POST["fecha_inicio"];
     $fecha_fin = $_POST["fecha_fin"];
@@ -445,7 +458,7 @@ if ($_POST["funcion"] == "buscar_resumen_eficiencia") {
 if ($_POST["funcion"] == "buscar_resumen_eficiencia_asesor") {
     $fecha_inicio = $_POST["fecha_inicio"];
     $fecha_fin = $_POST["fecha_fin"];
-    $user = $id_usuario;
+    $user = $_POST["usuario"];
     $usuario->buscar_resumen_eficiencia_asesor($fecha_inicio, $fecha_fin, $user);
     if ($usuario->mensaje) {
         echo $usuario->mensaje;

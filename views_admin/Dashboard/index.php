@@ -80,86 +80,38 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
 
 
                                     <div class="relative mb-6">
-                                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                            <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
-                                            </svg>
+                                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                            <ion-icon id="icon-drop-asesor" name="chevron-down"></ion-icon>
+
                                         </div>
-                                        <input type="search" id="asesor-search" class="block w-full p-2.5 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Buscar por nombre del asesor">
+                                        <div id="asesor-search" class="whitespace-nowrap overflow-hidden overflow-ellipsis cursor-pointer block w-full p-2.5 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                            <span>Seleccione un asesor</span>
 
-                                        <div id="listUsuarios" class="hidden absolute top-full w-full max-w-md p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
+                                        </div>
 
+                                        <div id="listUsuarios" style="top: calc(100% + 5px)" class="hidden cursor-pointer absolute w-full max-w-md bg-white border border-gray-200 rounded-lg shadow  dark:bg-gray-800 dark:border-gray-700">
+                                            <div class="relative">
+                                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                                    <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                                                    </svg>
+                                                </div>
+                                                <input id="search-asesor-input" type="search" class="block w-full p-2.5 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Buscar por nombre del asesor">
+                                            </div>
                                             <div class="flow-root">
-                                                <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
-                                                    <li class="py-3 sm:py-4">
+                                                <ul id="listAsesores" role="list" class="max-h-[200px] overflow-y-auto divide-y divide-gray-200 dark:divide-gray-700">
+                                                    <li class="py-3 px-4 sm:py-4 cursor-pointer hover:bg-gray-100">
                                                         <div class="flex items-center space-x-4">
                                                             <div class="flex-shrink-0">
-                                                                <img class="w-8 h-8 rounded-full" src="/docs/images/people/profile-picture-1.jpg" alt="Neil image">
+                                                                <img class="w-8 h-8 rounded-full" src="../../img/avatar_default.jpg" alt="Neil image">
                                                             </div>
                                                             <div class="flex-1 min-w-0">
                                                                 <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                                                                    Neil Sims
+                                                                    Nombres
                                                                 </p>
                                                                 <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                                                                    email@windster.com
+                                                                    Apellidos
                                                                 </p>
-                                                            </div>
-                                                            <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-                                                                $320
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                    <li class="py-3 sm:py-4">
-                                                        <div class="flex items-center space-x-4">
-                                                            <div class="flex-shrink-0">
-                                                                <img class="w-8 h-8 rounded-full" src="/docs/images/people/profile-picture-3.jpg" alt="Bonnie image">
-                                                            </div>
-                                                            <div class="flex-1 min-w-0">
-                                                                <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                                                                    Bonnie Green
-                                                                </p>
-                                                                <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                                                                    email@windster.com
-                                                                </p>
-                                                            </div>
-                                                            <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-                                                                $3467
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                    <li class="py-3 sm:py-4">
-                                                        <div class="flex items-center space-x-4">
-                                                            <div class="flex-shrink-0">
-                                                                <img class="w-8 h-8 rounded-full" src="/docs/images/people/profile-picture-2.jpg" alt="Michael image">
-                                                            </div>
-                                                            <div class="flex-1 min-w-0">
-                                                                <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                                                                    Michael Gough
-                                                                </p>
-                                                                <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                                                                    email@windster.com
-                                                                </p>
-                                                            </div>
-                                                            <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-                                                                $67
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                    <li class="py-3 sm:py-4">
-                                                        <div class="flex items-center space-x-4">
-                                                            <div class="flex-shrink-0">
-                                                                <img class="w-8 h-8 rounded-full" src="/docs/images/people/profile-picture-4.jpg" alt="Lana image">
-                                                            </div>
-                                                            <div class="flex-1 min-w-0">
-                                                                <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                                                                    Lana Byrd
-                                                                </p>
-                                                                <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                                                                    email@windster.com
-                                                                </p>
-                                                            </div>
-                                                            <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-                                                                $367
                                                             </div>
                                                         </div>
                                                     </li>
