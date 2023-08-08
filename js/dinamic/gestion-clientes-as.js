@@ -329,20 +329,38 @@ $(document).ready(function () {
   });
   encontrar_ventas();
   function encontrar_ventas() {
+    const startOfMonth = dayjs().startOf("month");
+    const endOfMonth = dayjs().endOf("month");
+    dayjs().locale("es");
+    const mesActual = dayjs().format("MMMM");
+    console.log(mesActual);
+    $("#mesNow").html(mesActual);
+    const fecha_inicio = startOfMonth.format("YYYY-MM-DD"); // Primer día del mes en formato YYYY-MM-DD
+    const fecha_fin = endOfMonth.format("YYYY-MM-DD");
+    console.log(fecha_inicio, fecha_fin);
     let funcion = "buscar_resumen_eficiencia_usuario";
     $.post(
       "../../controlador/UsuarioController.php",
-      { funcion },
+      { funcion, fecha_inicio, fecha_fin },
       (response) => {
         console.log(response);
-        let template;
+        let visitas;
+        let separaciones;
+        let ventas;
         if (response.trim() === "no-register") {
-          template = 0;
+          visitas = 0;
+          separaciones = 0;
+          ventas = 0;
         } else {
           let resumen = JSON.parse(response);
-          template = resumen[0].ventas;
+          console.log(resumen);
+          visitas_concretadas = resumen[0].visitas_concretadas;
+          separaciones = resumen[0].separaciones;
+          ventas = resumen[0].ventas;
         }
-        $("#ventas_count").html(template);
+        $("#ventas_count").html(ventas);
+        $("#separaciones_count").html(separaciones);
+        $("#visits_concretadas").html(visitas_concretadas);
       }
     );
   }
@@ -365,25 +383,11 @@ $(document).ready(function () {
           const pendientesList = interaccion.filter(
             (data) => data.status === "PENDIENTE"
           );
-          const visitasList = interaccion.filter(
-            (data) => data.asistio === "ASISTIO"
-          );
-          const separacionesList = interaccion.filter(
-            (data) => data.tipo === "SEPARACION"
-          );
-          const ventasList = interaccion.filter(
-            (data) => data.tipo === "VENTA"
-          );
-          console.log(ventasList);
-          ventas = ventasList.length;
-          separaciones = separacionesList.length;
-          count = visitasList.length;
           pendientes = pendientesList.length;
         }
         let total = 10;
         // var progressBar = document.querySelector(".progreessbar .barSize");
-        $("#visits_concretadas").html(count);
-        $("#separaciones_count").html(separaciones);
+
         // progressBar.style.width = `${(count / total) * 100}%`;
         $("#menu-pendientes").html("Pendientes: " + pendientes);
       }

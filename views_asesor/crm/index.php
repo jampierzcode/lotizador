@@ -390,7 +390,8 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
 
                 </div>
             </div>
-            <div class="justify-center flex gap-4">
+            <div class="w-full text-center mb-2">Mes actual: <span id="mesNow"></span></div>
+            <div class="justify-center flex gap-4 mb-5">
                 <div class="flex bg-blue-600 p-2 rounded-lg gap-4 items-center text-white">
                     <h1>Visitas Concretadas</h1>
                     <span id="visits_concretadas" class="text-white">0</span>
