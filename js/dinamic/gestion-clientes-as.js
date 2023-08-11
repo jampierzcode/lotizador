@@ -519,6 +519,9 @@ $(document).ready(function () {
       case "NO CONTACTADO":
         template += `<span class="target_tab warning">${status}</span>`;
         break;
+      case "NO INTERESADO":
+        template += `<span class="target_tab warning">${status}</span>`;
+        break;
 
       case "CONTACTADO":
         template += `<span class="target_tab info flex items-center gap-2">CONTACTANDO <div role="status">
@@ -703,26 +706,28 @@ $(document).ready(function () {
   }
   function filtrarPendientes() {
     let fecha_inicio = dayjs(
-      $("#fecha-inicio-pendients").val(),
+      $("#fecha-inicio-status").val(),
       "DD/MM/YYYY"
     ).format("YYYY-MM-DD");
-    let fecha_fin = dayjs($("#fecha-fin-pendients").val(), "DD/MM/YYYY").format(
+    let fecha_fin = dayjs($("#fecha-fin-status").val(), "DD/MM/YYYY").format(
       "YYYY-MM-DD"
     );
-    console.log(fecha_inicio, fecha_fin);
-    if (fecha_inicio !== "Invalid Date" && fecha_fin !== "Invalid Date") {
-      const clientes = clientesList.filter((cliente) => {
-        // console.log(cliente);
-        // if (
-        //   nombreProyecto !== "Todos" &&
-        //   cliente.nombre_proyecto !== nombreProyecto
-        // ) {
-        //   console.log(cliente.nombre_proyecto);
-        //   return false;
-        // }
-        if (cliente.fecha_visita === null) {
-          return false;
-        }
+    let status = $("#filter-status").val();
+    console.log(fecha_inicio, fecha_fin, status);
+    // if (fecha_inicio !== "Invalid Date" && fecha_fin !== "Invalid Date") {
+    const clientes = clientesList.filter((cliente) => {
+      // console.log(cliente);
+      // if (
+      //   nombreProyecto !== "Todos" &&
+      //   cliente.nombre_proyecto !== nombreProyecto
+      // ) {
+      //   console.log(cliente.nombre_proyecto);
+      //   return false;
+      // }
+      if (status !== "Todas" && status !== cliente.status) {
+        return false;
+      }
+      if (fecha_inicio !== "Invalid Date" && fecha_fin !== "Invalid Date") {
         if (
           dayjs(cliente.fecha_visita).isAfter(fecha_fin) ||
           dayjs(cliente.fecha_visita).isBefore(fecha_inicio)
@@ -730,12 +735,14 @@ $(document).ready(function () {
           console.log("entro");
           return false;
         }
-        return true;
-      });
-      console.log(clientes);
+      }
 
-      dataTable.clear().rows.add(clientes).draw();
-    }
+      return true;
+    });
+    console.log(clientes);
+
+    dataTable.clear().rows.add(clientes).draw();
+    // }
   }
 
   // Función auxiliar para verificar si el nombre y apellido coinciden con el filtro
@@ -765,16 +772,19 @@ $(document).ready(function () {
     dataTable.clear().rows.add(clientesList).draw();
   });
 
-  $("#fecha-inicio-pendients").on("change", function () {
+  $("#fecha-inicio-status").on("change", function () {
     const fechaInicio = dayjs($(this).val());
 
     // Habilitar "fechaFin"
-    $("#fecha-fin-pendients").prop("disabled", false);
+    $("#fecha-fin-status").prop("disabled", false);
 
     // Establecer el valor mínimo para "fechaFin" como un día después de "fechaInicio"
-    $("#fecha-fin-pendients").attr("min", fechaInicio.format("YYYY-MM-DD"));
+    $("#fecha-fin-status").attr("min", fechaInicio.format("YYYY-MM-DD"));
   });
-  $("#fecha-fin-pendients").on("change", filtrarPendientes);
+  $("#fecha-inicio-status, #fecha-fin-status, #filter-status").on(
+    "change",
+    filtrarPendientes
+  );
 
   // filtro de etiquetas
 

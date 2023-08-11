@@ -498,17 +498,22 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                     <div class="h-auto">
                         <label for="Fecha Inicio">Del: </label>
-                        <input type="date" id="fecha-inicio-pendients" class="block w-full p-2.5 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Buscar por nombre del asesor">
+                        <input type="date" id="fecha-inicio-status" class="block w-full p-2.5 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Buscar por nombre del asesor">
                     </div>
                     <div class="h-auto">
                         <label for="pendientes-search" class="mb-2 text-sm font-medium text-gray-900  dark:text-white">Al:</label>
-                        <input disabled type="date" id="fecha-fin-pendients" class="block w-full p-2.5 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Buscar por nombre del asesor">
+                        <input disabled type="date" id="fecha-fin-status" class="block w-full p-2.5 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Buscar por nombre del asesor">
                     </div>
                     <div>
-                        <label for="default-search" class="mb-2 text-sm font-medium text-gray-900  dark:text-white">Status(Estado)</label>
-                        <select id="filter-status-pendients" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                        <label for="default-search" class="mb-2 text-sm font-medium text-gray-900  dark:text-white">Status(último)</label>
+                        <select id="filter-status" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                             <option value="Todas" selected>Todas</option>
                             <option value="VISITA">VISITA</option>
+                            <option value="ASISTIO">ASISTIO</option>
+                            <option value="NO ASISTIO">NO ASISTIO</option>
+                            <option value="NO INTERESADO">NO INTERESADO</option>
+                            <option value="SEPARACION">SEPARACION</option>
+                            <option value="VENTA">VENTA</option>
                             <option value="REPROGRAMACION CONTACTO">REPROGRAMACION CONTACTO</option>
                             <option value="REPROGRAMACION VISITA">REPROGRAMACION VISITA</option>
                         </select>
