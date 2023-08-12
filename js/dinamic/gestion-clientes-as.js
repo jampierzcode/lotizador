@@ -76,6 +76,7 @@ $(document).ready(function () {
       {
         data: null,
         render: function (data, type, row) {
+          console.log(data.status);
           let template_status = imprimirStatus(data?.status); // Cambiar de const a let
 
           if (data.task_status === "PENDIENTE") {

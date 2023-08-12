@@ -564,7 +564,7 @@ class Usuario
                 0
             ) AS visitas_concretadas,
             (SELECT COUNT(*) FROM interaccion_cliente ic WHERE ic.tipo = 'SEPARACION' AND ic.user_id = :id_usuario AND ic.fecha_visita BETWEEN :fecha_inicio AND :fecha_fin) AS separaciones,
-             (SELECT COUNT(*) FROM ventas v WHERE v.user_id = 11 AND v.fecha_venta BETWEEN :fecha_inicio AND :fecha_fin) AS ventas
+             (SELECT COUNT(*) FROM ventas v WHERE v.user_id = :id_usuario AND v.fecha_venta BETWEEN :fecha_inicio AND :fecha_fin) AS ventas
         FROM 
             visitas_agenda va 
         JOIN 
