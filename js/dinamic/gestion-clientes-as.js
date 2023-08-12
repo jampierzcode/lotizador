@@ -973,6 +973,7 @@ $(document).ready(function () {
         console.log("VENTA");
         let fecha = dayjs().format("YYYY-MM-DD");
         register_venta(fecha, idCliente);
+        encontrar_ventas();
       }
       seguimiento_cliente(observaciones, idCliente, status);
 

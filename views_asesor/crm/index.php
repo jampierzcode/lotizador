@@ -512,6 +512,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                             <option value="ASISTIO">ASISTIO</option>
                             <option value="NO ASISTIO">NO ASISTIO</option>
                             <option value="NO INTERESADO">NO INTERESADO</option>
+                            <option value="NO RESPONDIO">NO RESPONDIO</option>
                             <option value="SEPARACION">SEPARACION</option>
                             <option value="VENTA">VENTA</option>
                             <option value="REPROGRAMACION CONTACTO">REPROGRAMACION CONTACTO</option>
