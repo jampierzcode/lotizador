@@ -209,12 +209,21 @@ $(document).ready(function () {
           });
         }
       });
-      let contenido = $("body").html();
       //   console.log(contenido);
-      $.post("./schemalotizador.php", { contenido }, (response) => {
-        console.log(response);
-      });
+      //   pdfviewer();
     }
+    $("#generar-pdf").click(function () {
+      // Generar PDF utilizando jsPDF y html2canvas
+      console.log(document.body);
+      var pdf = new jsPDF();
+      var element = document.body;
+
+      html2canvas(element).then(function (canvas) {
+        var imageData = canvas.toDataURL("image/jpeg", 1.0);
+        pdf.addImage(imageData, "JPEG", 0, 0, 210, 297); // A4 size
+        pdf.save("documento.pdf");
+      });
+    });
 
     // FUNCION PARA PINTAR LOS LOTES EN EL CARRITO
     function fetchLotes() {
