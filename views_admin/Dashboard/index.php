@@ -126,8 +126,8 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
                                     <button id="refresh_date_visitas" type="button" class="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700">Reset</button>
 
                                 </div>
-
                             </div>
+                            <span>El filtro funciona de acuerdo a un rango de fechas (con/sin) asesor</span>
                         </div>
                     </div>
                 </div>
@@ -240,7 +240,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
                 </div>
 
                 <span class="route mt-6">
-                    Visitas de enlaces de agentes
+                    Visitas de trafico al lotizador
                 </span>
                 <div class="flex gap-4">
                     <div class="w-full md:w-1/3 max-w-md p-1 bg-white border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">

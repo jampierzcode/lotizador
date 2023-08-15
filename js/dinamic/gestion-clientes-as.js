@@ -292,6 +292,7 @@ $(document).ready(function () {
       // console.log("yes");
       seguimiento_cliente(observacion, cliente, status);
       completarTask(task, cliente, status);
+      encontrar_ventas();
       register_visita_agenda(task, cliente, status);
     } else {
       console.log("rechazo");
@@ -973,13 +974,13 @@ $(document).ready(function () {
         console.log("VENTA");
         let fecha = dayjs().format("YYYY-MM-DD");
         register_venta(fecha, idCliente);
-        encontrar_ventas();
       }
       seguimiento_cliente(observaciones, idCliente, status);
 
       let funcion = "buscar_historial_seguimiento";
       buscar_clientes();
       buscarHistorial(funcion, idCliente);
+      encontrar_ventas();
       $("#status-evento").val("0");
       $("#observaciones-evento").val("");
       setTimeout(function () {

@@ -447,6 +447,15 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                         </div>
                     </div>
                 </div>
+                <div class="relative inline-block text-left">
+                    <div>
+                        <a href="../papelera/" type="button" class="inline-flex items-center w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 text-red-600" id="menu-button-etiqueta" aria-expanded="false" aria-haspopup="true">
+
+                            <ion-icon name="trash"></ion-icon>
+                            Ver Archivados
+                        </a>
+                    </div>
+                </div>
                 <!-- <input type="color" value="#5b5b5b"> -->
             </div>
             <div>
