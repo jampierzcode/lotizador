@@ -2,10 +2,8 @@ $(document).ready(function () {
   const urlParams = new URLSearchParams(window.location.search);
   var id = urlParams.get("proyect");
   var nameProyecto = "";
-  var numero = urlParams.get("phoneNumber");
-  var agent = urlParams.get("agent");
 
-  if (id && numero) {
+  if (id) {
     console.log("entro");
     var imageUrl;
     var lotesArray = [];
@@ -22,9 +20,9 @@ $(document).ready(function () {
     fetchLotes();
     var map1 = L.map("map1", {
       crs: L.CRS.Simple,
-      minZoom: -4,
-      maxZoom: 4,
-      zoom: 0,
+      minZoom: -1,
+      maxZoom: 2,
+      zoom: 1,
     });
     buscarProyecto();
     function buscarProyecto() {
@@ -143,14 +141,12 @@ $(document).ready(function () {
             [lote.cordinates[1][0], lote.cordinates[1][1]],
           ];
           let rectangle = L.rectangle(bounds, estiloPoligono).addTo(map1);
-          rectangle
-            .bindTooltip(
-              `
+          rectangle.bindTooltip(
+            `
               Lote: ${lote.numero} ${lote.mz_zona} <br> Precio: ${lote.precio}  <br> Area: ${lote.area}
               
               `
-            )
-            .openTooltip();
+          );
           rectangle.on("click", function () {
             let template = `
                 Estado: <span key_status="${lote.estado}" class="status ${estado}" id="estado">${lote.estado}</span>
@@ -176,14 +172,12 @@ $(document).ready(function () {
           });
         } else if (lote.tipo === "poligono") {
           let poligono = L.polygon(lote.cordinates, estiloPoligono).addTo(map1);
-          poligono
-            .bindTooltip(
-              `
+          poligono.bindTooltip(
+            `
               Lote: ${lote.numero} ${lote.mz_zona} <br> Precio: ${lote.precio}  <br> Area: ${lote.area}
               
               `
-            )
-            .openTooltip();
+          );
           poligono.on("click", function () {
             let template = `
               Estado: <span key_status="${lote.estado}" class="status ${estado}" id="estado">${lote.estado}</span>
@@ -213,16 +207,96 @@ $(document).ready(function () {
       //   pdfviewer();
     }
     $("#generar-pdf").click(function () {
+      //   document.querySelector("#map1").print();
+      //   var pdf = new jsPDF();
+      //   var documento = document.querySelector("#map1");
+      //   console.log(documento);
+      //   // Capturar el contenido del DOM como imagen usando html2canvas
+      //   html2canvas(documento).then(function (canvas) {
+      //     var imgData = canvas.toDataURL("image/jpeg");
+      //     var pdfWidth = pdf.internal.pageSize.getWidth();
+      //     var pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      //     // Agregar la imagen al PDF
+      //     pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight);
+      //     // Descargar el PDF
+      //     pdf.save("documento.pdf");
+      //   });
       // Generar PDF utilizando jsPDF y html2canvas
-      console.log(document.body);
-      var pdf = new jsPDF();
-      var element = document.body;
+      //   console.log(document.querySelector("#map1"));
+      //   // Landscape export, 2×4 inches
+      //   var doc = new jsPDF({
+      //     orientation: "landscape",
+      //   });
+      //   var margin = 10;
+      //   var scale =
+      //     (doc.internal.pageSize.width - margin * 2) /
+      //     document.querySelector("#map1").scrollWidth;
+      //   doc.html(document.querySelector("#map1"), {
+      //     // x: margin,
+      //     // y: margin,
+      //     html2canvas: {
+      //       scale: scale,
+      //     },
+      //     callback: function (doc) {
+      //       doc.save();
+      //     },
+      //   });
+      // ---------------------------
 
-      html2canvas(element).then(function (canvas) {
-        var imageData = canvas.toDataURL("image/jpeg", 1.0);
-        pdf.addImage(imageData, "JPEG", 0, 0, 210, 297); // A4 size
-        pdf.save("documento.pdf");
+      //   var doc = new jsPDF({
+      //     orientation: "landscape",
+      //   });
+
+      //   var mapContainer = document.querySelector("#map1");
+      //   var pdfWidth = doc.internal.pageSize.getWidth();
+      //   var pdfHeight = doc.internal.pageSize.getHeight();
+      //   console.log(pdfWidth, pdfHeight);
+
+      //   // Calcular la escala para ajustar la imagen al tamaño del PDF
+      //   var scale = pdfWidth / mapContainer.scrollWidth;
+
+      //   domtoimage.toPng(mapContainer).then(function (dataUrl) {
+      //     doc.addImage(dataUrl, "PNG", 0, 0, pdfWidth, pdfHeight, "a", "FAST");
+      //     doc.save("documento.pdf");
+      //   });
+
+      var doc = new jsPDF({
+        orientation: "landscape",
       });
+
+      var mapContainer = document.querySelector("#map1");
+      var pdfWidth = doc.internal.pageSize.getWidth();
+      var pdfHeight = doc.internal.pageSize.getHeight();
+
+      // Calcular la escala para ajustar el ancho de la imagen
+      var scale = pdfWidth / mapContainer.scrollWidth;
+      var imageWidth = mapContainer.scrollWidth * scale;
+
+      // Calcular la posición horizontal para centrar la imagen
+      var xPosition = (pdfWidth - imageWidth) / 2;
+      // Calcular la posición vertical para centrar la imagen
+      var yPosition = (pdfHeight - mapContainer.scrollHeight * scale) / 2;
+
+      domtoimage.toPng(mapContainer).then(function (dataUrl) {
+        doc.addImage(
+          dataUrl,
+          "PNG",
+          xPosition,
+          yPosition,
+          imageWidth,
+          mapContainer.scrollHeight * scale,
+          "a",
+          "FAST"
+        );
+        doc.save("documento.pdf");
+      });
+      //   var pdf = new jsPDF();
+      //   var element = document.body;
+      //   html2canvas(element).then(function (canvas) {
+      //     var imageData = canvas.toDataURL("image/jpeg", 1.0);
+      //     pdf.addImage(imageData, "JPEG", 0, 0, 210, 297); // A4 size
+      //     pdf.save("documento.pdf");
+      //   });
     });
 
     // FUNCION PARA PINTAR LOS LOTES EN EL CARRITO

@@ -27,7 +27,10 @@ $(document).ready(function () {
                 <div class="proyectos_cards_link">
                     <a id="rutaEnlace" style="color: #5b5b5b;" href="${dominio2}/views/Lotizador/?proyect=${proyecto.id}&&phoneNumber=${proyecto.phone_number}&&agent=${proyecto.id_agente}" target="_blank" rel="noopener noreferrer">Copiar Enlace</a>
                 </div>
-                <button class="btnJsvm default" agent="${proyecto.id_agente}" key="${proyecto.id}" numberAgent="${proyecto.phone_number}" id="compartirBtn">Compartir en <ion-icon name="logo-whatsapp"></ion-icon></button>
+                <div class="flex gap-4">
+                  <button class="btnJsvm default" agent="${proyecto.id_agente}" key="${proyecto.id}" numberAgent="${proyecto.phone_number}" id="compartirBtn">Compartir en <ion-icon name="logo-whatsapp"></ion-icon></button>
+                  <a target="_blank" class="btnJsvm default" key="${proyecto.id}" href="../schemalotizador.php?proyect=${proyecto.id}">PDF <ion-icon name="document-text-outline"></ion-icon></a>
+                </div>
             </div>
             </div>`;
           });
