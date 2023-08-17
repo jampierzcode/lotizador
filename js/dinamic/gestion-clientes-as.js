@@ -422,6 +422,7 @@ $(document).ready(function () {
       "../../controlador/UsuarioController.php",
       { funcion },
       (response) => {
+        console.log(response);
         $("#spin-load").html("");
         if (response.trim() === "no-register-clientes") {
           dataTable.clear().draw();
@@ -881,7 +882,7 @@ $(document).ready(function () {
   $(document).on("click", "#removeClient", function () {
     let id_cliente = $(this).attr("keyClient");
     idCliente = id_cliente;
-    let funcion = "delete_cliente_asesor";
+    let funcion = "archived_cliente_asesor";
     const confirmed = confirm("Estas seguro de archivar al cliente?");
     if (confirmed) {
       $.post(
@@ -889,7 +890,7 @@ $(document).ready(function () {
         { funcion, id_cliente },
         (response) => {
           console.log(response);
-          if (response.trim() === "delete-user-cliente") {
+          if (response.trim() === "archived-user-cliente") {
             alert("Se archivo correctamente");
             buscar_clientes();
             animarProgress();

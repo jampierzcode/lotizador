@@ -940,7 +940,7 @@ class Usuario
     {
         try {
             # code...
-            $sql = "SELECT ic.*, uc.*, va.status as asistio FROM interaccion_cliente ic INNER JOIN user_cliente uc ON ic.cliente_id = uc.cliente_id LEFT JOIN visitas_agenda va ON ic.id = va.interaccion_id WHERE ic.user_id =:usuario AND uc.user_id=:usuario;
+            $sql = "SELECT ic.*, uc.*, va.status as asistio FROM interaccion_cliente ic INNER JOIN user_cliente uc  ON ic.cliente_id = uc.cliente_id INNER JOIN cliente c ON uc.cliente_id=c.id_cliente LEFT JOIN visitas_agenda va ON ic.id = va.interaccion_id WHERE ic.user_id =:usuario AND uc.user_id=:usuario AND c.archived=0;
             ";
             $query = $this->conexion->prepare($sql);
             $query->execute(array(":usuario" => $usuario));
@@ -1161,6 +1161,34 @@ class Usuario
             return $this->mensaje;
         }
     }
+    function archived_cliente_asesor($cliente)
+    {
+        try {
+            # code...
+            $sql = "UPDATE cliente SET archived=1 WHERE id_cliente=:id_cliente";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(':id_cliente' => $cliente));
+            $this->mensaje = "archived-user-cliente";
+            return $this->mensaje;
+        } catch (\Throwable $error) {
+            $this->mensaje = "no-archived-user-cliente" . $error;
+            return $this->mensaje;
+        }
+    }
+    function restaurar_cliente($cliente)
+    {
+        try {
+            # code...
+            $sql = "UPDATE cliente SET archived=0 WHERE id_cliente=:id_cliente";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(':id_cliente' => $cliente));
+            $this->mensaje = "restaurar-cliente";
+            return $this->mensaje;
+        } catch (\Throwable $error) {
+            $this->mensaje = "no-restaurar-cliente" . $error;
+            return $this->mensaje;
+        }
+    }
     function borrar_cliente($id_cliente)
     {
         $sql = "DELETE FROM cliente WHERE id_cliente=:id_cliente";
@@ -1275,7 +1303,7 @@ class Usuario
             ic.fecha_visita,
             ic.hora_visita,
             CONCAT('[', GROUP_CONCAT(CONCAT('{\"nombre\":\"', et.nombre, '\"}') SEPARATOR ', '), ']') AS etiquetas
-FROM
+            FROM
             usuario u
         JOIN user_cliente uc ON u.id_usuario = uc.user_id
         JOIN cliente c ON uc.cliente_id = c.id_cliente
@@ -1289,7 +1317,7 @@ FROM
         ) et ON c.id_cliente = et.cliente_id
         WHERE
             u.id_usuario = :id_usuario
-            AND u.usuarioRol = 3
+            AND u.usuarioRol = 3 AND c.archived=0
         GROUP BY c.id_cliente, p.nombreProyecto, ic.id, ic.status, ic.fecha_visita, ic.hora_visita;
         
      
@@ -1304,7 +1332,52 @@ FROM
                 return $this->mensaje;
             }
         } catch (\Throwable $error) {
-            $this->mensaje = "fatal_error";
+            $this->mensaje = "fatal_error " + $error;
+            return $this->mensaje;
+            //throw $th;
+        }
+    }
+    function buscar_clientes_by_asesor_papelera($id_usuario)
+    {
+        try {
+            $sql = "SELECT
+            c.*,
+            p.nombreProyecto AS nombre_proyecto,
+            ic.id AS id_task,
+            ic.status AS task_status,
+            ic.fecha_visita,
+            ic.hora_visita,
+            CONCAT('[', GROUP_CONCAT(CONCAT('{\"nombre\":\"', et.nombre, '\"}') SEPARATOR ', '), ']') AS etiquetas
+            FROM
+            usuario u
+        JOIN user_cliente uc ON u.id_usuario = uc.user_id
+        JOIN cliente c ON uc.cliente_id = c.id_cliente
+        LEFT JOIN proyectos p ON c.proyet_id = p.id
+        LEFT JOIN interaccion_cliente ic ON ic.cliente_id = c.id_cliente AND ic.status = 'PENDIENTE'
+        LEFT JOIN (
+            SELECT ec.cliente_id, GROUP_CONCAT(et.nombre SEPARATOR ', ') AS nombre
+            FROM etiqueta_cliente ec
+            JOIN etiqueta et ON ec.etiqueta_id = et.id AND et.user_id = :id_usuario
+            GROUP BY ec.cliente_id
+        ) et ON c.id_cliente = et.cliente_id
+        WHERE
+            u.id_usuario = :id_usuario
+            AND u.usuarioRol = 3 AND c.archived=1
+        GROUP BY c.id_cliente, p.nombreProyecto, ic.id, ic.status, ic.fecha_visita, ic.hora_visita;
+        
+     
+            ";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":id_usuario" => $id_usuario));
+            $this->datos = $query->fetchAll(); // retorna objetos o no
+            if (!empty($this->datos)) {
+                return $this->datos;
+            } else {
+                $this->mensaje = "no-register-clientes";
+                return $this->mensaje;
+            }
+        } catch (\Throwable $error) {
+            $this->mensaje = "fatal_error " + $error;
             return $this->mensaje;
             //throw $th;
         }

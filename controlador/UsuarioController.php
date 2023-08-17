@@ -858,6 +858,16 @@ if ($_POST["funcion"] == "edit_cliente") {
     echo $usuario->mensaje;
 }
 
+if ($_POST["funcion"] == "archived_cliente_asesor") {
+    $cliente = intVal($_POST["id_cliente"]);
+    $usuario->archived_cliente_asesor($cliente);
+    echo $usuario->mensaje;
+}
+if ($_POST["funcion"] == "restaurar_cliente") {
+    $cliente = intVal($_POST["cliente"]);
+    $usuario->restaurar_cliente($cliente);
+    echo $usuario->mensaje;
+}
 if ($_POST["funcion"] == "delete_cliente_asesor") {
     $cliente = intVal($_POST["id_cliente"]);
     $asesor = intVal($_SESSION["id_usuario"]);
@@ -922,6 +932,41 @@ if ($_POST["funcion"] == "register_visita_agenda") {
 if ($_POST["funcion"] == "buscar_clientes_by_asesor") {
     $json = array();
     $usuario->buscar_clientes_by_asesor($_SESSION["id_usuario"]);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+        foreach ($usuario->datos as $dato) {
+            $json[] = array(
+                'id' => $dato->id_cliente,
+                'nombres' => $dato->nombres,
+                'apellidos' => $dato->apellidos,
+                'documento' => $dato->documento,
+                'correo' => $dato->correo,
+                'celular' => $dato->celular,
+                'telefono' => $dato->telefono,
+                'status' => $dato->status,
+                'origen' => $dato->origen,
+                'ciudad' => $dato->ciudad,
+                'campania' => $dato->campania,
+                'Pais' => $dato->pais,
+                'nombre_proyecto' => $dato->nombre_proyecto,
+                'created_cliente' => $dato->created_cliente,
+                'proyecto_id' => $dato->proyet_id,
+                'id_task' => $dato->id_task,
+                'task_status' => $dato->task_status,
+                'fecha_visita' => $dato->fecha_visita,
+                'hora_visita' => $dato->hora_visita,
+                'etiquetas' => $dato->etiquetas
+            );
+        }
+        $jsonstring = json_encode($json);
+        echo $jsonstring;
+    }
+}
+if ($_POST["funcion"] == "buscar_clientes_by_asesor_papelera") {
+    $json = array();
+    $usuario->buscar_clientes_by_asesor_papelera($_SESSION["id_usuario"]);
     if ($usuario->mensaje) {
         echo $usuario->mensaje;
     }

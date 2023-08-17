@@ -125,7 +125,8 @@ $(document).ready(function () {
         render: function (data, type, row) {
           return `
                 <div class="flex-actions">
-                <button target="_blank" keyClient="${data?.id}" id="editClient" class="bg-green-600 text-white p-2 rounded-md flex items-center gap-2"><ion-icon name="arrow-back"></ion-icon> Restaurar</button>
+                <button target="_blank" keyClient="${data?.id}" id="restaurarClient" class="bg-green-600 text-white p-2 rounded-md flex items-center gap-2"><ion-icon name="arrow-back"></ion-icon> Restaurar</button>
+                <button target="_blank" keyClient="${data?.id}" id="removeClient" class="btnJsvm danger"><ion-icon name="trash"></ion-icon></button>
                 <button target="_blank" keyClient="${data?.id}" id="historialCliente" class="btnJsvm normal">Historial</button>
                 
                 
@@ -154,11 +155,49 @@ $(document).ready(function () {
   //   function compareDatesDesc(a, b) {
   //     return dayjs(b.created_cliente).diff(dayjs(a.created_cliente));
   //   }
+  $(document).on("click", "#removeClient", function () {
+    let id_cliente = $(this).attr("keyClient");
+    idCliente = id_cliente;
+    let funcion = "delete_cliente_asesor";
+    const confirmed = confirm("Estas seguro de eliminar al cliente?");
+    if (confirmed) {
+      $.post(
+        "../../controlador/UsuarioController.php",
+        { funcion, id_cliente },
+        (response) => {
+          console.log(response);
+          if (response.trim() === "delete-user-cliente") {
+            alert("Se elimino correctamente");
+            buscar_clientes();
+          } else {
+            alert("Ocurrio un error, contacta al administrador");
+          }
+        }
+      );
+    }
 
+    // seguimiento_cliente(observacion, id_cliente, status);
+  });
+  $(document).on("click", "#restaurarClient", function () {
+    const id_cliente = $(this).attr("keyClient");
+    console.log(id_cliente);
+    let funcion = "restaurar_cliente";
+    $.post(
+      "../../controlador/UsuarioController.php",
+      { funcion, cliente: id_cliente },
+      (response) => {
+        if (response.trim() === "restaurar-cliente") {
+          buscar_clientes();
+        } else {
+          alert("Ocurrio un error al restaurar, contacte al administrador");
+        }
+      }
+    );
+  });
   buscar_clientes();
   // BUSCAR CLIENTES
   function buscar_clientes() {
-    funcion = "buscar_clientes_by_asesor";
+    funcion = "buscar_clientes_by_asesor_papelera";
     $.post(
       "../../controlador/UsuarioController.php",
       { funcion },
