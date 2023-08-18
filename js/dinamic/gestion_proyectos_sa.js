@@ -69,6 +69,7 @@ $(document).ready(function () {
           <div class="flex-actions">
             <a target="_blank" href="lotizador?id=${data.id}" class="btnLotes"> Ver lotes </a>
             <button class="btnLotes default"><ion-icon id=${data.id} name="create-outline"></ion-icon></button>
+            <a target="_blank" class="btnJsvm default" key="${data.id}" href="./schemalotizador.php?proyect=${data.id}">PDF <ion-icon name="document-text-outline"></ion-icon></a>
             <div class="dropdown">
             <button class="btnJsvm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
             <ion-icon aria-label="Favorite" aria-hidden="true" name="ellipsis-vertical-outline"></ion-icon>

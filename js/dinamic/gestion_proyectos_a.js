@@ -36,7 +36,8 @@ $(document).ready(function () {
           <a target="_blank" href="lotizador?id=${data.id}" class="btnLotes"> Ver lotes </a>
           <button target="_blank" keyProyect="https://lotizador.mcsolucionesti.com/views/Lotizador/Clientes/?proyect=${data.id}" id="rutaEnlace" class="btnLotes"> Copiar Link </button>
           <button id="manager_lotes" key_proyect=${data.id} name="${data.nombreProyecto} type="button" class="p-2 whitespace-nowrap text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">Administrar Lotes</button>
-
+<a target="_blank" class="btnJsvm default" key="${data.id}" href="./schemalotizador.php?proyect=${data.id}">PDF <ion-icon name="document-text-outline"></ion-icon></a>
+                
           </div>
 
           `;

@@ -6,7 +6,7 @@ class Conexion
     private $servidor = "localhost";
     private $dbname = "db_lotizador";
     private $puerto = 3306;
-    private $charset = "utf8";
+    private $charset = "utf8mb4";
     private $username = "root";
     private $password = "";
 

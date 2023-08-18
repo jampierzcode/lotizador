@@ -70,7 +70,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
 
         <div class="container-dashboard">
             <span class="route">
-                > Home > CRM
+                > Home > CRM > Plantillas mensajes
             </span>
             <div class="confirm-popup md-hidden">
                 <div class="form-confirm">
@@ -153,83 +153,6 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                     </div> -->
                     <!-- </form> -->
                 </div>
-            </div>
-            <div id="crear-etiqueta" class="modal-create md-hidden">
-                <div class="form-create">
-                    <!-- <form id="form_producto_add"> -->
-                    <div class="close-modal">
-                        <ion-icon name="close-outline"></ion-icon>
-                    </div>
-                    <h1 class="font-bold">Crear etiqueta</h1>
-                    <form id="registerEtiqueta">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="mb-6">
-                                <label for="nombre" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nombre</label>
-                                <input type="text" id="nombre-etiqueta" placeholder="Escribe un nombre para la etiqueta" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-                            </div>
-
-                        </div>
-                        <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Registrar</button>
-                    </form>
-                    <table id="etiquetasList" class="table cust-datatable dataTable no-footer" style="width:100%;">
-
-                        <thead>
-                            <tr>
-                                <th>Nombres</th>
-                                <th>Acciones</th>
-                                <!-- <th>
-                                <div style="width: 200px !important">Acciones</div>
-                            </th> -->
-                            </tr>
-                        </thead>
-                    </table>
-                </div>
-
-
-                <!-- <div class="card-input buttons-modal">
-                        <button id="cancel-form" class="btn-cancel">Cancelar</button>
-                        <button id="add-user-form" class="btn-create">Crear</button>
-                    </div> -->
-                <!-- </form> -->
-
-            </div>
-            <div id="ver-etiquetas-clientes" class="modal-create md-hidden">
-                <div class="form-create">
-                    <!-- <form id="form_producto_add"> -->
-                    <div class="close-modal">
-                        <ion-icon name="close-outline"></ion-icon>
-                    </div>
-                    <h1 class="font-bold">Mis etiquetas</h1>
-                    <div id="list-etiquetas" style="display: flex; flex-direction: row; gap: 15px">
-                        <select name="etiquetas[]" multiple="multiple" id="etiquetas-user" style="width: 100%" class="users_proyect" name="state">
-
-                        </select>
-                        <button id="update-asigned-etiqueta" class="btn-add">Agregar</button>
-                    </div>
-                    <div class="main-datatable">
-                        <table id="etiquetasClienteList" class="" style="width:100%;">
-
-                            <thead>
-                                <tr>
-                                    <th>Nombres</th>
-                                    <th>Asignacion</th>
-                                    <th>Acciones</th>
-                                    <!-- <th>
-                                <div style="width: 200px !important">Acciones</div>
-                            </th> -->
-                                </tr>
-                            </thead>
-                        </table>
-                    </div>
-                </div>
-
-
-                <!-- <div class="card-input buttons-modal">
-                        <button id="cancel-form" class="btn-cancel">Cancelar</button>
-                        <button id="add-user-form" class="btn-create">Crear</button>
-                    </div> -->
-                <!-- </form> -->
-
             </div>
             <div id="editar-lead" class="modal-create md-hidden">
                 <div class="form-create">
@@ -326,7 +249,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                             </div>
                         </div>
                     </div>
-                    <form id="registerFormEvento">
+                    <!-- <form id="registerFormEvento">
                         <div class="mb-6">
                             <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tipo de Evento</label>
                             <select id="status-evento" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
@@ -364,13 +287,8 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
 
                             <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 btnJsvm info">Registrar</button>
                         </div>
-                    </form>
+                    </form> -->
 
-                    <!-- <div class="card-input buttons-modal">
-                        <button id="cancel-form" class="btn-cancel">Cancelar</button>
-                        <button id="add-user-form" class="btn-create">Crear</button>
-                    </div> -->
-                    <!-- </form> -->
                 </div>
             </div>
             <div id="historial-event" class="modal-create md-hidden">
@@ -390,89 +308,43 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
 
                 </div>
             </div>
-            <div class="w-full text-center mb-2">Mes actual: <span id="mesNow"></span></div>
-            <div class="justify-center flex gap-4 mb-5">
-                <div class="flex bg-blue-600 p-2 rounded-lg gap-4 items-center text-white">
-                    <h1>Visitas Concretadas</h1>
-                    <span id="visits_concretadas" class="text-white">0</span>
-                </div>
-                <div class="flex bg-yellow-600 p-2 rounded-lg gap-4 items-center text-white">
-                    <h1>Separaciones</h1>
-                    <span id="separaciones_count" class="text-white">0</span>
-                </div>
-                <div class="flex bg-green-600 p-2 rounded-lg gap-4 items-center text-white">
-                    <h1>Ventas</h1>
-                    <span id="ventas_count" class="text-white">0</span>
-                </div>
-            </div>
-            <div style="display: flex; gap:10px; margin-bottom: 20px">
-                <div class="relative inline-block text-left">
-                    <div>
-                        <button type="button" class="inline-flex items-center w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 btn-add hover:bg-gray-50" id="menu-button" aria-expanded="false" aria-haspopup="true">
+            <div class="w-full">
+                <div class="flex flex-wrap md:flex-nowrap gap-4">
+                    <div class="w-full bg-white p-6 rounded-md md:w-[500px] shadow-md space-y-4">
 
-                            <ion-icon name="people-sharp"></ion-icon>
+                        <h1 class="text-sm text-black font-bold">Nombre de la plantilla</h1>
+                        <input id="message" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-200 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Escribe el nombre de tu plantilla"></input>
+                        <h1 class="text-sm text-black font-bold">Custom mensaje</h1>
+                        <div class="flex items-center gap-2 w-full">
+                            <div class="relative">
+                                <div id="emojiSelectorIcon" class="rounded-full w-[30px] h-[30px] flex items-center justify-center p-1 cursor-pointer bg-green-600">😀</div>
+                                <div style="left: calc(100% + 10px); z-index: 2000" id="emojiSelector" class="hidden absolute w-[325px] top-1/2 -translate-y-1/2 p-6 bg-white shadow-xl">
+                                    <input id="emojiSearch" rows="4" class="block p-2 mb-4 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Escribe el nombre de tu plantilla"></input>
+                                    <ul id="emojiList" class="emoji-list h-[100px] overflow-y-auto">
 
-                            Leads
-                            <svg class="-mr-1 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
-                            </svg>
-                        </button>
+                                    </ul>
+
+                                </div>
+                            </div>
+                            <p class="text-gray-500 text-sm">Add emoji</p>
+                        </div>
+                        <textarea id="message" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-200 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Escribe el mensaje de tu plantilla"></textarea>
+                        <p class="text-gray-500 text-sm">Example: “Hola te presento al proyecto ...”</p>
+                        <button class="p-2 rounded-xl w-full text-white bg-blue-500 hover:bg-blue-800">Crear</button>
                     </div>
-
-                    <div id="expand_file" class="absolute left-0 z-10 mt-2 w-56 origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none hidden" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
-                        <div class="py-1" role="none">
-                            <li id="modal-lead" class="flex items-center gap-2 cursor-pointer hover:bg-slate-200 text-gray-700 block px-4 py-2 text-sm" role="menuitem" tabindex="-1" id="menu-item-0"><ion-icon name="add-outline"></ion-icon> Agregar Lead</li>
-                            <a href="./importar.php" class="flex items-center gap-2 cursor-pointer hover:bg-slate-200 text-gray-700 block px-4 py-2 text-sm" role="menuitem" tabindex="-1" id="menu-item-0"> <ion-icon name="cloud-upload-outline"></ion-icon> Importar</a>
-
+                    <div class="max-w-max h-auto">
+                        <div class="h-full flex flex-col justify-center items-center">
+                            <ion-icon name="arrow-forward"></ion-icon>
+                            <p class="text-sm text-gray-400 text-center">Asi lo verán los usuarios</p>
                         </div>
                     </div>
-                </div>
-                <div class="relative inline-block text-left">
-                    <div>
-                        <button type="button" class="inline-flex items-center w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 btn-add hover:bg-gray-50" id="menu-button-etiqueta" aria-expanded="false" aria-haspopup="true">
-
-                            <ion-icon name="pricetags"></ion-icon>
-
-                            Etiquetas
-                            <svg class="-mr-1 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
-                            </svg>
-                        </button>
-                    </div>
-
-                    <div id="expand-etiqueta" class="absolute left-0 z-10 mt-2 w-56 origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none hidden" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
-                        <div class="py-1" role="none">
-                            <li id="modal-etiqueta" class="flex items-center gap-2 cursor-pointer hover:bg-slate-200 text-gray-700 block px-4 py-2 text-sm" role="menuitem" tabindex="-1" id="menu-item-0"><ion-icon name="add-outline"></ion-icon> Crear etiqueta</li>
-
-                        </div>
+                    <div class="w-full bg-white p-6 rounded-md md:w-1/2 shadow-md">
+                        <h1 class="text-sm text-black font-bold">Previsualizacion</h1>
                     </div>
                 </div>
-                <div class="relative inline-block text-left">
-                    <div>
-                        <a href="../papelera/" type="button" class="inline-flex items-center w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 text-red-600" id="menu-button-etiqueta" aria-expanded="false" aria-haspopup="true">
-
-                            <ion-icon name="trash"></ion-icon>
-                            Ver Archivados
-                        </a>
-                    </div>
-                </div>
-                <!-- <div class="relative inline-block text-left">
-                    <div>
-                        <a href="../msj-plantilla/" type="button" class="inline-flex items-center w-full justify-center gap-x-1.5 rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset hover:bg-blue-700 text-white" id="menu-button-etiqueta" aria-expanded="false" aria-haspopup="true">
-
-                            <ion-icon name="mail"></ion-icon>
-                            Template MSJ
-                        </a>
-                    </div>
-                </div> -->
-                <!-- <input type="color" value="#5b5b5b"> -->
-            </div>
-            <div>
-                <p class="text-lg text-black">Filtro Avanzado:</p>
             </div>
             <div class="main-datatable">
-                <!-- <form> -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <!-- <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div>
                         <label for="default-search" class="mb-2 text-sm font-medium text-gray-900  dark:text-white">Nombre</label>
                         <div class="relative">
@@ -527,7 +399,6 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
 
                 <p class="mt-4 text-lg text-black">Filtro de Pendientes:</p>
 
-                <!-- <form> -->
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                     <div class="h-auto">
                         <label for="Fecha Inicio">Del: </label>
@@ -565,7 +436,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                         </button>
 
                     </div>
-                </div>
+                </div> -->
 
                 <table id="usuariosList" class="table cust-datatable dataTable no-footer" style="width:100%;">
                     <thead>
@@ -608,119 +479,6 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                 <!-- </div> -->
             </div>
         </div>
-        </div>
-        <script>
-            // Obtiene el botón y el menú desplegable
-            var button = document.getElementById('menu-button');
-            var menu = document.getElementById('expand_file');
-
-            // Agrega un evento de clic al botón para mostrar/ocultar el menú desplegable
-            menu.addEventListener('click', function() {
-                var expanded = button.getAttribute('aria-expanded') === 'true' || false;
-                button.setAttribute('aria-expanded', !expanded);
-
-                if (!expanded) {
-                    menu.style.transformOrigin = 'left top';
-                    menu.style.transform = 'scale(0)';
-                    menu.style.opacity = '0';
-                    setTimeout(function() {
-                        menu.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
-                        menu.style.transform = 'scale(1)';
-                        menu.style.opacity = '1';
-                    }, 0);
-                    menu.classList.remove('hidden');
-                } else {
-                    menu.style.transformOrigin = 'left top';
-                    menu.style.opacity = '1';
-                    menu.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
-                    menu.style.transform = 'scale(0)';
-                    menu.style.opacity = '0';
-                    setTimeout(function() {
-                        menu.classList.add('hidden');
-                    }, 300);
-                }
-            });
-            button.addEventListener('click', function() {
-                var expanded = button.getAttribute('aria-expanded') === 'true' || false;
-                button.setAttribute('aria-expanded', !expanded);
-
-                if (!expanded) {
-                    menu.style.transformOrigin = 'left top';
-                    menu.style.transform = 'scale(0)';
-                    menu.style.opacity = '0';
-                    setTimeout(function() {
-                        menu.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
-                        menu.style.transform = 'scale(1)';
-                        menu.style.opacity = '1';
-                    }, 0);
-                    menu.classList.remove('hidden');
-                } else {
-                    menu.style.transformOrigin = 'left top';
-                    menu.style.opacity = '1';
-                    menu.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
-                    menu.style.transform = 'scale(0)';
-                    menu.style.opacity = '0';
-                    setTimeout(function() {
-                        menu.classList.add('hidden');
-                    }, 300);
-                }
-            });
-            // Obtiene el botón y el menú desplegable etiqueta
-            var button_etiqueta = document.getElementById('menu-button-etiqueta');
-            var menu_etiqueta = document.getElementById('expand-etiqueta');
-
-            // Agrega un evento de clic al botón para mostrar/ocultar el menú desplegable
-            menu_etiqueta.addEventListener('click', function() {
-                var expanded = button_etiqueta.getAttribute('aria-expanded') === 'true' || false;
-                button_etiqueta.setAttribute('aria-expanded', !expanded);
-
-                if (!expanded) {
-                    menu_etiqueta.style.transformOrigin = 'left top';
-                    menu_etiqueta.style.transform = 'scale(0)';
-                    menu_etiqueta.style.opacity = '0';
-                    setTimeout(function() {
-                        menu_etiqueta.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
-                        menu_etiqueta.style.transform = 'scale(1)';
-                        menu_etiqueta.style.opacity = '1';
-                    }, 0);
-                    menu.classList.remove('hidden');
-                } else {
-                    menu_etiqueta.style.transformOrigin = 'left top';
-                    menu_etiqueta.style.opacity = '1';
-                    menu_etiqueta.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
-                    menu_etiqueta.style.transform = 'scale(0)';
-                    menu_etiqueta.style.opacity = '0';
-                    setTimeout(function() {
-                        menu_etiqueta.classList.add('hidden');
-                    }, 300);
-                }
-            });
-            button_etiqueta.addEventListener('click', function() {
-                var expanded = button_etiqueta.getAttribute('aria-expanded') === 'true' || false;
-                button_etiqueta.setAttribute('aria-expanded', !expanded);
-
-                if (!expanded) {
-                    menu_etiqueta.style.transformOrigin = 'left top';
-                    menu_etiqueta.style.transform = 'scale(0)';
-                    menu_etiqueta.style.opacity = '0';
-                    setTimeout(function() {
-                        menu_etiqueta.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
-                        menu_etiqueta.style.transform = 'scale(1)';
-                        menu_etiqueta.style.opacity = '1';
-                    }, 0);
-                    menu_etiqueta.classList.remove('hidden');
-                } else {
-                    menu_etiqueta.style.transformOrigin = 'left top';
-                    menu_etiqueta.style.opacity = '1';
-                    menu_etiqueta.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
-                    menu_etiqueta.style.transform = 'scale(0)';
-                    menu_etiqueta.style.opacity = '0';
-                    setTimeout(function() {
-                        menu_etiqueta.classList.add('hidden');
-                    }, 300);
-                }
-            });
-        </script>
 
     </body>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js">
@@ -740,7 +498,8 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.9.4/dayjs.min.js" integrity="sha512-XZSHSEFj4QeE0G4pwy4tToyAhF2VXoEcF9CP0t1PSZMP2XHhEEB9PjM9knsdzcEKbi6GRMazdt8tJadz0JTKIQ==" crossorigin="anonymous"></script>
-    <script src="../../js/dinamic/gestion-clientes-as.js"></script>
+    <!-- <script src="../../js/dinamic/gestion-clientes-as.js"></script> -->
+    <script src="../../js/dinamic/emojiapp.js"></script>
 
     </html>
 <?php } ?>

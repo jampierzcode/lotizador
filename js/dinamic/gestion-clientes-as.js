@@ -40,7 +40,16 @@ $(document).ready(function () {
 
     columns: [
       // { data: "id" },
-      { data: "nombres" },
+      {
+        data: null,
+        render: (data) => {
+          if (data.asignedUser === "si") {
+            return `<div class="flex items-center gap-4"><img style="width: 20px;" src="../../img/corona.png" alt=""> ${data.nombres}</div>`;
+          } else {
+            return `<div class="flex items-center gap-4">${data.nombres}</div>`;
+          }
+        },
+      },
       { data: "apellidos" },
       {
         data: null,
@@ -52,7 +61,6 @@ $(document).ready(function () {
           } else {
             // Convertir la cadena a un array
             const etiquetas = JSON.parse(data.etiquetas);
-            console.log(etiquetas);
             const etiquetasArray = etiquetas[0].nombre.split(",");
             etiquetasArray.forEach((e) => {
               template += `<div class="p-2 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400" role="alert">
@@ -69,14 +77,13 @@ $(document).ready(function () {
       { data: "created_cliente" },
       // { data: "correo" },
       { data: "celular" },
-      { data: "telefono" },
-      { data: "origen" },
-      { data: "ciudad" },
+      // { data: "telefono" },
+      // { data: "origen" },
+      // { data: "ciudad" },
       { data: "nombre_proyecto" },
       {
         data: null,
         render: function (data, type, row) {
-          console.log(data.status);
           let template_status = imprimirStatus(data?.status); // Cambiar de const a let
 
           if (data.task_status === "PENDIENTE") {
@@ -264,6 +271,12 @@ $(document).ready(function () {
       },
     ],
   });
+  // mis leads
+  $("#meusers-filtros").click(function () {
+    const meclientes = clientesList.filter((e) => e.asignedUser === "si");
+    console.log(meclientes);
+    dataTable.clear().rows.add(meclientes).draw();
+  });
 
   // -------register asistencia
   function register_visita_agenda(task, cliente, status) {
@@ -422,13 +435,12 @@ $(document).ready(function () {
       "../../controlador/UsuarioController.php",
       { funcion },
       (response) => {
-        console.log(response);
         $("#spin-load").html("");
         if (response.trim() === "no-register-clientes") {
           dataTable.clear().draw();
         } else {
           const clientes = JSON.parse(response);
-          // console.log(clientes);
+          console.log(clientes);
           clientesList = clientes;
           clientesList.sort(compareDatesDesc);
 

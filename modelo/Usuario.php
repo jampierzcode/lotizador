@@ -1296,7 +1296,7 @@ class Usuario
     {
         try {
             $sql = "SELECT
-            c.*,
+            c.*, c.createdBy as asigned,
             p.nombreProyecto AS nombre_proyecto,
             ic.id AS id_task,
             ic.status AS task_status,

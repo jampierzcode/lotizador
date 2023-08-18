@@ -937,6 +937,11 @@ if ($_POST["funcion"] == "buscar_clientes_by_asesor") {
     }
     if ($usuario->datos) {
         foreach ($usuario->datos as $dato) {
+            if ($dato->asigned === $id_usuario) {
+                $asigned = "si";
+            } else {
+                $asigned = "no";
+            }
             $json[] = array(
                 'id' => $dato->id_cliente,
                 'nombres' => $dato->nombres,
@@ -948,6 +953,7 @@ if ($_POST["funcion"] == "buscar_clientes_by_asesor") {
                 'status' => $dato->status,
                 'origen' => $dato->origen,
                 'ciudad' => $dato->ciudad,
+                'createdBy' => $dato->asigned,
                 'campania' => $dato->campania,
                 'Pais' => $dato->pais,
                 'nombre_proyecto' => $dato->nombre_proyecto,
@@ -957,7 +963,8 @@ if ($_POST["funcion"] == "buscar_clientes_by_asesor") {
                 'task_status' => $dato->task_status,
                 'fecha_visita' => $dato->fecha_visita,
                 'hora_visita' => $dato->hora_visita,
-                'etiquetas' => $dato->etiquetas
+                'etiquetas' => $dato->etiquetas,
+                'asignedUser' => $asigned
             );
         }
         $jsonstring = json_encode($json);
