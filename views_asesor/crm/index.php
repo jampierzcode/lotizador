@@ -456,7 +456,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                         </a>
                     </div>
                 </div>
-                <!-- <div class="relative inline-block text-left">
+                <div class="relative inline-block text-left">
                     <div>
                         <a href="../msj-plantilla/" type="button" class="inline-flex items-center w-full justify-center gap-x-1.5 rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset hover:bg-blue-700 text-white" id="menu-button-etiqueta" aria-expanded="false" aria-haspopup="true">
 
@@ -464,7 +464,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                             Template MSJ
                         </a>
                     </div>
-                </div> -->
+                </div>
                 <!-- <input type="color" value="#5b5b5b"> -->
             </div>
             <div>

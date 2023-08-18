@@ -399,6 +399,33 @@ class Usuario
             return $this->mensaje;
         }
     }
+    function buscar_msg_template($user)
+    {
+        $sql = "SELECT * FROM template_user WHERE user_id = :user_id";
+        $query = $this->conexion->prepare($sql);
+        $query->execute(array(":user_id" => $user));
+        $this->datos = $query->fetchAll(); // retorna objetos o no
+        if (!empty($this->datos)) {
+            return $this->datos;
+        } else {
+            $this->mensaje = "no-register";
+            return $this->mensaje;
+        }
+    }
+
+    function register_msg($user, $nombre, $msg)
+    {
+        $sql = "INSERT INTO template_user(user_id, nombre, mensaje) VALUES (:user_id, :nombre, :msg)";
+        $query = $this->conexion->prepare($sql);
+        try {
+            $query->execute(array(":nombre" => $nombre, ":msg" => $msg, ":user_id" => $user));
+            $this->mensaje = "add-msg";
+            return $this->mensaje;
+        } catch (\Throwable $error) {
+            $this->mensaje = "no-add-msg";
+            return $this->mensaje;
+        }
+    }
     // function buscar_proyectos_user($id_usuario, $proyectos)
     // {
     //     foreach ($proyectos as $proyecto) {

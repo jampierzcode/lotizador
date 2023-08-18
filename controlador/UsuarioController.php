@@ -368,6 +368,25 @@ if ($_POST["funcion"] == "buscar_lotes_by_proyecto") {
         echo $jsonstring;
     }
 }
+if ($_POST["funcion"] == "buscar_msg_template") {
+    $user = $id_usuario;
+    $usuario->buscar_msg_template($user);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+        $jsonstring = json_encode($usuario->datos);
+        echo $jsonstring;
+    }
+}
+if ($_POST["funcion"] == "register-msg") {
+    $user = $id_usuario;
+    $nombre = $_POST["nombre"];
+    $msg = $_POST["msg"];
+    $usuario->register_msg($user, $nombre, $msg);
+    echo $usuario->mensaje;
+}
+
 if ($_POST["funcion"] == "buscar_proyectos_user") {
     $json = array();
     $id_usuario = $_POST["id_cliente"];

@@ -72,6 +72,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
             <span class="route">
                 > Home > CRM > Plantillas mensajes
             </span>
+            <button id="active-created" class="inline-block p-4 text-white bg-blue-600 rounded-md mb-4">Crear PLantilla</button>
             <div class="confirm-popup md-hidden">
                 <div class="form-confirm">
                     <span class="title-confirm">Estas seguro de eliminar el usuario</span>
@@ -90,62 +91,67 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                 </div>
                 <p><span id="numberVisit"></span> visitas</p>
             </div> -->
-            <div id="crear-lead" class="modal-create md-hidden">
-                <div class="form-create">
+            <div id="crear-plantilla" class="modal-create md-hidden">
+                <div class="form-create" style="width: 100% !important; max-width: 1250px">
                     <!-- <form id="form_producto_add"> -->
                     <div class="close-modal">
                         <ion-icon name="close-outline"></ion-icon>
                     </div>
                     <h1 class="font-bold">Crear Lead</h1>
-                    <form id="registerLead">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="mb-6">
-                                <label for="nombres" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nombres</label>
-                                <input type="text" id="nombre-lead" placeholder="Ingrese el nombre del cliente" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                    <div class="w-full">
+                        <div class="flex flex-wrap md:flex-nowrap gap-4">
+                            <div class="w-full bg-white p-6 rounded-md md:w-[500px] shadow-md space-y-4">
+
+                                <h1 class="text-sm text-black font-bold">Nombre de la plantilla</h1>
+                                <input id="name-message" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-200 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Escribe el nombre de tu plantilla"></input>
+                                <h1 class="text-sm text-black font-bold">Custom mensaje</h1>
+                                <div class="flex items-center gap-2 w-full">
+                                    <div class="relative">
+                                        <div id="emojiSelectorIcon" class="rounded-full w-[30px] h-[30px] flex items-center justify-center p-1 cursor-pointer bg-green-600">😀</div>
+                                        <div style="left: calc(100% + 10px); z-index: 2000" id="emojiSelector" class="hidden absolute w-[325px] top-1/2 -translate-y-1/2 p-6 bg-white shadow-xl">
+                                            <input id="emojiSearch" rows="4" class="block p-2 mb-4 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Escribe el nombre de tu plantilla"></input>
+                                            <ul id="emojiList" class="emoji-list h-[150px] overflow-y-auto">
+
+                                            </ul>
+
+                                        </div>
+                                    </div>
+                                    <p class="text-gray-500 text-sm">Add emoji</p>
+                                </div>
+                                <textarea id="message-plantilla" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-200 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Escribe el mensaje de tu plantilla"></textarea>
+                                <p class="text-gray-500 text-sm">Example: “Hola te presento al proyecto ...”</p>
+                                <button id="created-submit-msj" class="p-2 rounded-xl w-full text-white bg-blue-500 hover:bg-blue-800">Crear</button>
                             </div>
-                            <div class="mb-6">
-                                <label for="apellidos" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Apellidos</label>
-                                <input type="text" id="apellido-lead" placeholder="Ingrese los apellidos del cliente" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                            <div class="max-w-max h-auto">
+                                <div class="h-full flex flex-col justify-center items-center">
+                                    <ion-icon name="arrow-forward"></ion-icon>
+                                    <p class="text-sm text-gray-400 text-center">Asi lo verán los usuarios</p>
+                                </div>
                             </div>
-                            <div class="mb-6">
-                                <label for="documento" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Documento</label>
-                                <input type="text" id="documento-lead" placeholder="Ingrese su nro documento" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-                            </div>
-                            <div class="mb-6">
-                                <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email</label>
-                                <input type="email" id="email-lead" placeholder="Ingrese su correo electrónico" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-                            </div>
-                            <div class="mb-6">
-                                <label for="celular" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Celular</label>
-                                <input type="text" id="celular-lead" placeholder="Ingrese su celular" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-                            </div>
-                            <div class="mb-6">
-                                <label for="telefono" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Telefono</label>
-                                <input type="text" id="telefono-lead" placeholder="Ingrese su telefono" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-                            </div>
-                            <div class="mb-6">
-                                <label for="pais" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Pais</label>
-                                <input type="text" id="pais-lead" placeholder="Ingrese el pais del cliente" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-                            </div>
-                            <div class="mb-6">
-                                <label for="origen" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Medio Contactado</label>
-                                <input type="text" id="origen-lead" placeholder="ejm: Facebook, Instagram, Capacitaciones, etc." class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-                            </div>
-                            <div class="mb-6">
-                                <label for="campania" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Campaña</label>
-                                <input type="text" id="campania-lead" placeholder="Ingrese si pertenece a una campaña" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-                            </div>
-                            <div class="mb-6">
-                                <label for="ciudad" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Ciudad</label>
-                                <input type="text" id="ciudad-lead" placeholder="Ingrese ciudad de origen" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-                            </div>
-                            <div class="mb-6">
-                                <label for="proyecto" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Proyecto</label>
-                                <select type="text" id="proyecto-lead" placeholder="Ingrese ciudad de origen" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"></select>
+                            <div class="w-full bg-white p-6 rounded-md md:max-w-[400px] shadow-md">
+                                <h1 class="text-sm text-black font-bold mb-4">Previsualizacion</h1>
+                                <div style="padding: 35px 8px 35px 8px; max-width: 280px; " class="mt-4 relative bg-white rounded-xl shadow-xl max-w-[280px] border">
+                                    <div class="bg-[#ECE5DD] relative max-w-[280px] bg-[#ECE5DD] min-h-[450px] w-full h-full relative">
+                                        <div class="w-full px-4 flex h-[50px] bg-[#ededed] items-center">
+                                            <img class="w-[35px] h-[35px] object-cover rounded-full" src="../../img/user.png" alt="img">
+                                            <p class="">+51 900266553</p>
+                                        </div>
+                                        <div class="max-w-[200px] w-full rounded-xl bg-[#DCF8C6] absolute right-[10px] bottom-[60px] p-2">
+                                            Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                                        </div>
+
+                                        <div class="flex jutify-between w-full bg-[#f0f0f0] absolute left-0 right-0 bottom-[0px] p-2">
+                                            <div id="preview-insert-text" class="w-full bg-white p-4"></div>
+                                            <img class="w-[20px]" src="../../img//icon-send.png" alt="">
+
+                                        </div>
+                                    </div>
+
+
+                                </div>
                             </div>
                         </div>
-                        <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Registrar</button>
-                    </form>
+                    </div>
 
                     <!-- <div class="card-input buttons-modal">
                         <button id="cancel-form" class="btn-cancel">Cancelar</button>
@@ -308,41 +314,6 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
 
                 </div>
             </div>
-            <div class="w-full">
-                <div class="flex flex-wrap md:flex-nowrap gap-4">
-                    <div class="w-full bg-white p-6 rounded-md md:w-[500px] shadow-md space-y-4">
-
-                        <h1 class="text-sm text-black font-bold">Nombre de la plantilla</h1>
-                        <input id="message" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-200 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Escribe el nombre de tu plantilla"></input>
-                        <h1 class="text-sm text-black font-bold">Custom mensaje</h1>
-                        <div class="flex items-center gap-2 w-full">
-                            <div class="relative">
-                                <div id="emojiSelectorIcon" class="rounded-full w-[30px] h-[30px] flex items-center justify-center p-1 cursor-pointer bg-green-600">😀</div>
-                                <div style="left: calc(100% + 10px); z-index: 2000" id="emojiSelector" class="hidden absolute w-[325px] top-1/2 -translate-y-1/2 p-6 bg-white shadow-xl">
-                                    <input id="emojiSearch" rows="4" class="block p-2 mb-4 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Escribe el nombre de tu plantilla"></input>
-                                    <ul id="emojiList" class="emoji-list h-[100px] overflow-y-auto">
-
-                                    </ul>
-
-                                </div>
-                            </div>
-                            <p class="text-gray-500 text-sm">Add emoji</p>
-                        </div>
-                        <textarea id="message" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-200 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Escribe el mensaje de tu plantilla"></textarea>
-                        <p class="text-gray-500 text-sm">Example: “Hola te presento al proyecto ...”</p>
-                        <button class="p-2 rounded-xl w-full text-white bg-blue-500 hover:bg-blue-800">Crear</button>
-                    </div>
-                    <div class="max-w-max h-auto">
-                        <div class="h-full flex flex-col justify-center items-center">
-                            <ion-icon name="arrow-forward"></ion-icon>
-                            <p class="text-sm text-gray-400 text-center">Asi lo verán los usuarios</p>
-                        </div>
-                    </div>
-                    <div class="w-full bg-white p-6 rounded-md md:w-1/2 shadow-md">
-                        <h1 class="text-sm text-black font-bold">Previsualizacion</h1>
-                    </div>
-                </div>
-            </div>
             <div class="main-datatable">
                 <!-- <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div>
@@ -438,7 +409,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                     </div>
                 </div> -->
 
-                <table id="usuariosList" class="table cust-datatable dataTable no-footer" style="width:100%;">
+                <table id="msgList" class="table cust-datatable dataTable no-footer" style="width:100%;">
                     <thead>
                         <tr>
                             <!-- <th>
@@ -449,17 +420,9 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                             <!-- <th>
                                 <div style="width: 50px !important">Apellidos</div>
                             </th> -->
-                            <th>Nombres</th>
-                            <th>Apellidos</th>
-                            <th>Etiquetas</th>
-                            <th>Fecha Hora Creacion</th>
-                            <!-- <th>Correo</th> -->
-                            <th>Celular</th>
-                            <!-- <th>Telefono</th>
-                            <th>Origen</th>
-                            <th>Ciudad</th> -->
-                            <th>Proyecto</th>
-                            <th>Estado</th>
+                            <th>id</th>
+                            <th>Nombre</th>
+                            <th>Mensaje</th>
                             <th>Acciones</th>
                             <!-- <th>
                                 <div style="width: 200px !important">Acciones</div>
@@ -500,6 +463,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.9.4/dayjs.min.js" integrity="sha512-XZSHSEFj4QeE0G4pwy4tToyAhF2VXoEcF9CP0t1PSZMP2XHhEEB9PjM9knsdzcEKbi6GRMazdt8tJadz0JTKIQ==" crossorigin="anonymous"></script>
     <!-- <script src="../../js/dinamic/gestion-clientes-as.js"></script> -->
     <script src="../../js/dinamic/emojiapp.js"></script>
+    <script src="../../js/dinamic/gestion-plantilla.js"></script>
 
     </html>
 <?php } ?>
