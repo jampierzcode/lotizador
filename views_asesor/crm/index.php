@@ -390,6 +390,28 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
 
                 </div>
             </div>
+            <div id="send-modal-event" class="modal-create md-hidden">
+                <div class="form-create">
+                    <!-- <form id="form_producto_add"> -->
+                    <div class="close-modal">
+                        <ion-icon name="close-outline"></ion-icon>
+                    </div>
+
+                    <h1 class="font-bold">Enviar message template</h1>
+
+                    <label for="countries" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Mis plantillas</label>
+                    <select id="listPlantillas" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                        <option selected>Seleccione una plantilla</option>
+                    </select>
+
+                    <label for="message" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your message</label>
+                    <textarea id="message-modal-plantilla" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Write your thoughts here..."></textarea>
+
+
+                    <a target="_blank" class="text-center w-max-content p-2 text-white bg-green-500 rounded-md text-lg inline-block" id="link-w-send" href="">Enviar</a>
+
+                </div>
+            </div>
             <div class="w-full text-center mb-2">Mes actual: <span id="mesNow"></span></div>
             <div class="justify-center flex gap-4 mb-5">
                 <div class="flex bg-blue-600 p-2 rounded-lg gap-4 items-center text-white">
@@ -588,6 +610,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                             <th>Origen</th>
                             <th>Ciudad</th> -->
                             <th>Proyecto</th>
+                            <th>Message</th>
                             <th>Estado</th>
                             <th>Acciones</th>
                             <!-- <th>

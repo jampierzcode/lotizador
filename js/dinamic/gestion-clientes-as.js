@@ -1,6 +1,8 @@
 $(document).ready(function () {
   var funcion = "";
   var clientesList;
+  var plantillasList;
+  var templateMsg;
   var idCliente;
   var proyectosList = [];
   var dataTable = $("#usuariosList").DataTable({
@@ -173,6 +175,14 @@ $(document).ready(function () {
       },
       {
         data: null,
+        render: function (data) {
+          return `<button id="open-plantilla" keyClient="${data.id}" class="p-2 rounded-md flex wwhitespace-nowrap text-sm bg-green-500 text-white">
+              Enviar msg
+            </button>`;
+        },
+      },
+      {
+        data: null,
         render: function (data, type, row) {
           return `
               <div class="flex-actions">
@@ -270,6 +280,80 @@ $(document).ready(function () {
         },
       },
     ],
+  });
+  // send plantilla
+  buscar_plantillas_user();
+  function buscar_plantillas_user() {
+    let funcion = "buscar_msg_template";
+    $.post(
+      "../../controlador/UsuarioController.php",
+      { funcion },
+      (response) => {
+        console.log(response);
+        let template = "";
+        if (response.trim() === "no-register") {
+          template += `<option value="0">No hay plantillas</option>`;
+        } else {
+          const plantillas = JSON.parse(response);
+          template += `<option value="0" selected>Seleccione una plantilla</option>`;
+          plantillas.forEach((plantilla) => {
+            template += `<option value="${plantilla.id}">${plantilla.nombre}</option>`;
+          });
+          plantillasList = plantillas;
+        }
+        $("#listPlantillas").html(template);
+      }
+    );
+  }
+  $("#listPlantillas").change(function () {
+    console.log("change");
+    let id_msg = $(this).val();
+    if (id_msg !== "0") {
+      const msg = plantillasList.find((e) => e.id === id_msg);
+      console.log(msg);
+      $("#message-modal-plantilla").val(msg.mensaje);
+      let saltoMsg = $("#message-modal-plantilla").val();
+
+      // Reemplazar saltos de línea con %0A en el mensaje
+      const mensajeFormateado = encodeURIComponent(
+        saltoMsg.replace(/\n/g, "\n")
+      );
+
+      // Actualizar el atributo href con el mensaje formateado
+      $("#link-w-send").attr(
+        "href",
+        `https://api.whatsapp.com/send?phone=${templateMsg}&text=${mensajeFormateado}`
+      );
+    } else {
+      $("#message-modal-plantilla").val("");
+      $("#link-w-send").attr("href", "");
+    }
+  });
+  $("#message-modal-plantilla").on("keyup", function () {
+    let value = $(this).val();
+    console.log(value);
+    const mensajeFormateado = encodeURIComponent(value.replace(/\n/g, "\n"));
+    $("#link-w-send").attr(
+      "href",
+      `https://api.whatsapp.com/send?phone=${templateMsg}&text=${mensajeFormateado}`
+    );
+  });
+
+  $(document).on("click", "#open-plantilla", function () {
+    let id = $(this).attr("keyClient");
+    const cliente = clientesList.find((e) => e.id === id);
+    console.log(cliente);
+    templateMsg = cliente.celular;
+    $("#send-modal-event").removeClass("md-hidden");
+    setTimeout(() => {
+      $("#send-modal-event .form-create").addClass("modal-show");
+    }, 10);
+  });
+  $("#send-modal-event .close-modal").click(function () {
+    setInterval(() => {
+      $("#send-modal-event .form-create").removeClass("modal-show");
+    }, 10);
+    $("#send-modal-event").addClass("md-hidden");
   });
   // mis leads
   $("#meusers-filtros").click(function () {

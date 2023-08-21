@@ -83,7 +83,7 @@ $(document).ready(function () {
   $("#created-submit-msj").click(function () {
     let funcion = "register-msg";
     let nombre = $("#name-message").val();
-    let msg = $("message-plantilla").val();
+    let msg = $("#message-plantilla").val();
 
     if (nombre !== "") {
       $.post(
@@ -92,6 +92,7 @@ $(document).ready(function () {
         (response) => {
           console.log(response);
           if (response.trim() === "add-msg") {
+            alert("Se creo correctamente la plantilla");
             $("#name-message").val("");
             $("#message-plantilla").val("");
             buscar_msg();
