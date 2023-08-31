@@ -27,10 +27,10 @@ $(document).ready(function () {
       {
         data: null,
         render: function (data, type, row) {
+          // <button target="_blank" keyClient="${data?.id}" id="editClient" class="btnJsvm normal"><ion-icon name="create-sharp"></ion-icon></button>
           return `
             <div class="flex-actions">
-             <button target="_blank" keyProyect="https://lotizador.mcsolucionesti.com/views/Lotizador/Clientes/?proyect=${data.id}" id="rutaEnlace" class="btnLotes"> Send Msj </button>
-              
+            <button target="_blank" keyMsg="${data?.id}" id="deleteMsg" class="btnJsvm danger"><ion-icon name="trash"></ion-icon></button>
             </div>
   
             `;
@@ -62,7 +62,25 @@ $(document).ready(function () {
       }
     );
   }
-
+  $(document).on("click", "#deleteMsg", function () {
+    const idMsg = $(this).attr("keyMsg");
+    let confirmado = confirm("Esta seguro de eliminar el mensaje");
+    if (confirmado) {
+      let funcion = "delete_msg_plantilla";
+      $.post(
+        "../../controlador/UsuarioController.php",
+        { funcion, id: idMsg },
+        (response) => {
+          if (response.trim() === "delete-msg") {
+            buscar_msg();
+            alert("Se elimino correctamente la plantilla");
+          } else {
+            alert("Hubo un error contacta al administrador");
+          }
+        }
+      );
+    }
+  });
   $(document).on("click", "#emojiList li", function () {
     let emoji = $(this).html();
     console.log(emoji);

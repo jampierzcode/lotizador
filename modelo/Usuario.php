@@ -281,6 +281,19 @@ class Usuario
             return $this->mensaje;
         }
     }
+    function remove_cliente_asesor($id_cliente, $id_usuario)
+    {
+        $sql = "DELETE FROM user_cliente WHERE user_id = :user_id AND cliente_id = :cliente_id";
+        $query = $this->conexion->prepare($sql);
+        try {
+            $query->execute(array(":user_id" => $id_usuario, ":cliente_id" => $id_cliente));
+            $this->mensaje = "remove-asigned";
+            return $this->mensaje;
+        } catch (\Throwable $error) {
+            $this->mensaje = "no-remove-asigned" . $error;
+            return $this->mensaje;
+        }
+    }
     function remove_etiqueta_lead($id_etiqueta, $cliente)
     {
         $sql = "DELETE FROM etiqueta_cliente WHERE etiqueta_id = :etiqueta AND cliente_id = :cliente";
@@ -322,6 +335,20 @@ class Usuario
             return $this->mensaje;
         } catch (\Throwable $error) {
             $this->mensaje = "no-delete-proyect" . $error;
+            return $this->mensaje;
+        }
+    }
+    function delete_msg_plantilla($id)
+    {
+        $sql = "DELETE FROM template_user
+        WHERE id = :id_msg";
+        $query = $this->conexion->prepare($sql);
+        try {
+            $query->execute(array(":id_msg" => $id));
+            $this->mensaje = "delete-msg";
+            return $this->mensaje;
+        } catch (\Throwable $error) {
+            $this->mensaje = "no-delete-msg" . $error;
             return $this->mensaje;
         }
     }
@@ -1270,7 +1297,7 @@ class Usuario
             LEFT JOIN usuario AS USUARIO ON UC.user_id = USUARIO.id_usuario
             LEFT JOIN proyectos AS PROYECTO ON CLIENTE.proyet_id = PROYECTO.id
         WHERE
-            UP.user_id = :id_usuario;
+            UP.user_id = :id_usuario; AND CLIENTE.archived=0
         ";
             $query = $this->conexion->prepare($sql);
             $query->execute(array(":id_usuario" => $user));
@@ -1393,6 +1420,40 @@ class Usuario
         GROUP BY c.id_cliente, p.nombreProyecto, ic.id, ic.status, ic.fecha_visita, ic.hora_visita;
         
      
+            ";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":id_usuario" => $id_usuario));
+            $this->datos = $query->fetchAll(); // retorna objetos o no
+            if (!empty($this->datos)) {
+                return $this->datos;
+            } else {
+                $this->mensaje = "no-register-clientes";
+                return $this->mensaje;
+            }
+        } catch (\Throwable $error) {
+            $this->mensaje = "fatal_error " + $error;
+            return $this->mensaje;
+            //throw $th;
+        }
+    }
+    function buscar_clientes_by_admin_papelera($id_usuario)
+    {
+        try {
+            $sql = "SELECT
+            CLIENTE.*,
+            CASE
+                WHEN UC.cliente_id IS NULL THEN 'No asignado'
+                ELSE CONCAT(USUARIO.nombre, ' ', USUARIO.apellido)
+            END AS asignado_usuario,
+            PROYECTO.nombreProyecto AS nombre_proyecto
+        FROM
+            cliente AS CLIENTE
+            INNER JOIN user_proyect AS UP ON CLIENTE.proyet_id = UP.proyecto_id    
+            LEFT JOIN user_cliente AS UC ON CLIENTE.id_cliente = UC.cliente_id
+            LEFT JOIN usuario AS USUARIO ON UC.user_id = USUARIO.id_usuario
+            LEFT JOIN proyectos AS PROYECTO ON CLIENTE.proyet_id = PROYECTO.id
+        WHERE
+            UP.user_id = :id_usuario AND CLIENTE.archived=1
             ";
             $query = $this->conexion->prepare($sql);
             $query->execute(array(":id_usuario" => $id_usuario));

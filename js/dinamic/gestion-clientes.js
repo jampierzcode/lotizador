@@ -6,7 +6,7 @@ $(document).ready(function () {
   buscar_clientes();
   var dataTable = $("#usuariosList").DataTable({
     select: true,
-    stateSave: true,
+    stateSave: false,
     lengthMenu: [5, 10, 25, 50],
     language: {
       lengthMenu: "Mostrar _MENU_ registros por página",
@@ -27,8 +27,7 @@ $(document).ready(function () {
     // scrollCollapse: true,
     // paging: false,
     fixedColumns: {
-      leftColumns: 3, //Le indico que deje fijas solo las 2 primeras columnas
-      // rightColumns: 1,
+      leftColumns: 3,
     },
     // aoColumnDefs: [
     //   {
@@ -38,15 +37,7 @@ $(document).ready(function () {
     // ],
 
     columns: [
-      {
-        data: null,
-
-        render: function (data, type) {
-          return `
-          <input type="checkbox" class="cliente-checkbox" data-id="${data?.id}">
-          `;
-        },
-      },
+      { data: null },
       // { data: "id" },
       { data: "nombres" },
       { data: "apellidos" },
@@ -55,9 +46,9 @@ $(document).ready(function () {
       },
       { data: "correo" },
       { data: "celular" },
-      { data: "telefono" },
-      { data: "origen" },
-      { data: "ciudad" },
+      // { data: "telefono" },
+      // { data: "origen" },
+      // { data: "ciudad" },
       { data: "nombre_proyecto" },
       {
         data: null,
@@ -81,7 +72,6 @@ $(document).ready(function () {
           <div class="flex-actions">
           <button target="_blank" keyClient="${data?.id}" id="asignedClient" class="btnJsvm default"><ion-icon name="add-circle-sharp"></ion-icon></button>
           <button target="_blank" keyClient="${data?.id}" id="editClient" class="btnJsvm normal"><ion-icon name="create-sharp"></ion-icon></button>
-          <button target="_blank" keyClient="${data?.id}" id="deleteClient" class="btnJsvm danger"><ion-icon name="trash"></ion-icon></button>
            
           <button target="_blank" keyClient="${data?.id}" id="historialCliente" class="btnJsvm normal">Historial</button>
            
@@ -91,10 +81,9 @@ $(document).ready(function () {
         },
       },
     ],
-    // columnDefs: [{ type: "date-dd-mm-yyyy", aTargets: [5] }],
-    // order: false,
-    // bLengthChange: false,
-    // dom: '<"top">ct<"top"p><"clear">',
+    order: [],
+    columnDefs: [{ orderable: false, targets: 0 }],
+    columnDefs: [{ checkboxes: { selectRow: true }, targets: 0 }],
   });
 
   var datatablesAsesores = $("#proyectsAsigned").DataTable({
@@ -120,16 +109,8 @@ $(document).ready(function () {
         data: null,
         render: function (data, type, row) {
           return `
-          <div class="flex-actions">
-          <div class="dropdown">
-            <button class="btnJsvm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <ion-icon aria-label="Favorite" aria-hidden="true" name="ellipsis-vertical-outline"></ion-icon>
-            </button>
-            <ul class="dropdown-menu">
-              <li><button class="dropdown-item" id="no-asigned_user" key_proyect=${data.id}>- Quitar usuario</button></li>
-              </ul>
-          </div>
-          </div>
+          <button target="_blank" keyAsesor="${data?.id}" id="deleteAsesor" class="btnJsvm danger"><ion-icon name="trash"></ion-icon></button>
+          
 
           `;
         },
@@ -237,6 +218,158 @@ $(document).ready(function () {
       return 0;
     }
   };
+  // delete asigneed asesor
+
+  $(document).on("click", "#deleteAsesor", function () {
+    const id_asesor = $(this).attr("keyAsesor");
+    console.log(idCliente);
+    let funcion = "removed_asigned_asesor";
+    $.post(
+      "../../controlador/UsuarioController.php",
+      { funcion, cliente: idCliente, usuario: id_asesor },
+      async (response) => {
+        console.log(response);
+        if (response.trim() === "remove-asigned") {
+          alert("se elimino correctamente al asesor");
+          const asesores = await buscar_asesores(id_cliente);
+          // let template;
+          let template = `<option value="" selected></option>`;
+          let asesoresAsigned = [];
+          asesores.forEach((asesor) => {
+            let option = `<option value=${asesor.id}>${asesor.nombreAsesor}</option>`;
+            if (asesor.asignado_usuario === "Asignado") {
+              asesoresAsigned.push(asesor);
+              option = `<option value=${asesor.id} disabled>${asesor.nombreAsesor}</option>`;
+            }
+            template += option;
+          });
+          datatablesAsesores.clear().rows.add(asesoresAsigned).draw();
+
+          $(".users_proyect").html(template);
+          $(".users_proyect").select2({
+            allowClear: true,
+            placeholder: "Selecciona un asesor",
+            data: [],
+          });
+
+          const result = clientesList.find(
+            (elemento) => elemento.id === idCliente
+          );
+
+          $("#nombre_user").html(
+            result.nombres +
+              " " +
+              (result.apellidos !== "" && result.apellidos !== null
+                ? result.apellidos
+                : "")
+          );
+          buscar_clientes();
+        } else {
+          alert("Hubo un error, contacta al administrador");
+        }
+      }
+    );
+  });
+
+  // fin de delete asigneed asesor
+
+  // editar lead
+  $(document).on("click", "#editClient", function () {
+    // console.log(e);
+    // console.log("hola");
+    let template = "";
+    template += `<option value="0">Seleccione un proyecto</option>`;
+    proyectosList.forEach((proyecto) => {
+      template += `<option value="${proyecto.id}">${proyecto.nombreProyecto}</option>`;
+    });
+    $("#editar-lead #proyecto-lead").html(template);
+    $("#editar-lead").removeClass("md-hidden");
+    setTimeout(function () {
+      $("#editar-lead .form-create").addClass("modal-show");
+    }, 10);
+    const id_cliente = $(this).attr("keyClient");
+    idCliente = id_cliente;
+    const clienteResult = clientesList.filter(
+      (elemento) => elemento.id === id_cliente
+    );
+    console.log(id_cliente, clienteResult);
+
+    $("#editar-lead #nombre-lead").val(clienteResult[0].nombres);
+    $("#editar-lead #apellido-lead").val(clienteResult[0].apellidos);
+    $("#editar-lead #documento-lead").val(clienteResult[0].documento);
+    $("#editar-lead #celular-lead").val(clienteResult[0].celular);
+    $("#editar-lead #telefono-lead").val(clienteResult[0].telefono);
+    $("#editar-lead #origen-lead").val(clienteResult[0].origen);
+    $("#editar-lead #ciudad-lead").val(clienteResult[0].ciudad);
+    $("#editar-lead #pais-lead").val(clienteResult[0].Pais);
+    $("#editar-lead #campania-lead").val(clienteResult[0].campania);
+    $("#editar-lead #email-lead").val(clienteResult[0].correo);
+
+    $("#editar-lead #proyecto-lead").val(clienteResult[0].proyecto_id);
+  });
+  $("#editar-lead #editLead").submit((e) => {
+    e.preventDefault();
+    let nombre = $("#editar-lead #nombre-lead").val();
+    let apellido = $("#editar-lead #apellido-lead").val();
+    let documento = $("#editar-lead #documento-lead").val();
+    let celular = $("#editar-lead #celular-lead").val();
+    let telefono = $("#editar-lead #telefono-lead").val();
+    let origen = $("#editar-lead #origen-lead").val();
+    let ciudad = $("#editar-lead #ciudad-lead").val();
+    let pais = $("#editar-lead #pais-lead").val();
+    let campania = $("#editar-lead #campania-lead").val();
+    let correo = $("#editar-lead #email-lead").val();
+    let proyecto_id = $("#editar-lead #proyecto-lead").val();
+    const result = {
+      nombre: nombre,
+      apellido: apellido,
+      documento: documento,
+      correo: correo,
+      celular: celular,
+      telefono: telefono,
+      Pais: pais,
+      origen: origen,
+      campaña: campania,
+      ciudad: ciudad,
+    };
+    console.log(result);
+    if (proyecto_id !== "0") {
+      let funcion = "edit_cliente";
+      $.post(
+        "../../controlador/UsuarioController.php",
+        { funcion, result, proyecto_id, cliente: idCliente },
+        (response) => {
+          console.log(response);
+          const data = JSON.parse(response);
+          console.log(data);
+
+          if (data.hasOwnProperty("error")) {
+            // Si la respuesta contiene un mensaje de error, muestra el mensaje
+            alert(data.error);
+          } else {
+            alert("Se edito correctamente al cliente");
+            setTimeout(function () {
+              $("#editar-lead .form-create").removeClass("modal-show");
+            }, 1000);
+            $("#editar-lead").addClass("md-hidden");
+            buscar_clientes();
+
+            $("#editar-lead #nombre-lead").val("");
+            $("#editar-lead #apellido-lead").val("");
+            $("#editar-lead #documento-lead").val("");
+            $("#editar-lead #celular-lead").val("");
+            $("#editar-lead #telefono-lead").val("");
+            $("#editar-lead #origen-lead").val("");
+            $("#editar-lead #ciudad-lead").val("");
+            $("#editar-lead #pais-lead").val("");
+            $("#editar-lead #campania-lead").val("");
+            $("#editar-lead #email-lead").val("");
+          }
+        }
+      );
+    }
+  });
+  // fin de editar lead
   // show modal de historial de cliente
   $(document).on("click", "#historialCliente", function () {
     let cliente = $(this).attr("keyClient");
@@ -319,14 +452,30 @@ $(document).ready(function () {
   }
 
   // Event listeners para los cambios en el select y el input
-  $("#cliente-search, #filter-proyecto").on("change keyup", filtrarProyectos);
+  $("#cliente-search, #filter-proyecto, #filter-selected").on(
+    "change keyup",
+    filtrarProyectos
+  );
   function filtrarProyectos() {
     console.log(clientesList);
+    const selected = $("#filter-selected").val();
     const nombreProyecto = $("#filter-proyecto").val();
     const nombreCliente = $("#cliente-search").val().toLowerCase();
     console.log(nombreProyecto, nombreCliente);
 
     const clientes = clientesList.filter((cliente) => {
+      // si, asignado true
+      //si, no asignado false
+      // no, asignado false
+      // no, no asignado true
+      if (selected === "SI" && cliente.asignado_usuario === "No asignado") {
+        console.log(cliente.nombre_proyecto);
+        return false;
+      }
+      if (selected === "NO" && cliente.asignado_usuario !== "No asignado") {
+        console.log(cliente.nombre_proyecto);
+        return false;
+      }
       if (
         nombreProyecto !== "Todos" &&
         cliente.proyecto_id !== nombreProyecto
@@ -467,9 +616,21 @@ $(document).ready(function () {
   });
 
   // asignar clientes
-  $(document).on("change", ".cliente-checkbox", function () {
-    var clientesSeleccionados = $(".cliente-checkbox:checked").length;
+  $("#usuariosList tbody").on("click", ".cliente-checkbox", function () {
+    var clientesSeleccionados = $(".cliente-checkbox:checked");
     console.log(clientesSeleccionados);
+    var row = $(this).closest("tr");
+    row.toggleClass("seleccion", $(this).checked);
+    // Utiliza la variable "clientesSeleccionados" para asignarlos a un asesor u otras acciones que desees realizar.
+  });
+  $(document).on("click", "#checkAllClient", function () {
+    if ($(this).is(":checked")) {
+      $(".cliente-checkbox").prop("checked", true);
+      var row = $(".cliente-checkbox").closest("tr");
+      row.toggleClass("seleccion", $(".cliente-checkbox").checked);
+    } else {
+      $(".cliente-checkbox").prop("checked", false);
+    }
     // Utiliza la variable "clientesSeleccionados" para asignarlos a un asesor u otras acciones que desees realizar.
   });
 
@@ -481,7 +642,6 @@ $(document).ready(function () {
     idCliente = id_cliente;
     try {
       const asesores = await buscar_asesores(id_cliente);
-      console.log(asesores);
       // let template;
       let template = `<option value="" selected></option>`;
       let asesoresAsigned = [];

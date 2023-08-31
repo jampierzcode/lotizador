@@ -350,7 +350,7 @@ $(document).ready(function () {
     }, 10);
   });
   $("#send-modal-event .close-modal").click(function () {
-    setInterval(() => {
+    setTimeout(() => {
       $("#send-modal-event .form-create").removeClass("modal-show");
     }, 10);
     $("#send-modal-event").addClass("md-hidden");
@@ -519,6 +519,7 @@ $(document).ready(function () {
       "../../controlador/UsuarioController.php",
       { funcion },
       (response) => {
+        console.log(response);
         $("#spin-load").html("");
         if (response.trim() === "no-register-clientes") {
           dataTable.clear().draw();

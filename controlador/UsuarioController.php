@@ -321,13 +321,24 @@ if ($_POST["funcion"] == "asigned_user_proyecto") {
 }
 if ($_POST["funcion"] == "removed_asigned_user") {
     $id_proyecto = intVal($_POST["id_proyecto"]);
-    $id_usuario = intVal($_POST["id_usuario"]);
-    $usuario->remove_user_proyecto($id_proyecto, $id_usuario);
+    $user_id = intVal($_POST["id_usuario"]);
+    $usuario->remove_user_proyecto($id_proyecto, $user_id);
+    echo $usuario->mensaje;
+}
+if ($_POST["funcion"] == "removed_asigned_asesor") {
+    $id_cliente = intVal($_POST["cliente"]);
+    $user_id = intVal($_POST["usuario"]);
+    $usuario->remove_cliente_asesor($id_cliente, $user_id);
     echo $usuario->mensaje;
 }
 if ($_POST["funcion"] == "delete_user") {
     $id = $_POST["id"];
     $usuario->delete_user($id);
+    echo $usuario->mensaje;
+}
+if ($_POST["funcion"] == "delete_msg_plantilla") {
+    $id = $_POST["id"];
+    $usuario->delete_msg_plantilla($id);
     echo $usuario->mensaje;
 }
 if ($_POST["funcion"] == "removed_proyecto") {
@@ -983,16 +994,16 @@ if ($_POST["funcion"] == "buscar_clientes_by_asesor") {
                 'fecha_visita' => $dato->fecha_visita,
                 'hora_visita' => $dato->hora_visita,
                 'etiquetas' => $dato->etiquetas,
-                'asignedUser' => $asigned
+                'asignedUser' => $asigned,
             );
         }
         $jsonstring = json_encode($json);
         echo $jsonstring;
     }
 }
-if ($_POST["funcion"] == "buscar_clientes_by_asesor_papelera") {
+if ($_POST["funcion"] == "buscar_clientes_by_admin_papelera") {
     $json = array();
-    $usuario->buscar_clientes_by_asesor_papelera($_SESSION["id_usuario"]);
+    $usuario->buscar_clientes_by_admin_papelera($_SESSION["id_usuario"]);
     if ($usuario->mensaje) {
         echo $usuario->mensaje;
     }
@@ -1002,23 +1013,16 @@ if ($_POST["funcion"] == "buscar_clientes_by_asesor_papelera") {
                 'id' => $dato->id_cliente,
                 'nombres' => $dato->nombres,
                 'apellidos' => $dato->apellidos,
-                'documento' => $dato->documento,
                 'correo' => $dato->correo,
                 'celular' => $dato->celular,
                 'telefono' => $dato->telefono,
-                'status' => $dato->status,
                 'origen' => $dato->origen,
                 'ciudad' => $dato->ciudad,
-                'campania' => $dato->campania,
-                'Pais' => $dato->pais,
                 'nombre_proyecto' => $dato->nombre_proyecto,
                 'created_cliente' => $dato->created_cliente,
                 'proyecto_id' => $dato->proyet_id,
-                'id_task' => $dato->id_task,
-                'task_status' => $dato->task_status,
-                'fecha_visita' => $dato->fecha_visita,
-                'hora_visita' => $dato->hora_visita,
-                'etiquetas' => $dato->etiquetas
+                'asignado_usuario' => $dato->asignado_usuario,
+                'status' => $dato->status
             );
         }
         $jsonstring = json_encode($json);

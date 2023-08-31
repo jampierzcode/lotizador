@@ -1,7 +1,7 @@
 <?php
 
 session_start();
-if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
+if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
     header("Location: ../../index.php");
 } else {
 ?>
@@ -390,204 +390,22 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
 
                 </div>
             </div>
-            <div id="send-modal-event" class="modal-create md-hidden">
-                <div class="form-create">
-                    <!-- <form id="form_producto_add"> -->
-                    <div class="close-modal">
-                        <ion-icon name="close-outline"></ion-icon>
-                    </div>
-
-                    <h1 class="font-bold">Enviar message template</h1>
-
-                    <label for="countries" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Mis plantillas</label>
-                    <select id="listPlantillas" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                        <option selected>Seleccione una plantilla</option>
-                    </select>
-
-                    <label for="message" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your message</label>
-                    <textarea id="message-modal-plantilla" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Write your thoughts here..."></textarea>
-
-
-                    <a target="_blank" class="text-center w-max-content p-2 text-white bg-green-500 rounded-md text-lg inline-block" id="link-w-send" href="">Enviar</a>
-
-                </div>
-            </div>
-            <div class="w-full text-center mb-2">Mes actual: <span id="mesNow"></span></div>
-            <div class="justify-center flex gap-4 mb-5">
-                <div class="flex bg-blue-600 p-2 rounded-lg gap-4 items-center text-white">
-                    <h1>Visitas Concretadas</h1>
-                    <span id="visits_concretadas" class="text-white">0</span>
-                </div>
-                <div class="flex bg-yellow-600 p-2 rounded-lg gap-4 items-center text-white">
-                    <h1>Separaciones</h1>
-                    <span id="separaciones_count" class="text-white">0</span>
-                </div>
-                <div class="flex bg-green-600 p-2 rounded-lg gap-4 items-center text-white">
-                    <h1>Ventas</h1>
-                    <span id="ventas_count" class="text-white">0</span>
-                </div>
-            </div>
             <div style="display: flex; gap:10px; margin-bottom: 20px">
                 <div class="relative inline-block text-left">
                     <div>
-                        <button type="button" class="inline-flex items-center w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 btn-add hover:bg-gray-50" id="menu-button" aria-expanded="false" aria-haspopup="true">
+                        <a href="../crm/" type="button" class="inline-flex items-center w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 btn-add hover:bg-gray-50" id="menu-button" aria-expanded="false" aria-haspopup="true">
 
                             <ion-icon name="people-sharp"></ion-icon>
 
-                            Leads
-                            <svg class="-mr-1 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
-                            </svg>
-                        </button>
-                    </div>
-
-                    <div id="expand_file" class="absolute left-0 z-10 mt-2 w-56 origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none hidden" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
-                        <div class="py-1" role="none">
-                            <li id="modal-lead" class="flex items-center gap-2 cursor-pointer hover:bg-slate-200 text-gray-700 block px-4 py-2 text-sm" role="menuitem" tabindex="-1" id="menu-item-0"><ion-icon name="add-outline"></ion-icon> Agregar Lead</li>
-                            <a href="./importar.php" class="flex items-center gap-2 cursor-pointer hover:bg-slate-200 text-gray-700 block px-4 py-2 text-sm" role="menuitem" tabindex="-1" id="menu-item-0"> <ion-icon name="cloud-upload-outline"></ion-icon> Importar</a>
-
-                        </div>
-                    </div>
-                </div>
-                <div class="relative inline-block text-left">
-                    <div>
-                        <button type="button" class="inline-flex items-center w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 btn-add hover:bg-gray-50" id="menu-button-etiqueta" aria-expanded="false" aria-haspopup="true">
-
-                            <ion-icon name="pricetags"></ion-icon>
-
-                            Etiquetas
-                            <svg class="-mr-1 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
-                            </svg>
-                        </button>
-                    </div>
-
-                    <div id="expand-etiqueta" class="absolute left-0 z-10 mt-2 w-56 origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none hidden" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
-                        <div class="py-1" role="none">
-                            <li id="modal-etiqueta" class="flex items-center gap-2 cursor-pointer hover:bg-slate-200 text-gray-700 block px-4 py-2 text-sm" role="menuitem" tabindex="-1" id="menu-item-0"><ion-icon name="add-outline"></ion-icon> Crear etiqueta</li>
-
-                        </div>
-                    </div>
-                </div>
-                <div class="relative inline-block text-left">
-                    <div>
-                        <a href="../papelera/" type="button" class="inline-flex items-center w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 text-red-600" id="menu-button-etiqueta" aria-expanded="false" aria-haspopup="true">
-
-                            <ion-icon name="trash"></ion-icon>
-                            Ver Archivados
+                            Ver Todos los Leads
                         </a>
                     </div>
-                </div>
-                <div class="relative inline-block text-left">
-                    <div>
-                        <a href="../msj-plantilla/" type="button" class="inline-flex items-center w-full justify-center gap-x-1.5 rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset hover:bg-blue-700 text-white" id="menu-button-etiqueta" aria-expanded="false" aria-haspopup="true">
 
-                            <ion-icon name="mail"></ion-icon>
-                            Template MSJ
-                        </a>
-                    </div>
                 </div>
                 <!-- <input type="color" value="#5b5b5b"> -->
             </div>
-            <div>
-                <p class="text-lg text-black">Filtro Avanzado:</p>
-            </div>
             <div class="main-datatable">
                 <!-- <form> -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div>
-                        <label for="default-search" class="mb-2 text-sm font-medium text-gray-900  dark:text-white">Nombre</label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
-                                </svg>
-                            </div>
-                            <input type="search" id="cliente-search" class="block w-full p-2.5 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Buscar por nombre de cliente">
-                        </div>
-                    </div>
-                    <div>
-                        <label for="default-search" class="mb-2 text-sm font-medium text-gray-900  dark:text-white">Proyectos</label>
-                        <select id="filter-proyecto" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                            <option selected value="Todos">Todos</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="default-search" class="mb-2 text-sm font-medium text-gray-900  dark:text-white">Etiquetas</label>
-                        <select id="filter-etiqueta" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                            <option value="Todos" selected>Todos</option>
-                        </select>
-                    </div>
-
-                    <div class="relative inline-block">
-                        <div class="flex gap-4">
-                            <div>
-
-                                <label for="pendientes-search" class="mb-2 text-sm font-medium text-gray-900  dark:text-white"></label> <br>
-                                <button type="button" class="flex max-w-max items-center justify-center gap-x-1.5 rounded-md text-white px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 bg-blue-600 hover:bg-blue-900" id="meusers-filtros" aria-expanded="false" aria-haspopup="true">
-
-                                    <img style="width: 20px;" src="../../img/corona.png" alt="">
-
-                                    Mis leads
-
-                                </button>
-                            </div>
-                            <div>
-
-                                <label for="pendientes-search" class="mb-2 text-sm font-medium text-gray-900  dark:text-white"></label> <br>
-                                <button type="button" class="inline-blockmax-w-max items-center justify-center gap-x-1.5 rounded-md text-white px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 bg-emerald-800 hover:bg-lime-900" id="reset_filtros" aria-expanded="false" aria-haspopup="true">
-
-                                    <ion-icon name="refresh"></ion-icon>
-
-                                    Resetear
-
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <p class="mt-4 text-lg text-black">Filtro de Ultimos Estados:</p>
-
-                <!-- <form> -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                    <div class="h-auto">
-                        <label for="Fecha Inicio">Del: </label>
-                        <input type="date" id="fecha-inicio-status" class="block w-full p-2.5 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Buscar por nombre del asesor">
-                    </div>
-                    <div class="h-auto">
-                        <label for="pendientes-search" class="mb-2 text-sm font-medium text-gray-900  dark:text-white">Al:</label>
-                        <input disabled type="date" id="fecha-fin-status" class="block w-full p-2.5 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Buscar por nombre del asesor">
-                    </div>
-                    <div>
-                        <label for="default-search" class="mb-2 text-sm font-medium text-gray-900  dark:text-white">Status(último)</label>
-                        <select id="filter-status" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                            <option value="Todas" selected>Todas</option>
-                            <option value="VISITA">VISITA</option>
-                            <option value="ASISTIO">ASISTIO</option>
-                            <option value="NO ASISTIO">NO ASISTIO</option>
-                            <option value="NO INTERESADO">NO INTERESADO</option>
-                            <option value="NO RESPONDIO">NO RESPONDIO</option>
-                            <option value="SEPARACION">SEPARACION</option>
-                            <option value="VENTA">VENTA</option>
-                            <option value="REPROGRAMACION CONTACTO">REPROGRAMACION CONTACTO</option>
-                            <option value="REPROGRAMACION VISITA">REPROGRAMACION VISITA</option>
-                        </select>
-                    </div>
-
-                    <div class="relative inline-block text-left">
-
-                        <label for="pendientes-search" class="mb-2 text-sm font-medium text-gray-900  dark:text-white">Pendientes</label>
-                        <button type="button" class="inline-flex items-center w-full justify-center gap-x-1.5 rounded-md bg-red-600 text-white px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-red-700" id="menu-pendientes" aria-expanded="false" aria-haspopup="true">
-
-                            <ion-icon name="warning"></ion-icon>
-
-                            Pendientes: 0
-
-                        </button>
-
-                    </div>
-                </div>
 
                 <table id="usuariosList" class="table cust-datatable dataTable no-footer" style="width:100%;">
                     <thead>
@@ -602,16 +420,15 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                             </th> -->
                             <th>Nombres</th>
                             <th>Apellidos</th>
-                            <th>Etiquetas</th>
                             <th>Fecha Hora Creacion</th>
-                            <!-- <th>Correo</th> -->
+                            <th>Correo</th>
                             <th>Celular</th>
                             <!-- <th>Telefono</th>
                             <th>Origen</th>
                             <th>Ciudad</th> -->
                             <th>Proyecto</th>
-                            <th>Estado</th>
-                            <th>Message</th>
+                            <th>Agente</th>
+                            <th>Status</th>
                             <th>Acciones</th>
                             <!-- <th>
                                 <div style="width: 200px !important">Acciones</div>
@@ -632,118 +449,6 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
             </div>
         </div>
         </div>
-        <script>
-            // Obtiene el botón y el menú desplegable
-            var button = document.getElementById('menu-button');
-            var menu = document.getElementById('expand_file');
-
-            // Agrega un evento de clic al botón para mostrar/ocultar el menú desplegable
-            menu.addEventListener('click', function() {
-                var expanded = button.getAttribute('aria-expanded') === 'true' || false;
-                button.setAttribute('aria-expanded', !expanded);
-
-                if (!expanded) {
-                    menu.style.transformOrigin = 'left top';
-                    menu.style.transform = 'scale(0)';
-                    menu.style.opacity = '0';
-                    setTimeout(function() {
-                        menu.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
-                        menu.style.transform = 'scale(1)';
-                        menu.style.opacity = '1';
-                    }, 0);
-                    menu.classList.remove('hidden');
-                } else {
-                    menu.style.transformOrigin = 'left top';
-                    menu.style.opacity = '1';
-                    menu.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
-                    menu.style.transform = 'scale(0)';
-                    menu.style.opacity = '0';
-                    setTimeout(function() {
-                        menu.classList.add('hidden');
-                    }, 300);
-                }
-            });
-            button.addEventListener('click', function() {
-                var expanded = button.getAttribute('aria-expanded') === 'true' || false;
-                button.setAttribute('aria-expanded', !expanded);
-
-                if (!expanded) {
-                    menu.style.transformOrigin = 'left top';
-                    menu.style.transform = 'scale(0)';
-                    menu.style.opacity = '0';
-                    setTimeout(function() {
-                        menu.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
-                        menu.style.transform = 'scale(1)';
-                        menu.style.opacity = '1';
-                    }, 0);
-                    menu.classList.remove('hidden');
-                } else {
-                    menu.style.transformOrigin = 'left top';
-                    menu.style.opacity = '1';
-                    menu.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
-                    menu.style.transform = 'scale(0)';
-                    menu.style.opacity = '0';
-                    setTimeout(function() {
-                        menu.classList.add('hidden');
-                    }, 300);
-                }
-            });
-            // Obtiene el botón y el menú desplegable etiqueta
-            var button_etiqueta = document.getElementById('menu-button-etiqueta');
-            var menu_etiqueta = document.getElementById('expand-etiqueta');
-
-            // Agrega un evento de clic al botón para mostrar/ocultar el menú desplegable
-            menu_etiqueta.addEventListener('click', function() {
-                var expanded = button_etiqueta.getAttribute('aria-expanded') === 'true' || false;
-                button_etiqueta.setAttribute('aria-expanded', !expanded);
-
-                if (!expanded) {
-                    menu_etiqueta.style.transformOrigin = 'left top';
-                    menu_etiqueta.style.transform = 'scale(0)';
-                    menu_etiqueta.style.opacity = '0';
-                    setTimeout(function() {
-                        menu_etiqueta.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
-                        menu_etiqueta.style.transform = 'scale(1)';
-                        menu_etiqueta.style.opacity = '1';
-                    }, 0);
-                    menu.classList.remove('hidden');
-                } else {
-                    menu_etiqueta.style.transformOrigin = 'left top';
-                    menu_etiqueta.style.opacity = '1';
-                    menu_etiqueta.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
-                    menu_etiqueta.style.transform = 'scale(0)';
-                    menu_etiqueta.style.opacity = '0';
-                    setTimeout(function() {
-                        menu_etiqueta.classList.add('hidden');
-                    }, 300);
-                }
-            });
-            button_etiqueta.addEventListener('click', function() {
-                var expanded = button_etiqueta.getAttribute('aria-expanded') === 'true' || false;
-                button_etiqueta.setAttribute('aria-expanded', !expanded);
-
-                if (!expanded) {
-                    menu_etiqueta.style.transformOrigin = 'left top';
-                    menu_etiqueta.style.transform = 'scale(0)';
-                    menu_etiqueta.style.opacity = '0';
-                    setTimeout(function() {
-                        menu_etiqueta.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
-                        menu_etiqueta.style.transform = 'scale(1)';
-                        menu_etiqueta.style.opacity = '1';
-                    }, 0);
-                    menu_etiqueta.classList.remove('hidden');
-                } else {
-                    menu_etiqueta.style.transformOrigin = 'left top';
-                    menu_etiqueta.style.opacity = '1';
-                    menu_etiqueta.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
-                    menu_etiqueta.style.transform = 'scale(0)';
-                    menu_etiqueta.style.opacity = '0';
-                    setTimeout(function() {
-                        menu_etiqueta.classList.add('hidden');
-                    }, 300);
-                }
-            });
-        </script>
 
     </body>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js">
@@ -763,7 +468,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.9.4/dayjs.min.js" integrity="sha512-XZSHSEFj4QeE0G4pwy4tToyAhF2VXoEcF9CP0t1PSZMP2XHhEEB9PjM9knsdzcEKbi6GRMazdt8tJadz0JTKIQ==" crossorigin="anonymous"></script>
-    <script src="../../js/dinamic/gestion-clientes-as.js"></script>
+    <script src="../../js/dinamic/gestion-clientes-a-papelera.js"></script>
 
     </html>
 <?php } ?>
