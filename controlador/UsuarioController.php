@@ -448,6 +448,17 @@ if ($_POST["funcion"] == "buscar_asesor_cliente") {
         echo $jsonstring;
     }
 }
+if ($_POST["funcion"] == "buscar_asesores") {
+    $json = array();
+    $usuario->buscar_asesores($id_usuario);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+        $jsonstring = json_encode($usuario->datos);
+        echo $jsonstring;
+    }
+}
 if ($_POST["funcion"] == "buscar_visitas_date") {
     $fecha_inicio = $_POST["fecha_inicio"];
     $fecha_fin = $_POST["fecha_fin"];

@@ -513,6 +513,25 @@ class Usuario
             return $this->mensaje;
         }
     }
+    function buscar_asesores($id_usuario)
+    {
+        try {
+            # code...
+            $sql = "SELECT * FROM usuario WHERE createdBy=:id_usuario";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":id_usuario" => $id_usuario));
+            $this->datos = $query->fetchAll(); // retorna objetos o no
+            if (!empty($this->datos)) {
+                return $this->datos;
+            } else {
+                $this->mensaje = "no-register";
+                return $this->mensaje;
+            }
+        } catch (\Throwable $error) {
+            $this->mensaje = $error;
+            return $this->mensaje;
+        }
+    }
     function buscar_asesor_cliente($id_usuario)
     {
         try {

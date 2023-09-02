@@ -1,8 +1,12 @@
 $(document).ready(function () {
   var funcion = "";
   var clientesList;
+  var asesoresList;
   var idCliente;
   var proyectosList;
+  var selectedCount = 0;
+  // lista de clientes seleccionados
+  var selectClientes;
   buscar_clientes();
   var dataTable = $("#usuariosList").DataTable({
     select: true,
@@ -37,7 +41,7 @@ $(document).ready(function () {
     // ],
 
     columns: [
-      { data: null },
+      { data: "id" },
       // { data: "id" },
       { data: "nombres" },
       { data: "apellidos" },
@@ -82,8 +86,19 @@ $(document).ready(function () {
       },
     ],
     order: [],
-    columnDefs: [{ orderable: false, targets: 0 }],
-    columnDefs: [{ checkboxes: { selectRow: true }, targets: 0 }],
+    // columnDefs: [{ orderable: false, targets: 0 }],
+    // columnDefs: [{ checkboxes: { selectRow: true }, targets: 0 }],
+    columnDefs: [
+      {
+        targets: 0,
+        checkboxes: {
+          selectRow: true,
+        },
+      },
+    ],
+    select: {
+      style: "multi",
+    },
   });
 
   var datatablesAsesores = $("#proyectsAsigned").DataTable({
@@ -120,8 +135,42 @@ $(document).ready(function () {
     bLengthChange: false,
     dom: '<"top">ct<"top"p><"clear">',
   });
+  // busca a todos los asesores
+  fetchasesores();
+  function fetchasesores() {
+    let funcion = "buscar_asesores";
+    $.post(
+      "../../controlador/UsuarioController.php",
+      { funcion },
+      (response) => {
+        console.log(response);
+        if (response.trim() === "no-register") {
+          return;
+        } else {
+          const asesores = JSON.parse(response);
+          asesoresList = asesores;
+          pintar_results_asesores(asesoresList);
+        }
+      }
+    );
+  }
+  function pintar_results_asesores(asesores) {
+    let template = `<option value="" selected></option>`;
+    asesores.forEach((asesor) => {
+      let option = `<option value=${asesor.id_usuario}>${asesor.nombre} ${asesor.apellido}</option>`;
 
-  // buscar asesores
+      template += option;
+    });
+
+    $("#asesor-user-multi").html(template);
+    $("#asesor-user-multi").select2({
+      allowClear: true,
+      placeholder: "Selecciona un asesor",
+      data: [],
+    });
+  }
+
+  // buscar asesores con id cliente asignado
   function buscar_asesores(id_cliente) {
     return new Promise((resolve, reject) => {
       let funcion = "buscar_asesor_cliente";
@@ -433,7 +482,7 @@ $(document).ready(function () {
           const clientes = JSON.parse(response);
           clientesList = clientes;
           clientes.sort(compareDatesDesc);
-          dataTable.clear().rows.add(clientes).draw();
+          filtrarProyectos();
         }
       }
     );
@@ -461,7 +510,7 @@ $(document).ready(function () {
     const selected = $("#filter-selected").val();
     const nombreProyecto = $("#filter-proyecto").val();
     const nombreCliente = $("#cliente-search").val().toLowerCase();
-    console.log(nombreProyecto, nombreCliente);
+    console.log(nombreProyecto, nombreCliente, selected);
 
     const clientes = clientesList.filter((cliente) => {
       // si, asignado true
@@ -493,7 +542,37 @@ $(document).ready(function () {
       return true;
     });
 
-    dataTable.clear().rows.add(clientes).draw();
+    var estadoActual = {
+      page: dataTable.page(), // Página actual
+      scrollLeft: $("#usuariosList").parent().scrollLeft(), // Posición de scroll horizontal
+      bodyScroll: $("body").parent().scrollTop(),
+    };
+
+    // Limpiar la tabla (eliminar las filas sin nueva carga)
+
+    dataTable.clear().draw(false);
+
+    // Agregar las nuevas filas
+    dataTable.rows.add(clientes).draw(false);
+    // Restaurar el número de página previo
+    var pageInfo = dataTable.page.info();
+    var totalPaginas = pageInfo.pages;
+    console.log(totalPaginas);
+    if (estadoActual.page < totalPaginas) {
+      console.log(estadoActual.page);
+      dataTable.page(estadoActual.page);
+    } else {
+      dataTable.clear().draw();
+
+      // Agregar las nuevas filas
+      dataTable.rows.add(clientes).draw();
+      console.log(totalPaginas - 1);
+      dataTable.page(totalPaginas - 1);
+    }
+
+    // Restaurar la posición de scroll horizontal
+    $("#usuariosList").parent().scrollLeft(estadoActual.scrollLeft);
+    $("body").parent().scrollTop(estadoActual.bodyScroll);
   }
   // Función auxiliar para verificar si el nombre y apellido coinciden con el filtro
   function contienenombreCliente(cliente, nombreCliente) {
@@ -501,6 +580,147 @@ $(document).ready(function () {
       `${cliente.nombres} ${cliente.apellidos}`.toLowerCase();
     return nombreCompleto.includes(nombreCliente);
   }
+  // $("#usuariosList").on("click", ".dt-checkboxes", function () {
+  //   console.log("check no check");
+  //   if ($(this).prop("checked")) {
+  //     selectedCount++;
+  //   } else {
+  //     selectedCount--;
+  //   }
+
+  //   // Actualiza el conteo en el elemento HTML
+  //   $("#seleccionadosCount").text(selectedCount);
+  // });
+  // $("#menu-button-acciones").on("click", function () {
+  //   var rows_selected = dataTable.column(0).checkboxes.selected();
+  //   $.each(rows_selected, function (key, clienteId) {
+  //     console.log(clienteId);
+  //   });
+  // });
+  $(document).on("click", function () {
+    var $expandAcciones = $("#expand-acciones");
+    var $mostrarBoton = $("#menu-button-acciones");
+
+    // Verifica si el clic no ocurrió en el botón ni en el elemento
+    if (
+      !$mostrarBoton.is(event.target) &&
+      !$mostrarBoton.has(event.target).length &&
+      !$expandAcciones.is(event.target) &&
+      !$expandAcciones.has(event.target).length
+    ) {
+      // Si no tiene la clase "hidden", la agrega
+      if (!$expandAcciones.hasClass("hidden")) {
+        $mostrarBoton.attr("aria-expanded", "false");
+        menu_acciones.style.transformOrigin = "left top";
+        menu_acciones.style.opacity = "1";
+        menu_acciones.style.transition =
+          "transform 300ms ease-out, opacity 300ms ease-out";
+        menu_acciones.style.transform = "scale(0)";
+        menu_acciones.style.opacity = "0";
+        setTimeout(function () {
+          menu_acciones.classList.add("hidden");
+        }, 300);
+      }
+    }
+  });
+  button_acciones.addEventListener("click", function () {
+    let bolCount = 0;
+    var expanded =
+      button_acciones.getAttribute("aria-expanded") === "true" || false;
+    button_acciones.setAttribute("aria-expanded", !expanded);
+    var rows_selected = dataTable.column(0).checkboxes.selected();
+    // console.log(rows_selected.length);
+    let arrayClientes = [];
+    $.each(rows_selected, function (key, clienteId) {
+      const cliente = clientesList.find((e) => e.id === clienteId);
+      arrayClientes.push(cliente);
+      if (cliente.asignado_usuario !== "No asignado") {
+        bolCount = bolCount + 1;
+      }
+    });
+    selectClientes = arrayClientes;
+    console.log(bolCount);
+    if (bolCount > 0) {
+      $("#asigned_usuarios_actions").attr("active", "false");
+      $("#asigned_usuarios_actions").removeClass("cursor-pointer");
+      $("#asigned_usuarios_actions").removeClass("hover:bg-slate-200");
+      $("#asigned_usuarios_actions").removeClass("text-gray-700");
+      $("#asigned_usuarios_actions").addClass("text-gray-200");
+      $("#asigned_usuarios_actions").addClass("hover:bg-slate-100");
+    } else {
+      $("#asigned_usuarios_actions").attr("active", "true");
+      $("#asigned_usuarios_actions").addClass("cursor-pointer");
+      $("#asigned_usuarios_actions").addClass("hover:bg-slate-200");
+      $("#asigned_usuarios_actions").addClass("text-gray-700");
+      $("#asigned_usuarios_actions").removeClass("text-gray-200");
+      $("#asigned_usuarios_actions").removeClass("hover:bg-slate-100");
+    }
+
+    if (!expanded) {
+      menu_acciones.style.transformOrigin = "left top";
+      menu_acciones.style.transform = "scale(0)";
+      menu_acciones.style.opacity = "0";
+      setTimeout(function () {
+        menu_acciones.style.transition =
+          "transform 300ms ease-out, opacity 300ms ease-out";
+        menu_acciones.style.transform = "scale(1)";
+        menu_acciones.style.opacity = "1";
+      }, 0);
+      menu_acciones.classList.remove("hidden");
+    } else {
+      menu_acciones.style.transformOrigin = "left top";
+      menu_acciones.style.opacity = "1";
+      menu_acciones.style.transition =
+        "transform 300ms ease-out, opacity 300ms ease-out";
+      menu_acciones.style.transform = "scale(0)";
+      menu_acciones.style.opacity = "0";
+      setTimeout(function () {
+        menu_acciones.classList.add("hidden");
+      }, 300);
+    }
+  });
+  // asignar varios clientes a un asesor
+  $("#asigned_usuarios_actions").click(function () {
+    let active = $(this).attr("active");
+    console.log(active);
+    if (active === "true") {
+      var rows_selected = dataTable.column(0).checkboxes.selected();
+      if (rows_selected.length > 0) {
+        $("#asigned_asesores_multiclient").removeClass("md-hidden");
+        setTimeout(function () {
+          $("#asigned_asesores_multiclient .form-create").addClass(
+            "modal-show"
+          );
+        }, 10);
+      } else {
+        alert("aun no ha seleccionado ningun cliente");
+      }
+    } else {
+      alert("Algunos clientes cuentan con asignacion, revisar selecciones");
+    }
+  });
+  $("#asesor-asigned-multiclient").click(function () {
+    let funcion = "add_user_cliente";
+    let asesor = $("#asesor-user-multi").val();
+    console.log(asesor);
+    console.log(selectClientes);
+    selectClientes.forEach((cliente) => {
+      $.post(
+        "../../controlador/UsuarioController.php",
+        {
+          funcion,
+          asesor,
+          id: cliente.id,
+        },
+        (response) => {
+          console.log(response);
+        }
+      );
+    });
+    alert("Se asignaron todos los clientes");
+    buscar_clientes();
+  });
+  // fin de asignar varios clientes a un asesor
 
   function llenarFiltros() {
     let template = "";
@@ -708,19 +928,19 @@ $(document).ready(function () {
   });
 
   // FIN DE MODAL ASIGNES
-  $(".form-create .close-modal").click(() => {
+  $("#asigned_asesores .form-create .close-modal").click(() => {
     $("#tipo-documento-modal").val(0);
     $("#documento-modal").val("");
     $("#documento-modal").attr("disabled", "true");
     $("#nombres-modal").val("");
     $(".modal-create").addClass("md-hidden");
   });
+  // FIN DE MODAL multi ASIGNES
+  $("#asigned_asesores_multiclient .form-create .close-modal").click(() => {
+    $("#asesor-user-multi").val(null).trigger("change");
 
-  $("#cancel-form").click(() => {
-    $("#tipo-documento-modal").val(0);
-    $("#documento-modal").val("");
-    $("#nombres-modal").val("");
     $(".modal-create").addClass("md-hidden");
   });
+
   // fin de presentation modal
 });

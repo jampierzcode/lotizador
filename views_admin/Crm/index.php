@@ -323,6 +323,26 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
                     <!-- </form> -->
                 </div>
             </div>
+            <div id="asigned_asesores_multiclient" class="modal-create md-hidden">
+                <div class="form-create">
+                    <!-- <form id="form_producto_add"> -->
+                    <div class="close-modal">
+                        <ion-icon name="close-outline"></ion-icon>
+                    </div>
+                    <h1>Asignar a Asesores</h1>
+                    <div class="fileProyect">
+                        <p class="text-center w-full">Cliente: <span id="nombre_user"></span></p>
+                    </div>
+
+                    <div id="list-campos" style="display: flex; flex-direction: row; gap: 15px">
+                        <select name="asesor" id="asesor-user-multi" style="width: 100%" name="state">
+
+                        </select>
+                        <button id="asesor-asigned-multiclient" class="btn-add">Agregar</button>
+                    </div>
+                    <!-- </form> -->
+                </div>
+            </div>
 
             <div id="editar-lead" class="modal-create md-hidden">
                 <div class="form-create">
@@ -447,6 +467,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
                     <div>
                         <label for="default-search" class="mb-2 text-sm font-medium text-gray-900  dark:text-white">Proyectos</label>
                         <select id="filter-proyecto" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                            <option value="Todos">Todos</option>
                         </select>
                     </div>
                     <div>
@@ -475,7 +496,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
 
                         <div id="expand-acciones" class="absolute top-full left-0 z-10 mt-2 w-56 origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none hidden" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
                             <div class="py-1" role="none">
-                                <li id="modal-lead-group-asigned" class="flex items-center gap-2 cursor-pointer hover:bg-slate-200 text-gray-700 block px-4 py-2 text-sm" role="menuitem" tabindex="-1" id="menu-item-0"><ion-icon name="add-outline"></ion-icon> Asignar asesor</li>
+                                <li active="true" id="asigned_usuarios_actions" class="flex items-center gap-2 cursor-pointer hover:bg-slate-200 text-gray-700 block px-4 py-2 text-sm" role="menuitem" tabindex="-1" id="menu-item-0"><ion-icon name="add-outline"></ion-icon> Asignar asesor</li>
                                 <li id="modal-lead-group-archived" class="flex items-center gap-2 cursor-pointer hover:bg-slate-200 text-gray-700 block px-4 py-2 text-sm" role="menuitem" tabindex="-1" id="menu-item-0"> <ion-icon name="trash"></ion-icon> Archivar lead(s)</li>
 
 
@@ -588,31 +609,6 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
                         menu_acciones.style.opacity = '1';
                     }, 0);
                     menu.classList.remove('hidden');
-                } else {
-                    menu_acciones.style.transformOrigin = 'left top';
-                    menu_acciones.style.opacity = '1';
-                    menu_acciones.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
-                    menu_acciones.style.transform = 'scale(0)';
-                    menu_acciones.style.opacity = '0';
-                    setTimeout(function() {
-                        menu_acciones.classList.add('hidden');
-                    }, 300);
-                }
-            });
-            button_acciones.addEventListener('click', function() {
-                var expanded = button_acciones.getAttribute('aria-expanded') === 'true' || false;
-                button_acciones.setAttribute('aria-expanded', !expanded);
-
-                if (!expanded) {
-                    menu_acciones.style.transformOrigin = 'left top';
-                    menu_acciones.style.transform = 'scale(0)';
-                    menu_acciones.style.opacity = '0';
-                    setTimeout(function() {
-                        menu_acciones.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
-                        menu_acciones.style.transform = 'scale(1)';
-                        menu_acciones.style.opacity = '1';
-                    }, 0);
-                    menu_acciones.classList.remove('hidden');
                 } else {
                     menu_acciones.style.transformOrigin = 'left top';
                     menu_acciones.style.opacity = '1';
