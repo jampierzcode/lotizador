@@ -1040,6 +1040,40 @@ if ($_POST["funcion"] == "buscar_clientes_by_admin_papelera") {
         echo $jsonstring;
     }
 }
+if ($_POST["funcion"] == "buscar_clientes_by_asesor_papelera") {
+    $json = array();
+    $usuario->buscar_clientes_by_asesor_papelera($_SESSION["id_usuario"]);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+        foreach ($usuario->datos as $dato) {
+            $json[] = array(
+                'id' => $dato->id_cliente,
+                'nombres' => $dato->nombres,
+                'apellidos' => $dato->apellidos,
+                'documento' => $dato->documento,
+                'correo' => $dato->correo,
+                'celular' => $dato->celular,
+                'telefono' => $dato->telefono,
+                'status' => $dato->status,
+                'origen' => $dato->origen,
+                'ciudad' => $dato->ciudad,
+                // 'created_cliente' => $dato->created_cliente,
+                'campania' => $dato->campania,
+                'Pais' => $dato->pais,
+                'nombre_proyecto' => $dato->nombre_proyecto,
+                'id_task' => $dato->id_task,
+                'task_status' => $dato->task_status,
+                'fecha_visita' => $dato->fecha_visita,
+                'hora_visita' => $dato->hora_visita,
+                'etiquetas' => $dato->etiquetas,
+            );
+        }
+        $jsonstring = json_encode($json);
+        echo $jsonstring;
+    }
+}
 // funciones de seguimiento
 if ($_POST["funcion"] == "remove_etiqueta_lead") {
     $id_etiqueta = $_POST["id_etiqueta"];
@@ -1067,6 +1101,26 @@ if ($_POST["funcion"] == "buscar_historial_seguimiento") {
         foreach ($usuario->datos as $dato) {
             $json[] = array(
                 'observacion' => $dato->observacion,
+                'status' => $dato->status,
+                'fecha' => $dato->fecha_register,
+                'hora' => $dato->hora_register,
+            );
+        }
+        $jsonstring = json_encode($json);
+        echo $jsonstring;
+    }
+}
+if ($_POST["funcion"] == "buscar_historial_status") {
+    $user = $id_usuario;
+    $usuario->buscar_historial_status($user);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+        foreach ($usuario->datos as $dato) {
+            $json[] = array(
+                'observacion' => $dato->observacion,
+                'cliente_id' => $dato->cliente_id,
                 'status' => $dato->status,
                 'fecha' => $dato->fecha_register,
                 'hora' => $dato->hora_register,

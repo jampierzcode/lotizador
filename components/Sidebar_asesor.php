@@ -85,7 +85,7 @@ $links = [
                         </div>
                     </div>
                 </li>
-                <!-- <li class="links-menu-dashboard">
+                <li class="links-menu-dashboard">
                     <div class="link-block">
                         <div class="left-link">
                             <a class="toggle-drop <?php echo ($currentUrl === "target_user") ? ' active-link' : ''; ?>" href="../target_user">
@@ -94,7 +94,7 @@ $links = [
                             </a>
                         </div>
                     </div>
-                </li> -->
+                </li>
             <?php
             }
             ?>

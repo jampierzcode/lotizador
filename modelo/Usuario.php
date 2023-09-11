@@ -1158,6 +1158,25 @@ class Usuario
             return $this->mensaje;
         }
     }
+    function buscar_historial_status($user)
+    {
+        try {
+            # code...
+            $sql = "SELECT rc.* FROM registro_contact as rc join user_cliente as uc on rc.cliente_id=uc.cliente_id inner join cliente as c on rc.cliente_id=c.id_cliente WHERE uc.user_id=:id_user AND c.archived=0;";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":id_user" => $user));
+            $this->datos = $query->fetchAll(); // retorna objetos o no
+            if (!empty($this->datos)) {
+                return $this->datos;
+            } else {
+                $this->mensaje = "no-data";
+                return $this->mensaje;
+            }
+        } catch (\Throwable $error) {
+            $this->mensaje = $error;
+            return $this->mensaje;
+        }
+    }
     function add_permisos($id_usuario, $permisos)
     {
         foreach ($permisos as $permiso) {

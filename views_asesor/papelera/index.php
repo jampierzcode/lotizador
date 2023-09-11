@@ -421,7 +421,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                             <th>Nombres</th>
                             <th>Apellidos</th>
                             <th>Etiquetas</th>
-                            <th>Fecha Hora Creacion</th>
+                            <!-- <th>Fecha Hora Creacion</th> -->
                             <!-- <th>Correo</th> -->
                             <th>Celular</th>
                             <th>Telefono</th>

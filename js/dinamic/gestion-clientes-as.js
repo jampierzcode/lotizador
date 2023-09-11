@@ -5,6 +5,7 @@ $(document).ready(function () {
   var templateMsg;
   var idCliente;
   var proyectosList = [];
+  var clientesLastStatus;
   var dataTable = $("#usuariosList").DataTable({
     // scrollY: "160px",
     // scrollY: "500px",
@@ -281,6 +282,77 @@ $(document).ready(function () {
       },
     ],
   });
+  buscar_registros_status();
+  function buscar_registros_status() {
+    let funcion = "buscar_historial_status";
+    $.post(
+      "../../controlador/UsuarioController.php",
+      { funcion },
+      (response) => {
+        // console.log(response);
+        if (response.trim() !== "no-data") {
+          const clientes = JSON.parse(response);
+          const clientesAgroup = obtenerUltimoEstadoPorCliente(clientes);
+          clientesLastStatus = clientesAgroup;
+        }
+      }
+    );
+  }
+  function cambiarFormatoFecha(cadenaFecha) {
+    // Dividir la cadena en día, mes y año
+    const partes = cadenaFecha.split("/");
+    const dia = partes[0];
+    const mes = partes[1];
+    const año = partes[2];
+
+    // Crear una nueva cadena en el formato deseado (yyyy/mm/dd)
+    const nuevaCadenaFecha = `${año}/${mes}/${dia}`;
+
+    return nuevaCadenaFecha;
+  }
+  function obtenerUltimoEstadoPorCliente(registros) {
+    const clienteEstados = [];
+
+    registros.forEach((registro) => {
+      const clienteID = registro.cliente_id;
+      const fechaChange = cambiarFormatoFecha(registro.fecha);
+      const formatoPersonalizado = "DD/MM/YYYY HH:mm:ss";
+      const fechaRegistro = dayjs(`${fechaChange} ${registro.hora}`, {
+        format: formatoPersonalizado,
+      });
+      const estado = registro.status;
+
+      const clienteExistente = clienteEstados.find(
+        (cliente) => cliente.cliente_id === clienteID
+      );
+      if (clienteExistente) {
+        if (
+          fechaRegistro.isAfter(
+            dayjs(clienteExistente.fechaRegistro, {
+              format: formatoPersonalizado,
+            })
+          )
+        ) {
+          clienteEstados.splice(clienteEstados.indexOf(clienteExistente), 1);
+          const nuevoCliente = {
+            cliente_id: clienteID,
+            status: estado,
+            fechaRegistro: `${fechaChange} ${registro.hora}`,
+          };
+          clienteEstados.push(nuevoCliente);
+        }
+      } else {
+        const nuevoCliente = {
+          cliente_id: clienteID,
+          status: estado,
+          fechaRegistro: `${fechaChange} ${registro.hora}`,
+        };
+        clienteEstados.push(nuevoCliente);
+      }
+    });
+
+    return clienteEstados;
+  }
   // send plantilla
   buscar_plantillas_user();
   function buscar_plantillas_user() {
@@ -289,7 +361,6 @@ $(document).ready(function () {
       "../../controlador/UsuarioController.php",
       { funcion },
       (response) => {
-        console.log(response);
         let template = "";
         if (response.trim() === "no-register") {
           template += `<option value="0">No hay plantillas</option>`;
@@ -432,17 +503,16 @@ $(document).ready(function () {
     const endOfMonth = dayjs().endOf("month");
     dayjs().locale("es");
     const mesActual = dayjs().format("MMMM");
-    console.log(mesActual);
+    // console.log(mesActual);
     $("#mesNow").html(mesActual);
     const fecha_inicio = startOfMonth.format("YYYY-MM-DD"); // Primer día del mes en formato YYYY-MM-DD
     const fecha_fin = endOfMonth.format("YYYY-MM-DD");
-    console.log(fecha_inicio, fecha_fin);
+    // console.log(fecha_inicio, fecha_fin);
     let funcion = "buscar_resumen_eficiencia_usuario";
     $.post(
       "../../controlador/UsuarioController.php",
       { funcion, fecha_inicio, fecha_fin },
       (response) => {
-        console.log(response);
         let visitas;
         let separaciones;
         let ventas;
@@ -452,7 +522,6 @@ $(document).ready(function () {
           ventas = 0;
         } else {
           let resumen = JSON.parse(response);
-          console.log(resumen);
           visitas_concretadas = resumen[0].visitas_concretadas;
           separaciones = resumen[0].separaciones;
           ventas = resumen[0].ventas;
@@ -478,7 +547,6 @@ $(document).ready(function () {
           pendientes = 0;
         } else {
           const interaccion = JSON.parse(response);
-          console.log(interaccion);
           const pendientesList = interaccion.filter(
             (data) => data.status === "PENDIENTE"
           );
@@ -519,13 +587,11 @@ $(document).ready(function () {
       "../../controlador/UsuarioController.php",
       { funcion },
       (response) => {
-        console.log(response);
         $("#spin-load").html("");
         if (response.trim() === "no-register-clientes") {
           dataTable.clear().draw();
         } else {
           const clientes = JSON.parse(response);
-          console.log(clientes);
           clientesList = clientes;
           clientesList.sort(compareDatesDesc);
 
@@ -732,26 +798,22 @@ $(document).ready(function () {
     const nombreProyecto = $("#filter-proyecto").val();
     const nombreCliente = $("#cliente-search").val().toLowerCase();
     const nombreEtiqueta = $("#filter-etiqueta").val();
-    console.log(nombreProyecto, nombreCliente, nombreEtiqueta);
+    // console.log(nombreProyecto, nombreCliente, nombreEtiqueta);
 
     const clientes = clientesList.filter((cliente) => {
       let etiquetasList;
-      console.log(cliente.etiquetas);
       let etiquetas = JSON.parse(cliente.etiquetas);
       if (etiquetas === null) {
         etiquetasList = [];
       } else {
         etiquetasList = etiquetas[0].nombre.split(",");
       }
-      console.log(etiquetasList);
       let count = 0;
       etiquetasList.forEach((etiqueta) => {
         if (etiqueta === nombreEtiqueta) {
           count = count + 1;
         }
       });
-      console.log(count);
-      console.log(nombreEtiqueta);
       if (count === 0 && nombreEtiqueta !== "Todos") {
         return false;
       }
@@ -759,19 +821,16 @@ $(document).ready(function () {
         nombreProyecto !== "Todos" &&
         cliente.nombre_proyecto !== nombreProyecto
       ) {
-        console.log(cliente.nombre_proyecto);
         return false;
       }
       if (
         nombreCliente !== "" &&
         !contienenombreCliente(cliente, nombreCliente)
       ) {
-        console.log(nombreCliente);
         return false;
       }
       return true;
     });
-    console.log(clientes);
     var estadoActual = {
       page: dataTable.page(), // Página actual
       scrollLeft: $("#usuariosList").parent().scrollLeft(), // Posición de scroll horizontal
@@ -787,9 +846,9 @@ $(document).ready(function () {
     // Restaurar el número de página previo
     var pageInfo = dataTable.page.info();
     var totalPaginas = pageInfo.pages;
-    console.log(totalPaginas);
+    // console.log(totalPaginas);
     if (estadoActual.page < totalPaginas) {
-      console.log(estadoActual.page);
+      // console.log(estadoActual.page);
       dataTable.page(estadoActual.page);
     } else {
       dataTable.clear().draw();
@@ -805,17 +864,17 @@ $(document).ready(function () {
     $("body").parent().scrollTop(estadoActual.bodyScroll);
   }
   function filtrarPendientes() {
-    let fecha_inicio = dayjs(
-      $("#fecha-inicio-status").val(),
-      "DD/MM/YYYY"
-    ).format("YYYY-MM-DD");
-    let fecha_fin = dayjs($("#fecha-fin-status").val(), "DD/MM/YYYY").format(
-      "YYYY-MM-DD"
-    );
+    let fecha_inicio = dayjs($("#fecha-inicio-status").val() + " 23:59:00");
+    let fecha_fin = dayjs($("#fecha-fin-status").val() + " 23:59:00");
     let status = $("#filter-status").val();
     console.log(fecha_inicio, fecha_fin, status);
-    // if (fecha_inicio !== "Invalid Date" && fecha_fin !== "Invalid Date") {
-    const clientes = clientesList.filter((cliente) => {
+    // if (
+    //   fecha_inicio.format("YYYY/MM/DD") !== "Invalid Date" &&
+    //   fecha_fin.format("YYYY/MM/DD") !== "Invalid Date"
+    // ) {
+    const clientes = clientesLastStatus.filter((cliente) => {
+      // const fechaRegistro = dayjs(`${cliente.fechaRegistro}`);
+      console.log(cliente);
       // console.log(cliente);
       // if (
       //   nombreProyecto !== "Todos" &&
@@ -827,21 +886,42 @@ $(document).ready(function () {
       if (status !== "Todas" && status !== cliente.status) {
         return false;
       }
-      if (fecha_inicio !== "Invalid Date" && fecha_fin !== "Invalid Date") {
+      if (
+        fecha_inicio.format("YYYY/MM/DD") !== "Invalid Date" &&
+        fecha_fin.format("YYYY/MM/DD") !== "Invalid Date"
+      ) {
+        console.log(dayjs(cliente.fechaRegistro, "YYYY/MM/DD"));
+        console.log(
+          dayjs(cliente.fechaRegistro, "YYYY/MM/DD").isAfter(fecha_fin)
+        );
+        console.log(
+          dayjs(cliente.fechaRegistro, "YYYY/MM/DD").isBefore(fecha_inicio)
+        );
+
         if (
-          dayjs(cliente.fecha_visita).isAfter(fecha_fin) ||
-          dayjs(cliente.fecha_visita).isBefore(fecha_inicio)
+          !dayjs(cliente.fechaRegistro, "YYYY/MM/DD").isSame(fecha_fin) ||
+          !dayjs(cliente.fechaRegistro, "YYYY/MM/DD").isSame(fecha_inicio)
         ) {
-          console.log("entro");
-          return false;
+          if (
+            dayjs(cliente.fechaRegistro, "YYYY/MM/DD").isAfter(fecha_fin) ||
+            dayjs(cliente.fechaRegistro, "YYYY/MM/DD").isBefore(fecha_inicio)
+          ) {
+            return false;
+          }
         }
       }
 
       return true;
     });
-    console.log(clientes);
+    const clientesNuevos = [];
+    clientes.map((cliente, index) => {
+      const result = clientesList.find((c) => c.id === cliente.cliente_id);
+      clientesNuevos.push(result);
+    });
 
-    dataTable.clear().rows.add(clientes).draw();
+    console.log(clientesNuevos);
+
+    dataTable.clear().rows.add(clientesNuevos).draw();
     // }
   }
 
@@ -867,8 +947,9 @@ $(document).ready(function () {
     $("#cliente-search").val("");
     $("#filter-proyecto").val("Todos");
     $("#filter-etiqueta").val("Todos");
-    $("#fecha-inicio-pendients").val(null);
-    $("#fecha-fin-pendients").val(null);
+    $("#fecha-inicio-status").val(null);
+    $("#fecha-fin-status").val(null);
+    $("#filter-status").val("Todas");
     dataTable.clear().rows.add(clientesList).draw();
   });
 
@@ -1300,7 +1381,7 @@ $(document).ready(function () {
       "../../controlador/UsuarioController.php",
       { funcion },
       (response) => {
-        console.log(response);
+        // console.log(response);
         if (response !== "") {
           const etiquetas = JSON.parse(response);
           let template = `<option value="Todos">Todos</option>`;

@@ -564,6 +564,8 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                         <select id="filter-status" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                             <option value="Todas" selected>Todas</option>
                             <option value="VISITA">VISITA</option>
+                            <option value="CONTACTADO">CONTACTADO</option>
+                            <option value="NO CONTACTADO">NO CONTACTADO</option>
                             <option value="ASISTIO">ASISTIO</option>
                             <option value="NO ASISTIO">NO ASISTIO</option>
                             <option value="NO INTERESADO">NO INTERESADO</option>
@@ -762,7 +764,9 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
 
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.9.4/dayjs.min.js" integrity="sha512-XZSHSEFj4QeE0G4pwy4tToyAhF2VXoEcF9CP0t1PSZMP2XHhEEB9PjM9knsdzcEKbi6GRMazdt8tJadz0JTKIQ==" crossorigin="anonymous"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.9.4/dayjs.min.js" integrity="sha512-XZSHSEFj4QeE0G4pwy4tToyAhF2VXoEcF9CP0t1PSZMP2XHhEEB9PjM9knsdzcEKbi6GRMazdt8tJadz0JTKIQ==" crossorigin="anonymous"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+
     <script src="../../js/dinamic/gestion-clientes-as.js"></script>
 
     </html>
