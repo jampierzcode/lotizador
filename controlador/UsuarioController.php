@@ -970,6 +970,25 @@ if ($_POST["funcion"] == "register_visita_agenda") {
     $usuario->register_visita_agenda($id_task, $cliente, $status);
     echo $usuario->mensaje;
 }
+// target user
+if ($_POST["funcion"] == "buscar_user_target") {
+    $json = array();
+    $usuario->buscar_user_target($_SESSION["id_usuario"]);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+
+        $jsonstring = json_encode($usuario->datos);
+        echo $jsonstring;
+    }
+}
+if ($_POST["funcion"] == "update_user_target") {
+    $json = array();
+    $data = json_decode($_POST["data"]);
+    $usuario->update_user_target($data, $id_usuario);
+    echo $usuario->mensaje;
+}
 if ($_POST["funcion"] == "buscar_clientes_by_asesor") {
     $json = array();
     $usuario->buscar_clientes_by_asesor($_SESSION["id_usuario"]);

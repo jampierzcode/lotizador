@@ -1384,6 +1384,55 @@ class Usuario
             return $this->mensaje;
         }
     }
+    // target user
+    function buscar_user_target($id_usuario)
+    {
+        try {
+            $sql = "SELECT * FROM target_user WHERE user_id=:id_usuario
+            ";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":id_usuario" => $id_usuario));
+            $this->datos = $query->fetchAll(); // retorna objetos o no
+            if (!empty($this->datos)) {
+                return $this->datos;
+            } else {
+                $this->mensaje = "no-register-target";
+                return $this->mensaje;
+            }
+        } catch (\Throwable $error) {
+            $this->mensaje = "fatal_error " + $error;
+            return $this->mensaje;
+            //throw $th;
+        }
+    }
+    function update_user_target($data, $id_usuario)
+    {
+        try {
+            // consultar existencia
+            $sql = "SELECT * FROM target_user WHERE user_id=:id_usuario
+            ";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":id_usuario" => $id_usuario));
+            $this->datos = $query->fetchAll(); // retorna objetos o no
+            if (!empty($this->datos)) {
+                $sql = "UPDATE target_user SET picture_perfil=:picture, cover_photo=:cover, name_user=:name, job=:job, custom_description=:custom WHERE user_id=:id_usuario
+            ";
+                $query = $this->conexion->prepare($sql);
+                $query->execute(array(":picture" => $data->picture_perfil, ":cover" => $data->cover_photo, ":name" => $data->name_user, ":job" => $data->job, ":custom" => $data->custom_description, ":id_usuario" => $id_usuario));
+            } else {
+                $sql = "INSERT INTO target_user (user_id, name_user, job, custom_description) VALUES (:id_usuario, :name, :job, :custom)
+            ";
+                $query = $this->conexion->prepare($sql);
+                $query->execute(array(":name" => $data->name_user, ":job" => $data->job, ":custom" => $data->custom_description, ":id_usuario" => $id_usuario));
+            }
+
+            $this->mensaje = "update-sucess";
+        } catch (\Throwable $error) {
+            $this->mensaje = "fatal_error " + $error;
+            return $this->mensaje;
+            //throw $th;
+        }
+    }
     function buscar_clientes_by_asesor($id_usuario)
     {
         try {

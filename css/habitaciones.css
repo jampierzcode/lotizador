@@ -130,7 +130,7 @@
 tr {
   width: 100%;
   border-bottom: 1px solid #ececec;
-  /* white-space: nowrap; */
+  white-space: nowrap;
 }
 .remove-btn {
   background: #d24444;
@@ -190,7 +190,7 @@ table th,
 table td {
   padding: 80px 12px;
   text-align: start;
-  font-size: 13px !important;
+  font-size: 11px !important;
 }
 
 /* list caracteristicas */

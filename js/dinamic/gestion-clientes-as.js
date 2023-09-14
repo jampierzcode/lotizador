@@ -10,7 +10,7 @@ $(document).ready(function () {
     // scrollY: "160px",
     // scrollY: "500px",
     // ordering: false,
-    stateSave: true,
+    // stateSave: true,
     lengthMenu: [5, 10, 25, 50],
     language: {
       lengthMenu: "Mostrar _MENU_ registros por página",
@@ -28,12 +28,12 @@ $(document).ready(function () {
     },
     pageLength: 5,
     scrollX: true,
-    // scrollCollapse: true,
+    scrollCollapse: true,
     // paging: false,
-    fixedColumns: {
-      leftColumns: 2, //Le indico que deje fijas solo las 2 primeras columnas
-      // rightColumns: 1,
-    },
+    // fixedColumns: {
+    //   leftColumns: 2, //Le indico que deje fijas solo las 2 primeras columnas
+    //   // rightColumns: 1,
+    // },
     // aoColumnDefs: [
     //   {
     //     bSortable: false,
@@ -177,7 +177,7 @@ $(document).ready(function () {
       {
         data: null,
         render: function (data) {
-          return `<button id="open-plantilla" keyClient="${data.id}" class="p-2 rounded-md flex wwhitespace-nowrap text-sm bg-green-500 text-white">
+          return `<button id="open-plantilla" keyClient="${data.id}" class="p-2 rounded-md flex whitespace-nowrap text-sm bg-green-500 text-white">
               Enviar msg
             </button>`;
         },
@@ -198,10 +198,6 @@ $(document).ready(function () {
         },
       },
     ],
-    // columnDefs: [{ type: "date-dd-mm-yyyy", aTargets: [5] }],
-    // order: false,
-    // bLengthChange: false,
-    // dom: '<"top">ct<"top"p><"clear">',
   });
   var dataTableEtiquetas = $("#etiquetasList").DataTable({
     // scrollY: "160px",

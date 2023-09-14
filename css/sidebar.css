@@ -2,7 +2,7 @@
   z-index: 2000;
   padding: 0px;
   position: fixed;
-  width: 250px;
+  width: 200px;
   bottom: 0;
   left: 0px;
   top: 0px;
@@ -237,12 +237,13 @@
 }
 .link-block > .left-link > a > p {
   margin: 0px !important;
+  font-size: 12px;
 }
 .link-block > .left-link > a > ion-icon,
 .link-block > .left-link > a > i {
   text-align: center;
-  min-width: 55px;
-  font-size: 20px;
+  min-width: 40px;
+  font-size: 18px;
   transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
 }
 .link-block > .right-link > svg {

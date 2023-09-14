@@ -85,16 +85,16 @@ $links = [
                         </div>
                     </div>
                 </li>
-                <li class="links-menu-dashboard">
+                <!-- <li class="links-menu-dashboard">
                     <div class="link-block">
                         <div class="left-link">
-                            <a class="toggle-drop <?php echo ($currentUrl === "target_user") ? ' active-link' : ''; ?>" href="../target_user">
+                            <a class="toggle-drop <?php echo ($currentUrl === "target_user" || $currentUrl === "about.php") ? ' active-link' : ''; ?>" href="../target_user">
                                 <ion-icon name="id-card"></ion-icon>
                                 <p>Tarjeta Asesor</p>
                             </a>
                         </div>
                     </div>
-                </li>
+                </li> -->
             <?php
             }
             ?>

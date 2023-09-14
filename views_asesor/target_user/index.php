@@ -75,29 +75,29 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                 > Home > Target User
             </span>
             <div class="w-full">
+
                 <div class="flex flex-wrap md:flex-nowrap">
-                    <div class="border-r-[2px] border-gray-300 grow w-full bg-white p-6 md:w-[500px] shadow-md space-y-4">
+                    <div class="w-full md:w-[200px] flex flex-wrap md:flex-nowrap bg-white border-r-[2px] border-gray-100">
+                        <div class="p-3">
+                            <ul class="flex md:flex-col gap-1">
+                                <li class="w-full">
+                                    <a class="page-target actived w-full inline-block p-4 rounded-xl hover:bg-gray-200 ease-out duration-300 flex items-center gap-3 text-[12px]" href="../target_user/">
+                                        <ion-icon name="apps-outline"></ion-icon>
+                                        Contenido
+                                    </a>
+                                </li>
+                                <li class="w-full">
+                                    <a class="page-target w-full inline-block p-4 rounded-xl hover:bg-gray-200 ease-out duration-300 flex items-center gap-3 text-[12px]" href="about.php">
+                                        <ion-icon name="person-outline"></ion-icon>
+                                        Sobre mi
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="border-r-[2px] border-gray-100 grow w-full bg-white p-6 md:w-[500px] shadow-md space-y-4">
 
-                        <h1 class="text-sm text-black font-bold">Nombre del usuario</h1>
-                        <input id="name-message" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-200 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Escribe tu nombre"></input>
-                        <h1 class="text-sm text-black font-bold">Ocupacion</h1>
-                        <input id="name-message" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-200 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Escribe la ocupacion primaria"></input>
-                        <h1 class="text-sm text-black font-bold">Custom description</h1>
-
-                        <!-- <div class="flex items-center gap-2 w-full">
-                            <div class="relative">
-                                <div id="emojiSelectorIcon" class="rounded-full w-[30px] h-[30px] flex items-center justify-center p-1 cursor-pointer bg-green-600">😀</div>
-                                <div style="left: calc(100% + 10px); z-index: 2000" id="emojiSelector" class="hidden absolute w-[325px] top-1/2 -translate-y-1/2 p-6 bg-white shadow-xl">
-                                    <input id="emojiSearch" rows="4" class="block p-2 mb-4 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Escribe el nombre de tu plantilla"></input>
-                                    <ul id="emojiList" class="emoji-list h-[150px] overflow-y-auto">
-                                        
-                                        </ul>
-                                        
-                                    </div>
-                                </div>
-                                <p class="text-gray-500 text-sm">Add emoji</p>
-                            </div> -->
-                        <textarea id="message-plantilla" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-200 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Escribe el mensaje de tu plantilla"></textarea>
+                        <!-- links -->
                         <h1 class="text-sm text-black font-bold">redes sociales</h1>
 
                         <ul class="sortable-list">
@@ -132,7 +132,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                                     <span class="text-sm">Email</span>
                                 </div>
                                 <div class="boton-encend">
-                                    <input checked type="checkbox" class="btnchecklink" id="btn-email">
+                                    <input type="checkbox" class="btnchecklink" id="btn-email">
                                     <label for="btn-email" class="lbl-switch"></label>
                                 </div>
                             </li>
@@ -167,7 +167,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                                     <span class="text-sm">Facebook</span>
                                 </div>
                                 <div class="boton-encend">
-                                    <input checked type="checkbox" class="btnchecklink" id="btn-facebook">
+                                    <input type="checkbox" class="btnchecklink" id="btn-facebook">
                                     <label for="btn-facebook" class="lbl-switch"></label>
                                 </div>
                             </li>
@@ -206,7 +206,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                                     <span class="text-sm">Instagram</span>
                                 </div>
                                 <div class="boton-encend">
-                                    <input checked type="checkbox" class="btnchecklink" id="btn-insta">
+                                    <input type="checkbox" class="btnchecklink" id="btn-insta">
                                     <label for="btn-insta" class="lbl-switch"></label>
                                 </div>
                             </li>
@@ -240,7 +240,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                                     <span class="text-sm">Celular/Whatsapp</span>
                                 </div>
                                 <div class="boton-encend">
-                                    <input checked type="checkbox" class="btnchecklink" id="btn-whatsapp">
+                                    <input type="checkbox" class="btnchecklink" id="btn-whatsapp">
                                     <label for="btn-whatsapp" class="lbl-switch"></label>
                                 </div>
                             </li>
@@ -270,13 +270,16 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                                     <span class="text-sm">TikTok</span>
                                 </div>
                                 <div class="boton-encend">
-                                    <input checked type="checkbox" class="btnchecklink" id="btn-switch">
+                                    <input type="checkbox" class="btnchecklink" id="btn-switch">
                                     <label for="btn-switch" class="lbl-switch"></label>
                                 </div>
                             </li>
 
                         </ul>
-                        <button id="created-submit-msj" class="p-2 rounded-xl w-full text-white bg-blue-500 hover:bg-blue-800">Crear</button>
+                        <div class="flex items-center gap-4 justify-end">
+                            <button disabled class="rounded-full text-[12px] px-5 py-2 border-gray-300 border-solid border-2 text-gray-300 bg-white ">Cancelar</button>
+                            <button disabled class="rounded-full text-[12px] px-5 py-2 text-gray-500 bg-gray-300 ">Actualizar</button>
+                        </div>
                     </div>
                     <div class="grow w-full bg-white p-6 justify-center flex md:max-w-[400px] shadow-md">
                         <div class="card-movil">
@@ -457,7 +460,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.9.4/dayjs.min.js" integrity="sha512-XZSHSEFj4QeE0G4pwy4tToyAhF2VXoEcF9CP0t1PSZMP2XHhEEB9PjM9knsdzcEKbi6GRMazdt8tJadz0JTKIQ==" crossorigin="anonymous"></script>
     <!-- <script src="../../js/dinamic/gestion-clientes-as.js"></script> -->
     <!-- <script src="../../js/dinamic/emojiapp.js"></script> -->
-    <script src="../../js/dinamic/gestion-plantilla.js" defer></script>
+    <script src="../../js/dinamic/gestion-target.js" defer></script>
 
     </html>
 <?php } ?>

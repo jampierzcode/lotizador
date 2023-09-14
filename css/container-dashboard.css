@@ -1,5 +1,5 @@
 .container-dashboard {
-  margin-left: 250px;
+  margin-left: 200px;
   background: #f5f7fb;
   padding: 110px 60px 40px 60px;
   min-height: calc(100vh);
@@ -231,7 +231,7 @@ a {
 .route {
   display: block;
   text-align: start;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
   color: #000;
   margin-bottom: 30px;

@@ -1,5 +1,13 @@
 /* boton encend */
 
+/* sidebar active */
+.page-target.actived {
+  background: #e9e4ff;
+  color: #310ecd;
+  font-weight: 600;
+}
+
+/* ------------------ */
 .lbl-switch {
   display: inline-block;
   width: 55px;
