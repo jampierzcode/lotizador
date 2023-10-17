@@ -13,6 +13,32 @@
   width: 0px;
   height: 0px;
 }
+/* scrooll css */
+/* Estilo de la barra de desplazamiento vertical */
+.jss791::-webkit-scrollbar {
+  width: 12px; /* Ancho de la barra de desplazamiento, ajusta según tus necesidades */
+}
+
+.jss791::-webkit-scrollbar-track {
+  background: #ececec; /* Color del fondo de la barra de desplazamiento */
+  border-radius: 10px; /* Bordes redondeados */
+}
+
+.jss791::-webkit-scrollbar-thumb {
+  background: #ababab; /* Color de la barra de desplazamiento */
+  border-radius: 10px; /* Bordes redondeados */
+  transition: all 0.8s;
+}
+.jss791::-webkit-scrollbar-thumb:hover {
+  background: #787878; /* Color de la barra de desplazamiento */
+  border-radius: 10px; /* Bordes redondeados */
+}
+
+/* Estilo de la barra de desplazamiento horizontal (si es necesario) */
+.jss791::-webkit-scrollbar-thumb:horizontal {
+  background: #999; /* Color de la barra de desplazamiento horizontal */
+}
+/* scrooll css */
 .text-icon-target {
   width: 90%;
   overflow: hidden;

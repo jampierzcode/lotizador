@@ -100,6 +100,25 @@ $(document).ready(function () {
     $(".main-file").removeClass("md-hidden");
     $(".container-asignedTables").addClass("md-hidden");
   });
+  // Crear una función que realizará la solicitud post y devolverá una promesa
+  function performPostRequest(result, funcion, proyecto_id) {
+    return new Promise((resolve, reject) => {
+      $.post(
+        "../../controlador/UsuarioController.php",
+        { funcion, result, proyecto_id },
+        (response) => {
+          console.log(response);
+
+          if (data.hasOwnProperty("error")) {
+            // Si la respuesta contiene un mensaje de error, muestra el mensaje
+            reject(data.error);
+          } else {
+            resolve(data);
+          }
+        }
+      );
+    });
+  }
   $("body").on("click", "#subirData", function () {
     const asignaciones = [];
     const proyecto_id = $("#listMyProyects").val();
@@ -137,38 +156,40 @@ $(document).ready(function () {
       const obj = { ...camposPredefinidos };
       asignaciones.forEach((asignacion) => {
         const { position, key, value } = asignacion;
-        obj[value] = registro[position];
+        obj[value] =
+          registro[position] === null || registro[position] === ""
+            ? ""
+            : registro[position];
       });
       return obj;
     });
     console.log(asignaciones);
+    console.log(resultado);
     console.log(contadorAsignacion);
     if (asignaciones.length === contadorAsignacion) {
       if (proyecto_id !== "0") {
-        let funcion = "add_cliente";
-        resultado.forEach((result, index) => {
-          $.post(
-            "../../controlador/UsuarioController.php",
-            { funcion, result, proyecto_id },
-            (response) => {
-              const data = JSON.parse(response);
-              console.log(data);
+        let funcion = "add_cliente2"; // Cambiamos la función a "add_clientes"
+        // const dataToInsert = []; // Array para almacenar los datos a insertar
 
-              if (data.hasOwnProperty("error")) {
-                // Si la respuesta contiene un mensaje de error, muestra el mensaje
-                alert(data.error);
-              }
-            }
-          );
-        });
-        alert("Se subieron correctamente todos los datos");
-        var urlActual = window.location.href;
-
-        // Eliminar la última parte de la URL (la carpeta actual)
-        var urlPadre = urlActual.substring(0, urlActual.lastIndexOf("/"));
-        console.log(urlPadre);
-        // Redireccionar a la carpeta anterior
-        window.location.href = urlPadre;
+        // Llenar el array de datos a insertar
+        // resultado.forEach((result) => {
+        //   dataToInsert.push(result);
+        // });
+        const jsonData = JSON.stringify(resultado);
+        console.log(jsonData);
+        // Realizar una única solicitud con todos los datos
+        performPostRequest(jsonData, funcion, proyecto_id)
+          .then((response) => {
+            console.log(response);
+            alert("Se subieron correctamente todos los datos");
+            var urlActual = window.location.href;
+            var urlPadre = urlActual.substring(0, urlActual.lastIndexOf("/"));
+            console.log(urlPadre);
+            window.location.href = urlPadre;
+          })
+          .catch((error) => {
+            alert("Se produjo un error: " + error);
+          });
       } else {
         alert("Debes seleccionar un proyecto a donde asignar los clientes");
       }

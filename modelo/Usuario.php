@@ -944,6 +944,52 @@ class Usuario
             return $this->mensaje;
         }
     }
+    function add_cliente2($data, $proyect_id, $created_by)
+    {
+        try {
+            $sql = "INSERT INTO cliente(nombres, apellidos, documento, correo, celular, telefono, Pais, createdBy, origen, campania, ciudad, proyet_id, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $stmt = $this->conexion->prepare($sql);
+
+            if ($stmt === false) {
+                throw new Exception("Error en la preparación de la consulta: " . implode(", ", $this->conexion->errorInfo()));
+            }
+
+            foreach ($data as $cliente) {
+                $values = array(
+                    $cliente->nombre,
+                    $cliente->apellido,
+                    $cliente->documento,
+                    $cliente->correo,
+                    $cliente->celular,
+                    $cliente->telefono,
+                    $cliente->Pais,
+                    $created_by,
+                    $cliente->origen,
+                    $cliente->campaña,
+                    $cliente->ciudad,
+                    $proyect_id,
+                    "NO CONTACTADO"
+                );
+
+                if (!$stmt->execute($values)) {
+                    throw new Exception("Error al insertar cliente: " . implode(", ", $stmt->errorInfo()));
+                }
+            }
+
+            $response = array("message" => "Se insertaron correctamente los clientes");
+            $this->mensaje = $response;
+        } catch (Exception $error) {
+            $response = array("error" => $error->getMessage());
+            $this->mensaje = $response;
+        }
+    }
+
+
+
+
+
+
+
     function add_cliente($resultado, $proyect_id, $created_by)
     {
         $dato = $resultado;
@@ -1433,6 +1479,74 @@ class Usuario
             //throw $th;
         }
     }
+    function update_img_proyect($id, $ruta)
+    {
+        try {
+            $sql = "UPDATE proyectos SET logo=:logo WHERE id=:id
+            ";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":id" => $id, ":logo" => $ruta));
+
+            $this->mensaje = "update-sucess";
+            return $this->mensaje;
+        } catch (\Throwable $error) {
+            $this->mensaje = "fatal_error " + $error;
+            return $this->mensaje;
+            //throw $th;
+        }
+    }
+    function subirimagenesgallery($id, $galeria)
+    {
+        try {
+            $sql = "INSERT INTO multimedia(url, type, proyecto_id) VALUES (:url, :type, :id)";
+            $query = $this->conexion->prepare($sql);
+            foreach ($galeria as $ga) {
+                # code...
+                $query->execute(array(":id" => $id, ":url" => $ga, ":type" => "imagen"));
+            }
+
+            $this->mensaje = "create-sucess";
+            return $this->mensaje;
+        } catch (\Throwable $error) {
+            $this->mensaje = "fatal_error " + $error;
+            return $this->mensaje;
+            //throw $th;
+        }
+    }
+    function multimedia_proyecto($id)
+    {
+        $resultado = array(); // Crear un arreglo para almacenar los resultados
+
+        // Consulta preparada para obtener el logo del proyecto
+        $sql_logo = "SELECT logo FROM proyectos WHERE id = :id";
+        $query_logo = $this->conexion->prepare($sql_logo);
+        $query_logo->execute(array(":id" => $id));
+        $logo = $query_logo->fetch(PDO::FETCH_ASSOC);
+
+        // Agregar el logo al resultado si existe
+        if (!empty($logo['logo'])) {
+            $resultado['logo'] = $logo['logo'];
+        } else {
+            $resultado['logo'] = "";
+        }
+
+        // Consulta preparada para obtener el contenido multimedia (selecciona todos los campos con *)
+        $sql_multimedia = "SELECT * FROM multimedia WHERE proyecto_id = :id";
+        $query_multimedia = $this->conexion->prepare($sql_multimedia);
+        $query_multimedia->execute(array(":id" => $id));
+        $multimedia = $query_multimedia->fetchAll(PDO::FETCH_ASSOC);
+
+        // Agregar la multimedia al resultado si existe
+        if (!empty($multimedia)) {
+            $resultado['multimedia'] = $multimedia;
+        } else {
+            $resultado['multimedia'] = [];
+        }
+
+        // Devolver el resultado como JSON
+        return json_encode($resultado);
+    }
+
     function buscar_clientes_by_asesor($id_usuario)
     {
         try {

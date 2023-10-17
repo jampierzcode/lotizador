@@ -313,9 +313,15 @@ $(document).ready(function () {
           if (stateNewDAtaTarget.picture_perfil === "") {
             // eliminar mi image
             console.log("eliminar imagen perfil");
+            profilePromise = eliminarImagenes(dataTargetUser.picture_perfil);
           } else {
             // actualizo la imagen
             console.log("actualizar imagen perfil");
+
+            profilePromise = updateImagenes(
+              dataTargetUser.picture_perfil,
+              profileFile
+            );
           }
         }
       }
@@ -327,9 +333,14 @@ $(document).ready(function () {
         } else {
           if (stateNewDAtaTarget.cover_photo === "") {
             // eliminar mi image
+            coverPhotoPromise = eliminarImagenes(dataTargetUser.cover_photo);
             console.log("eliminar imagen portada");
           } else {
             // actualizo la imagen
+            coverPhotoPromise = updateImagenes(
+              dataTargetUser.cover_photo,
+              portadaFile
+            );
             console.log("actualizar imagen portada");
           }
         }
@@ -350,16 +361,36 @@ $(document).ready(function () {
 
       if (profilePromise !== null) {
         promisesToWaitFor.push(
-          profilePromise.then((galeria) => {
-            newData.picture_perfil = galeria;
+          profilePromise.then((response) => {
+            console.log(response);
+            if (response === "delete-sucess") {
+              newData.picture_perfil = "";
+            } else {
+              if (response === "no-existe") {
+                console.log("la imagen no existe");
+              }
+              if (response !== "no-existe") {
+                newData.picture_perfil = response;
+              }
+            }
           })
         );
       }
 
       if (coverPhotoPromise !== null) {
         promisesToWaitFor.push(
-          coverPhotoPromise.then((galeria) => {
-            newData.cover_photo = galeria;
+          coverPhotoPromise.then((response) => {
+            console.log(response);
+            if (response === "delete-sucess") {
+              newData.cover_photo = "";
+            } else {
+              if (response === "no-existe") {
+                console.log("la imagen no existe");
+              }
+              if (response !== "no-existe") {
+                newData.cover_photo = response;
+              }
+            }
           })
         );
       }
@@ -442,6 +473,32 @@ $(document).ready(function () {
       });
     });
   }
+  // funcion de update imagnes
+  function updateImagenes(route, file) {
+    return new Promise((resolve, reject) => {
+      const funcion = "update_image";
+      const formData = new FormData();
+      formData.append("funcion", funcion);
+      formData.append("route", route);
+      formData.append("targetimagenupdate", file);
+
+      $.ajax({
+        url: "../../controlador/subirimagenes.php",
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (response) {
+          resolve(response);
+        },
+        error: function (error) {
+          reject("Error al guardar las imágenes");
+        },
+      });
+    });
+  }
+
+  // funcion eliminar imagenes
   function eliminarImagenes(route) {
     return new Promise((resolve, reject) => {
       let funcion = "delete_image";
@@ -454,4 +511,13 @@ $(document).ready(function () {
       );
     });
   }
+  //   const result = eliminarImagenes(
+  //     // "imagenes/targets/6503bc2d95ef9-meprofile.jpg"
+  //     "imagenes/targets/6503bc2d95ef9-meprofile.jpg"
+  //   );
+  //   result
+  //     .then((response) => {
+  //       console.log(response);
+  //     })
+  //     .catch();
 });

@@ -120,6 +120,56 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
                     <!-- </form> -->
                 </div>
             </div>
+
+            <div id="modal-manager-proyect" class="modal-create md-hidden">
+                <div class="form-create" style="width: 500px;">
+                    <!-- <form id="form_producto_add"> -->
+                    <div class="close-modal">
+                        <ion-icon name="close-circle-outline"></ion-icon>
+                    </div>
+                    <h1 class="text-sm font-bold">Configuración Proyecto</h1>
+
+                    <span class="route" style="margin-bottom: 0px !important">
+                        Logo
+                    </span>
+                    <div class="flex" id="content-logo">
+                        <div>
+                            <div class="relative" id="content-avatar-logo">
+                                <img id="logo-preview" class="w-[60px] h-[60px] rounded-full object-cover" src="../../img/avatar_default.jpg" alt="">
+                                <span id="edit-logo" class="bottom-0 cursor-pointer left-7 absolute flex items-center jutify-center  w-[30px] h-[30px] bg-[#ffde00] border-2 border-white dark:border-gray-800 rounded-full">
+                                    <ion-icon class="w-full" aria-hidden="true" name="create"></ion-icon>
+
+                                </span>
+                            </div>
+                            <span class="text-[10px]  tex-gray-300">Max 15 MB</span>
+                        </div>
+
+                        <input class="hidden" type="file" name="logo_proyect" id="upload_logo">
+                    </div>
+                    <span class="route" style="margin-bottom: 0px !important">
+                        Galeria
+                    </span>
+                    <div id="botones-event-gallery" class="flex items-center gap-3 hidden">
+                        <button id="save_img_gallery" class="p-2 rounded-lg text-[10px] inline-block max-h-max text-white bg-success">Guardar</button>
+                        <button id="cancelar_img_gallery" class="p-2 rounded-lg border-1 border-[#ececec] text-[10px] inline-block max-h-max bg-white text-gray-500">Cancelar</button>
+                    </div>
+
+                    <div id="multimedia_photos_preview" class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        <div>
+                            <div id="drag-gallery" class="p-3 cursor-pointer justify-center items-center rounded-lg border-2 border-dashed border-[#ececec] flex flex-col gap-3">
+                                <ion-icon name="add-outline" class="font-bold"></ion-icon>
+                                <span class="text-sm text-center font-bold">Agregar fotos</span>
+                            </div>
+                            <input accept="image/*" multiple type="file" class="hidden" id="upload-gallery">
+                        </div>
+                    </div>
+                </div>
+                <!-- <div class="card-input buttons-modal">
+                        <button id="cancel-form-asigned" class="btn-cancel">Cancelar</button>
+                    </div> -->
+                <!-- </form> -->
+
+            </div>
             <div class="main-datatable">
                 <div class="overflow-x">
                     <!-- <h1 class="title-table">Proyectos</h1> -->

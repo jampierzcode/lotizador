@@ -885,6 +885,13 @@ if ($_POST["funcion"] == "add_cliente") {
     $usuario->add_cliente($resultado, $proyect_id, $_SESSION["id_usuario"]);
     echo $usuario->mensaje;
 }
+if ($_POST["funcion"] == "add_cliente2") {
+    $jsonData = $_POST["result"];
+    $data = json_decode($jsonData);
+    $proyect_id = $_POST["proyecto_id"];
+    $usuario->add_cliente2($data, $proyect_id, $_SESSION["id_usuario"]);
+    echo json_encode($usuario->mensaje);
+}
 if ($_POST["funcion"] == "add_etiqueta") {
     $nombre = $_POST["nombre"];
     $fecha = $_POST["fecha"];
@@ -983,6 +990,39 @@ if ($_POST["funcion"] == "buscar_user_target") {
         echo $jsonstring;
     }
 }
+if ($_POST["funcion"] == "search_target_user_uuid") {
+    $json = array();
+    $user = $_POST["id"];
+    $usuario->buscar_user_target($user);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+
+        $jsonstring = json_encode($usuario->datos);
+        echo $jsonstring;
+    }
+}
+if ($_POST["funcion"] == "update_img_proyect") {
+    $ruta = $_POST["ruta"];
+    $id = $_POST["id"];
+    $usuario->update_img_proyect($id, $ruta);
+    echo $usuario->mensaje;
+}
+if ($_POST["funcion"] == "subirimagenesgallery") {
+    $galeria = $_POST["galeria"];
+    $id = $_POST["id"];
+    $usuario->subirimagenesgallery($id, $galeria);
+    echo $usuario->mensaje;
+}
+if ($_POST["funcion"] == "multimedia_proyecto") {
+    $id = $_POST["id"];
+    $json_resultado = $usuario->multimedia_proyecto($id);
+
+    // Devuelve el JSON al cliente
+    echo $json_resultado;
+}
+
 if ($_POST["funcion"] == "update_user_target") {
     $json = array();
     $data = json_decode($_POST["data"]);

@@ -1,5 +1,10 @@
 $(document).ready(function () {
+  var idProyecto;
+  var nombreProyecto;
+  var proyectosList = [];
+  var logoFile;
   var funcion = "";
+  var imagenesCargadas = [];
   var dataTable = $("#proyectosList").DataTable({
     pageLength: 5,
     aoColumnDefs: [
@@ -37,7 +42,7 @@ $(document).ready(function () {
           <button target="_blank" keyProyect="https://lotizador.mcsolucionesti.com/views/Lotizador/Clientes/?proyect=${data.id}" id="rutaEnlace" class="btnLotes"> Copiar Link </button>
           <button id="manager_lotes" key_proyect=${data.id} name="${data.nombreProyecto} type="button" class="p-2 whitespace-nowrap text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">Administrar Lotes</button>
 <a target="_blank" class="btnJsvm default" key="${data.id}" href="./schemalotizador.php?proyect=${data.id}">PDF <ion-icon name="document-text-outline"></ion-icon></a>
-                
+             <button key="${data.id}" id="change_settings"><ion-icon name="settings"></ion-icon></button>   
           </div>
 
           `;
@@ -96,6 +101,363 @@ $(document).ready(function () {
       },
     ],
   });
+  // change logo
+  $(document).on("click", "#edit-logo", function () {
+    $("#upload_logo").click();
+  });
+  $("#upload_logo").change(function (e) {
+    var file = e.target.files[0];
+    if (file) {
+      // Verifica si el tamaño del archivo es mayor que 10 MB (10 * 1024 * 1024 bytes)
+      if (file.size > 15 * 1024 * 1024) {
+        alert(
+          "La imagen seleccionada supera los 15 MB. Por favor, elija una imagen más pequeña."
+        );
+        // Restablece el valor del input de tipo "file"
+        $("#upload_logo").val("");
+      } else {
+        logoFile = file;
+        mostrarVistaPrevia(file);
+      }
+    }
+  });
+  function mostrarVistaPrevia(input) {
+    if (input) {
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        $("#edit-logo").remove();
+        // $("#portada_overlay").html(
+        //   `<img class="rounded-lg object-cover w-full h-full dark:ring-gray-500" src="${e.target.result}" alt="rofile picture">`
+        // );
+        $("#logo-preview").attr("src", e.target.result);
+        $("#content-logo").append(
+          ` <div id="botones-event" class="flex ml-3 items-center gap-3">
+          <button id="save_img_perfil" class="p-2 rounded-lg text-[10px] inline-block max-h-max text-white bg-success">Guardar</button>
+          <button id="cancelar_img_perfil" class="p-2 rounded-lg border-1 border-[#ececec] text-[10px] inline-block max-h-max bg-white text-gray-500">Cancelar</button>
+      </div>`
+        );
+      };
+      reader.readAsDataURL(input);
+    }
+  }
+  // $("#save_img_perfil, #cancelar_img_perfi")
+  $(document).on("click", "#save_img_perfil", function () {
+    if (
+      idProyecto !== "" ||
+      (idProyecto !== undefined && logoFile !== "") ||
+      logoFile !== null
+    ) {
+      console.log(idProyecto);
+      console.log("si tiene info del logo como el id del proyecto");
+      let result;
+      if (logo !== "") {
+        result = updateImagenLogo(logo, logoFile);
+      } else {
+        result = enviarImagen(logoFile);
+      }
+      result
+        .then((ruta) => {
+          console.log(ruta);
+          let funcion = "update_img_proyect";
+          $.post(
+            "../../controlador/UsuarioController.php",
+            { funcion, ruta, id: idProyecto },
+            (response) => {
+              console.log(response);
+              if (response.trim() === "update-sucess") {
+                alert("Se cambio el logo correctamente");
+                $("#content-avatar-logo").append(
+                  `<span id="edit-logo" class="bottom-0 cursor-pointer left-7 absolute flex items-center jutify-center  w-[30px] h-[30px] bg-[#ffde00] border-2 border-white dark:border-gray-800 rounded-full">
+                                            <ion-icon class="w-full" aria-hidden="true" name="create"></ion-icon>
+            
+                                        </span>
+                  `
+                );
+
+                $("#botones-event").remove();
+              } else {
+                alert("Hubi un error contacta al administrador");
+                console.log(error);
+              }
+            }
+          );
+        })
+        .catch((error) => console.log(error));
+    } else {
+      console.log("No tiene");
+    }
+  });
+  $(document).on("click", "#cancelar_img_perfil", function () {
+    if (logo !== "") {
+      $("#content-avatar-logo").html(
+        `
+        <img id="logo-preview" class="w-[60px] h-[60px] rounded-full object-cover" src="../../${logo}" alt="logo_proyect">
+                              <span id="edit-logo" class="bottom-0 cursor-pointer left-7 absolute flex items-center jutify-center  w-[30px] h-[30px] bg-[#ffde00] border-2 border-white dark:border-gray-800 rounded-full">
+                                  <ion-icon class="w-full" aria-hidden="true" name="create"></ion-icon>
+  
+                              </span>
+        `
+      );
+    } else {
+      $("#content-avatar-logo").html(
+        `
+        <img id="logo-preview" class="w-[60px] h-[60px] rounded-full object-cover" src="../../img/avatar_default.jpg" alt="logo_proyect">
+                              <span id="edit-logo" class="bottom-0 cursor-pointer left-7 absolute flex items-center jutify-center  w-[30px] h-[30px] bg-[#ffde00] border-2 border-white dark:border-gray-800 rounded-full">
+                                  <ion-icon class="w-full" aria-hidden="true" name="create"></ion-icon>
+  
+                              </span>
+        `
+      );
+    }
+    $("#botones-event").remove();
+    $("#upload_logo").val("");
+  });
+  function updateImagenLogo(route, file) {
+    return new Promise((resolve, reject) => {
+      const funcion = "update_logo_proyecto";
+      const formData = new FormData();
+      formData.append("funcion", funcion);
+      formData.append("route", route);
+      formData.append("targetimagenupdate", file);
+
+      $.ajax({
+        url: "../../controlador/subirimagenes.php",
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (response) {
+          resolve(response);
+        },
+        error: function (error) {
+          reject("Error al guardar las imágenes");
+        },
+      });
+    });
+  }
+  function enviarImagen(file) {
+    return new Promise((resolve, reject) => {
+      const carpeta = "logos";
+      const formData = new FormData();
+      formData.append("carpeta", carpeta);
+      formData.append("targetimagen", file);
+
+      $.ajax({
+        url: "../../controlador/subirimagenes.php",
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (response) {
+          resolve(response);
+        },
+        error: function (error) {
+          reject("Error al guardar las imágenes");
+        },
+      });
+    });
+  }
+  function fetchMultimediaProyecto(id) {
+    let funcion = "multimedia_proyecto";
+    return new Promise((resolve, reject) => {
+      $.post(
+        "../../controlador/UsuarioController.php",
+        { funcion, id },
+        (response) => {
+          if (response.trim() === "no-register") {
+            resolve([]); // Resolvemos la promesa con un array vacío
+          } else {
+            const multimedia = JSON.parse(response);
+            resolve(multimedia); // Resolvemos la promesa con los datos obtenidos
+          }
+        }
+      ).fail((error) => {
+        reject(error); // En caso de error, rechazamos la promesa con el error
+      });
+    });
+  }
+  var logo = "";
+  var multimedia = [];
+  function pintarMultimediaProeyctos() {
+    if (logo !== "") {
+      $("#logo-preview").attr("src", "../../" + logo);
+    } else {
+      $("#logo-preview").attr("src", "../../img/avatar_default.jpg");
+    }
+    console.log(multimedia);
+    if (multimedia.length > 0) {
+      let template = `
+      <div>
+      <div id="drag-gallery" class="p-3 cursor-pointer justify-center items-center rounded-lg border-2 border-dashed border-[#ececec] flex flex-col gap-3">
+          <ion-icon name="add-outline" class="font-bold"></ion-icon>
+          <span class="text-sm text-center font-bold">Agregar fotos</span>
+      </div>
+      <input accept="image/*" multiple type="file" class="hidden" id="upload-gallery">
+  </div>`;
+
+      multimedia.reverse().forEach((multimedia) => {
+        template += `
+      <div class="flex items-center justify-center border-1 border-gray-100">
+        <img class="h-auto max-w-full rounded-lg" src="../../${multimedia.url}" alt="">
+      </div>
+      `;
+      });
+      $("#multimedia_photos_preview").html(template);
+    } else {
+      let template = `
+      <div>
+      <div id="drag-gallery" class="p-3 cursor-pointer justify-center items-center rounded-lg border-2 border-dashed border-[#ececec] flex flex-col gap-3">
+          <ion-icon name="add-outline" class="font-bold"></ion-icon>
+          <span class="text-sm text-center font-bold">Agregar fotos</span>
+      </div>
+      <input accept="image/*" multiple type="file" class="hidden" id="upload-gallery">
+  </div>
+        `;
+      $("#multimedia_photos_preview").html(template);
+    }
+    $("#modal-manager-proyect").removeClass("md-hidden");
+    setTimeout(function () {
+      $("#modal-manager-proyect .form-create").addClass("modal-show");
+    }, 10);
+  }
+  // change setting logo y galery
+  $(document).on("click", "#change_settings", function () {
+    var id = $(this).attr("key");
+    idProyecto = id;
+    const proyecto = proyectosList.find((e) => e.id == id);
+    nombreProyecto = proyecto.nombreProyecto;
+    let resultado = fetchMultimediaProyecto(id);
+    resultado
+      .then((response) => {
+        let contenido = response;
+        if (contenido.logo !== "") {
+          logo = contenido.logo;
+        } else {
+          logo = "";
+        }
+        if (contenido.multimedia.length > 0) {
+          multimedia = contenido.multimedia;
+        } else {
+          multimedia = [];
+        }
+        pintarMultimediaProeyctos();
+      })
+      .catch((error) => console.log(error));
+  });
+  $("#modal-manager-proyect .close-modal").click(function () {
+    $("#modal-manager-proyect").addClass("md-hidden");
+    setTimeout(function () {
+      $("#modal-manager-proyect .form-create").removeClass("modal-show");
+    }, 10);
+  });
+  // subir fotos
+  $(document).on("click", "#drag-gallery", function () {
+    $("#upload-gallery").click();
+  });
+  $(document).on("change", "#upload-gallery", function (e) {
+    let files = e.target.files;
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      // Aquí puedes llamar a la función para procesar la imagen, por ejemplo:
+      preMostrarGallery(file);
+    }
+    $("#botones-event-gallery").removeClass("hidden");
+  });
+  // cancelare y guardar gallery
+  $(document).on("click", "#save_img_gallery", function () {
+    let result = subirImagenesGallery(nombreProyecto);
+    result
+      .then((gallery) => {
+        let funcion = "subirimagenesgallery";
+        console.log(gallery);
+        const galeria = JSON.parse(gallery);
+        console.log(galeria);
+        $.post(
+          "../../controlador/UsuarioController.php",
+          {
+            funcion,
+            id: idProyecto,
+            galeria,
+          },
+          (response) => {
+            if (response.trim() == "create-sucess") {
+              alert("se subieron todas las imagenes");
+              $(".image-card>span").remove();
+
+              $("#botones-event-gallery").addClass("hidden");
+            } else {
+              console.log(response);
+            }
+          }
+        );
+      })
+      .catch((error) => console.log(error));
+  });
+  $(document).on("click", "#cancelar_img_gallery", function () {
+    console.log(imagenesCargadas);
+    imagenesCargadas = [];
+    $(".image-card").remove();
+    $("#botones-event-gallery").addClass("hidden");
+    console.log(imagenesCargadas);
+  });
+
+  // fin de cancelar y guiardar gallery
+  function preMostrarGallery(file) {
+    const imagePreviews = $("#multimedia_photos_preview");
+    var reader = new FileReader();
+    const index = imagenesCargadas.length;
+    reader.onload = function (e) {
+      let template = "";
+      template += `      
+        <div class="flex items-center justify-center border-1 border-gray-100 relative image-card">
+            <img class="h-auto max-w-full rounded-lg" src=${e.target.result} alt="">
+            <span class="cursor-pointer z-[5000] eliminar-gallery absolute top-0 right-0 p-1 bg-[#f00] leading-1 text-white" data-index="${index}">&times;</span>
+        </div>
+        `;
+      // imagePreviews.insertBefore(template, imagePreviews.firstChild);
+      const firstChild = imagePreviews.children().eq(0);
+      firstChild.after(template);
+      imagenesCargadas.push(file);
+    };
+    reader.readAsDataURL(file);
+  }
+  // eliminar gallery index
+  $(document).on("click", ".eliminar-gallery", function () {
+    let template = "";
+    const count = imagenesCargadas.length;
+    console.log(count);
+
+    const index = $(this).data("index");
+    imagenesCargadas.splice(index, 1);
+    $(this).closest(".image-card").remove();
+  });
+  function subirImagenesGallery(proyecto_nombre) {
+    return new Promise((resolve, reject) => {
+      const carpeta = "multimedia";
+      const formData = new FormData();
+
+      for (let i = 0; i < imagenesCargadas.length; i++) {
+        formData.append("imagengallery[]", imagenesCargadas[i]);
+      }
+      formData.append("carpeta", carpeta);
+      formData.append("proyecto", proyecto_nombre);
+
+      $.ajax({
+        url: "../../controlador/subirimagenes.php",
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (response) {
+          resolve(response);
+        },
+        error: function (error) {
+          reject("Error al guardar las imágenes");
+        },
+      });
+    });
+  }
+  // fin de subir fotos de galeria
 
   $(document).on("click", "#editLote", function () {
     var row = $(this).closest("tr");
@@ -289,6 +651,7 @@ $(document).ready(function () {
           template += "<td>No hay registros</td>";
         } else {
           const proyectos = JSON.parse(response);
+          proyectosList = proyectos;
           dataTable.clear().rows.add(proyectos).draw();
         }
       }
@@ -299,15 +662,17 @@ $(document).ready(function () {
 
     // Copiar la ruta al portapapeles
     var ruta = $(this).attr("keyProyect");
+    var btn = $(this);
+    console.log($(this));
     navigator.clipboard
       .writeText(ruta)
       .then(function () {
         // alert("La ruta se ha copiado al portapapeles.");
-        $("#rutaEnlace").text("Copiado!");
-        $("#rutaEnlace").addClass("success");
+        $(btn).text("Copiado!");
+        $(btn).addClass("success");
         setTimeout(function () {
-          $("#rutaEnlace").text("Copiar Link");
-          $("#rutaEnlace").removeClass("success");
+          $(btn).text("Copiar Link");
+          $(btn).removeClass("success");
         }, 3000);
       })
       .catch(function (error) {
