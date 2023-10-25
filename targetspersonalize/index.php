@@ -14,7 +14,6 @@
     <link rel="stylesheet" href="../css/productos.css">
     <link rel="stylesheet" href="../css/card-user.css">
     <link rel="stylesheet" href="../css/sortablelist.css">
-    <link rel="icon" href="../img/logo.jpg">
     <!-- data table CDN -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css" />
     <link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.4.0/css/fixedHeader.dataTables.min.css" />
@@ -26,7 +25,12 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <!-- tailwin css -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>AppLotizador</title>
+    <title>...</title>
+    <link rel="icon" type="image/png" href="favicon.png" id="favicon">
+    <meta name="description" content="Descripción por defecto">
+    <meta property="og:title" content="Título OG por defecto">
+    <meta property="og:description" content="Descripción OG por defecto">
+    <meta property="og:image" content="URL_de_la_imagen_por_defecto">
 </head>
 
 <body>

@@ -990,6 +990,30 @@ if ($_POST["funcion"] == "buscar_user_target") {
         echo $jsonstring;
     }
 }
+if ($_POST["funcion"] == "buscar_user_target_socials") {
+    $json = array();
+    $usuario->buscar_user_target_socials($_SESSION["id_usuario"]);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+
+        $jsonstring = json_encode($usuario->datos);
+        echo $jsonstring;
+    }
+}
+if ($_POST["funcion"] == "update_social_networks") {
+    $user_id = $id_usuario;
+    $redes_sociales = json_decode($_POST["redes_sociales"]);
+    $usuario->update_social_networks($user_id, $redes_sociales);
+    echo $usuario->mensaje;
+}
+if ($_POST["funcion"] == "update_social_networks_id") {
+    $user_id = $id_usuario;
+    $redes_sociales = json_decode($_POST["redes_sociales"]);
+    $usuario->update_social_networks_id($user_id, $redes_sociales);
+    echo $usuario->mensaje;
+}
 if ($_POST["funcion"] == "search_target_user_uuid") {
     $json = array();
     $user = $_POST["id"];

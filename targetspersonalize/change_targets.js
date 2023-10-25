@@ -29,6 +29,24 @@ $(document).ready(function () {
             $("#preview_nameuser").html(user[0].name_user);
             $("#preview_job").html(user[0].job);
             $("#preview_custom").html(user[0].custom_description);
+            // generar metadatos
+            $("#favicon").attr("href", "../" + user[0].picture_perfil);
+            // Supongamos que tienes datos dinámicos
+            const dynamicTitle = user[0].name_user;
+            const dynamicDescription = user[0].custom_description;
+            const dynamicImage = user[0].picture_perfil;
+
+            // Actualiza el contenido de las etiquetas OG con los datos dinámicos
+            $("meta[property='og:title']").attr("content", dynamicTitle);
+            $("meta[property='og:description']").attr(
+              "content",
+              dynamicDescription
+            );
+            $("meta[property='og:image']").attr("content", dynamicImage);
+
+            // También puedes actualizar el título y la descripción de la página
+            $("title").text(dynamicTitle);
+            $("meta[name='description']").attr("content", dynamicDescription);
           } else {
             $("body").html("No se puede acceder a esta ruta");
           }

@@ -926,8 +926,15 @@ $(document).ready(function () {
       }
     );
   });
+  $();
 
   // FIN DE MODAL ASIGNES
+  $("#historial-event .form-create .close-modal").click(() => {
+    $("#historial-event").addClass("md-hidden");
+    setTimeout(function () {
+      $("#historial-event .form-create").removeClass("modal-show");
+    }, 10);
+  });
   $("#asigned_asesores .form-create .close-modal").click(() => {
     $("#tipo-documento-modal").val(0);
     $("#documento-modal").val("");

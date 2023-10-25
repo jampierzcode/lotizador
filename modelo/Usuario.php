@@ -1451,6 +1451,26 @@ class Usuario
             //throw $th;
         }
     }
+    function buscar_user_target_socials($id_usuario)
+    {
+        try {
+            $sql = "SELECT * FROM social_networks WHERE user_id=:id_usuario
+            ";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":id_usuario" => $id_usuario));
+            $this->datos = $query->fetchAll(); // retorna objetos o no
+            if (!empty($this->datos)) {
+                return $this->datos;
+            } else {
+                $this->mensaje = "no-register-socials";
+                return $this->mensaje;
+            }
+        } catch (\Throwable $error) {
+            $this->mensaje = "fatal_error " + $error;
+            return $this->mensaje;
+            //throw $th;
+        }
+    }
     function update_user_target($data, $id_usuario)
     {
         try {
@@ -1473,6 +1493,42 @@ class Usuario
             }
 
             $this->mensaje = "update-sucess";
+        } catch (\Throwable $error) {
+            $this->mensaje = "fatal_error " + $error;
+            return $this->mensaje;
+            //throw $th;
+        }
+    }
+    function update_social_networks($user_id, $redes_sociales)
+    {
+        try {
+            $sql = "INSERT INTO social_networks(url, username, user_id, status, placeholder, social) VALUES (:url, :username, :user_id, :status, :placeholder, :social)";
+            $query = $this->conexion->prepare($sql);
+            foreach ($redes_sociales as $red) {
+                # code...
+                $query->execute(array(":user_id" => $user_id, ":url" => $red->url, ":username" => $red->username, ":status" => $red->status, ":placeholder" => $red->placeholder, ":social" => $red->social));
+            }
+
+            $this->mensaje = "create-sucess";
+            return $this->mensaje;
+        } catch (\Throwable $error) {
+            $this->mensaje = "fatal_error " + $error;
+            return $this->mensaje;
+            //throw $th;
+        }
+    }
+    function update_social_networks_id($user_id, $redes_sociales)
+    {
+        try {
+            $sql = "UPDATE social_networks SET url=:url, username=:username, status=:status WHERE id=:id";
+            $query = $this->conexion->prepare($sql);
+            foreach ($redes_sociales as $red) {
+                # code...
+                $query->execute(array(":url" => $red->url, ":username" => $red->username, ":status" => $red->status, ":id" => $red->id));
+            }
+
+            $this->mensaje = "update-sucess";
+            return $this->mensaje;
         } catch (\Throwable $error) {
             $this->mensaje = "fatal_error " + $error;
             return $this->mensaje;
