@@ -1,6 +1,11 @@
 $(document).ready(function () {
   var idProyecto;
   var nombreProyecto;
+  var descriptionProyecto;
+  var changedescriptionProyecto;
+  // url video variables
+  var videoProyecto;
+  var changevideoProyecto;
   var proyectosList = [];
   var logoFile;
   var funcion = "";
@@ -325,7 +330,37 @@ $(document).ready(function () {
     var id = $(this).attr("key");
     idProyecto = id;
     const proyecto = proyectosList.find((e) => e.id == id);
+    console.log(proyecto);
     nombreProyecto = proyecto.nombreProyecto;
+    // description module agregado recientemente
+    descriptionProyecto =
+      proyecto.description !== null && proyecto.description !== ""
+        ? proyecto.description
+        : "";
+    changedescriptionProyecto =
+      proyecto.description !== null && proyecto.description !== ""
+        ? proyecto.description
+        : "";
+    // video module agregado recientemente
+    videoProyecto =
+      proyecto.video_url !== null && proyecto.video_url !== ""
+        ? proyecto.video_url
+        : "";
+    changevideoProyecto =
+      proyecto.video_url !== null && proyecto.video_url !== ""
+        ? proyecto.video_url
+        : "";
+    if (changevideoProyecto !== "") {
+      let codigovideo = obtenerCodigoVideo(changevideoProyecto);
+      let videosrc = construirURLDeEmbed(codigovideo);
+      $("#iframeVideoY").attr("src", videosrc);
+      $("#iframeVideoY").removeClass("hidden");
+    } else {
+      $("#iframeVideoY").addClass("hidden");
+      $("#iframeVideoY").attr("src", "");
+    }
+    $("#description-proyect").val(proyecto.description);
+    $("#videoUrlProyecto").val(proyecto.video_url);
     let resultado = fetchMultimediaProyecto(id);
     resultado
       .then((response) => {
@@ -344,6 +379,94 @@ $(document).ready(function () {
       })
       .catch((error) => console.log(error));
   });
+
+  // cambios para description del proyecto
+  $("#description-proyect").on("change, keyup", function (e) {
+    let valor = e.target.value;
+    changedescriptionProyecto = valor;
+    console.log(descriptionProyecto);
+    console.log(changedescriptionProyecto);
+
+    if (descriptionProyecto !== changedescriptionProyecto) {
+      $("#viewbuttonsdescription").removeClass("hidden");
+    } else {
+      $("#viewbuttonsdescription").addClass("hidden");
+    }
+  });
+  $("#cancelardescription").click(function () {
+    $("#description-proyect").val(descriptionProyecto);
+    changedescriptionProyecto == descriptionProyecto;
+
+    $("#viewbuttonsdescription").addClass("hidden");
+  });
+  $("#savedescription").click(function () {
+    let valor = $("#description-proyect").val();
+    let funcion = "subir_description_proyect";
+    $.post(
+      "../../controlador/UsuarioController.php",
+      { funcion, id: idProyecto, description: valor },
+      (response) => {
+        if (response.trim() === "update-sucess") {
+          alert("Se actualizo correctamente la descripcion del proyecto");
+          descriptionProyecto = valor;
+          changedescriptionProyecto = valor;
+          $("#viewbuttonsdescription").addClass("hidden");
+        } else {
+          console.log(response);
+        }
+      }
+    );
+  });
+  // cambios para video url del proyecto
+  $("#videoUrlProyecto").on("change, keyup", function (e) {
+    let valor = e.target.value;
+    changevideoProyecto = valor;
+    console.log(videoProyecto);
+    console.log(changevideoProyecto);
+
+    if (videoProyecto !== changevideoProyecto) {
+      if (changevideoProyecto !== "") {
+        let codigovideo = obtenerCodigoVideo(valor);
+        let videosrc = construirURLDeEmbed(codigovideo);
+
+        $("#iframeVideoY").attr("src", videosrc);
+        $("#iframeVideoY").removeClass("hidden");
+      } else {
+        $("#iframeVideoY").attr("src", "");
+        $("#iframeVideoY").addClass("hidden");
+      }
+      $("#viewbuttonsvideo").removeClass("hidden");
+    } else {
+      $("#viewbuttonsvideo").addClass("hidden");
+    }
+  });
+  $("#cancelarvideo").click(function () {
+    $("#videoUrlProyecto").val(videoProyecto);
+
+    $("#iframeVideoY").attr("src", "");
+    changevideoProyecto == videoProyecto;
+
+    $("#viewbuttonsvideo").addClass("hidden");
+  });
+  $("#savevideo").click(function () {
+    let valor = $("#videoUrlProyecto").val();
+    let funcion = "subir_video_proyect";
+    $.post(
+      "../../controlador/UsuarioController.php",
+      { funcion, id: idProyecto, video: valor },
+      (response) => {
+        if (response.trim() === "update-sucess") {
+          alert("Se actualizo correctamente el url del video del proyecto");
+          videoProyecto = valor;
+          changevideoProyecto = valor;
+          $("#viewbuttonsvideo").addClass("hidden");
+        } else {
+          console.log(response);
+        }
+      }
+    );
+  });
+
   $("#modal-manager-proyect .close-modal").click(function () {
     $("#modal-manager-proyect").addClass("md-hidden");
     setTimeout(function () {
@@ -487,7 +610,7 @@ $(document).ready(function () {
       } else {
         var text = $(this).text();
         $(this).html(`
-        <input value="${text}" type="text" id="small-input" class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+        <input value="${text}" type="text" id="small-input" class="block w-full p-2 text-gray-900 border border-gray-200 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
   
         `);
         originalValues.push(text);
@@ -645,13 +768,14 @@ $(document).ready(function () {
       "../../controlador/UsuarioController.php",
       { funcion },
       (response) => {
-        console.log(response);
+        // console.log(response);
         let template = "";
         if (response.trim() == "no-register") {
           template += "<td>No hay registros</td>";
         } else {
           const proyectos = JSON.parse(response);
           proyectosList = proyectos;
+          // console.log(proyectos);
           dataTable.clear().rows.add(proyectos).draw();
         }
       }
@@ -679,4 +803,28 @@ $(document).ready(function () {
         console.error("Error al copiar la ruta: ", error);
       });
   });
+  // Función para extraer el código del video de la URL original
+  function obtenerCodigoVideo(url) {
+    const match = url.match(
+      /(?:youtu\.be\/|youtube\.com\/(?:.*v\/|.*&v=|.*embed\/|.*be\/|.*watch\?v=))([^"&?\/\s]{11})/
+    );
+    return match && match[1] ? match[1] : null;
+  }
+
+  // Función para construir la URL de embed
+  function construirURLDeEmbed(codigoVideo) {
+    return `https://www.youtube.com/embed/${codigoVideo}`;
+  }
+
+  // URL original del video
+  // const urlOriginal =
+  //   "https://www.youtube.com/watch?v=LpTdmXOfORs&ab_channel=SayianJimmy";
+  const urlOriginal = "https://youtu.be/JRhP2M2YodM";
+
+  // Extraer el código del video
+  const codigoVideo = obtenerCodigoVideo(urlOriginal);
+
+  // Construir la URL de embed
+  const urlEmbed = construirURLDeEmbed(codigoVideo);
+  console.log(urlEmbed);
 });

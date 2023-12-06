@@ -92,6 +92,12 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                                         Sobre mi
                                     </a>
                                 </li>
+                                <li class="w-full">
+                                    <a class="page-target w-full inline-block p-4 rounded-xl hover:bg-gray-200 ease-out duration-300 flex items-center gap-3 text-[12px]" href="share.php">
+                                        <ion-icon name="share-social"></ion-icon>
+                                        Compartir
+                                    </a>
+                                </li>
                             </ul>
                         </div>
                     </div>

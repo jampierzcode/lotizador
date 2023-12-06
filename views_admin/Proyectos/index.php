@@ -30,6 +30,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
         <!-- tailwin css -->
         <script src="https://cdn.tailwindcss.com"></script>
         <title>AppLotizador</title>
+
     </head>
 
     <body>
@@ -121,48 +122,225 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
                 </div>
             </div>
 
+            <!-- Modal para seleccionar icono -->
+            <div id="modalIconos" class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 items-center justify-center z-[50000]">
+                <div class="bg-white max-w-[400px] mx-auto p-4 rounded shadow-lg">
+                    <h2 class="text-xl mb-4">Selecciona un ícono</h2>
+                    <div class="grid grid-cols-5 gap-4">
+                        <!-- Se generan manualmente 4 botones con iconos de Ionicons -->
+                        <button class="p-2 border-[1px] rounded icono" data-icon="agua">
+                            <img class="w-full" src="../../imagenes/amenidades/agua.png" alt="agua" />
+                        </button>
+                        <button class="p-2 border-[1px] rounded icono" data-icon="luz">
+                            <img class="w-full" src="../../imagenes/amenidades/luz.png" alt="luz" />
+                        </button>
+                        <button class="p-2 border-[1px] rounded icono" data-icon="desague">
+                            <img class="w-full" src="../../imagenes/amenidades/desague.png" alt="desague" />
+                        </button>
+                        <button class="p-2 border-[1px] rounded icono" data-icon="carreteras">
+                            <img class="w-full" src="../../imagenes/amenidades/carreteras.png" alt="carreteras" />
+                        </button>
+                        <button class="p-2 border-[1px] rounded icono" data-icon="portico">
+                            <img class="w-full" src="../../imagenes/amenidades/portico.png" alt="portico" />
+                        </button>
+                        <button class="p-2 border-[1px] rounded icono" data-icon="pistas-afirmadas">
+                            <img class="w-full" src="../../imagenes/amenidades/pistas-afirmadas.png" alt="pistas-afirmadas" />
+                        </button>
+                        <button class="p-2 border-[1px] rounded icono" data-icon="parrilla">
+                            <img class="w-full" src="../../imagenes/amenidades/parrilla.png" alt="parrilla" />
+                        </button>
+                        <button class="p-2 border-[1px] rounded icono" data-icon="pistas">
+                            <img class="w-full" src="../../imagenes/amenidades/pistas.png" alt="pistas" />
+                        </button>
+                        <button class="p-2 border-[1px] rounded icono" data-icon="parques">
+                            <img class="w-full" src="../../imagenes/amenidades/parques.png" alt="parques" />
+                        </button>
+                        <button class="p-2 border-[1px] rounded icono" data-icon="jardin">
+                            <img class="w-full" src="../../imagenes/amenidades/jardin.png" alt="jardin" />
+                        </button>
+                        <button class="p-2 border-[1px] rounded icono" data-icon="areas-comunes">
+                            <img class="w-full" src="../../imagenes/amenidades/areas-comunes.png" alt="areas-comunes" />
+                        </button>
+                        <button class="p-2 border-[1px] rounded icono" data-icon="biodigestor">
+                            <img class="w-full" src="../../imagenes/amenidades/biodigestor.png" alt="biodigestor" />
+                        </button>
+                        <button class="p-2 border-[1px] rounded icono" data-icon="colegio">
+                            <img class="w-full" src="../../imagenes/amenidades/colegio.png" alt="colegio" />
+                        </button>
+                    </div>
+                    <button id="btnContinuarIconos" class="mt-4 bg-green-500 text-white px-4 py-2 rounded">
+                        Continuar
+                    </button>
+                </div>
+            </div>
+            <!-- Nuevo modal para editar icono -->
+            <div id="editarAmenidad" class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[50000]">
+                <div class="bg-white p-4 max-w-[400px] mx-auto rounded shadow-lg">
+                    <h2 class="text-xl mb-4">Editar amenidad</h2>
+                    <div class="flex items-center gap-3">
+                        <img class="w-[50px] cursor-pointer" id="iconoAmenidadEdit" src="../../imagenes/amenidades/luz.png" alt="luz">
+                        <input class="p-2 rounded bg-gray-200 text-gray-700" type="text" id="nombreAmenidadEdit" placeholder="Escribe la amenidad">
+                    </div>
+                    <div class=" flex items-center gap-3">
+
+                        <button id="cancelarEditAmenidad" class="mt-4 bg-gray-100 text-gray-700 px-4 py-2 rounded">
+                            Cancelar
+                        </button>
+                        <button id="saveEditAmenidad" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- Nuevo modal para editar icono -->
+            <div id="modalEditarIcono" class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[50000]">
+                <div class="bg-white p-4 max-w-[400px] mx-auto rounded shadow-lg">
+                    <h2 class="text-xl mb-4">Selecciona un nuevo ícono</h2>
+                    <div class="grid grid-cols-5 gap-4">
+                        <!-- Se generan manualmente 4 botones con iconos de Ionicons -->
+                        <button class="p-2 border-[1px] rounded icono-editar" data-icon="agua">
+                            <img class="w-full" src="../../imagenes/amenidades/agua.png" alt="agua" />
+                        </button>
+                        <button class="p-2 border-[1px] rounded icono-editar" data-icon="luz">
+                            <img class="w-full" src="../../imagenes/amenidades/luz.png" alt="luz" />
+                        </button>
+                        <button class="p-2 border-[1px] rounded icono-editar" data-icon="desague">
+                            <img class="w-full" src="../../imagenes/amenidades/desague.png" alt="desague" />
+                        </button>
+                        <button class="p-2 border-[1px] rounded icono-editar" data-icon="carreteras">
+                            <img class="w-full" src="../../imagenes/amenidades/carreteras.png" alt="carreteras" />
+                        </button>
+                        <button class="p-2 border-[1px] rounded icono-editar" data-icon="portico">
+                            <img class="w-full" src="../../imagenes/amenidades/portico.png" alt="portico" />
+                        </button>
+                        <button class="p-2 border-[1px] rounded icono-editar" data-icon="pistas-afirmadas">
+                            <img class="w-full" src="../../imagenes/amenidades/pistas-afirmadas.png" alt="pistas-afirmadas" />
+                        </button>
+                        <button class="p-2 border-[1px] rounded icono-editar" data-icon="parrilla">
+                            <img class="w-full" src="../../imagenes/amenidades/parrilla.png" alt="parrilla" />
+                        </button>
+                        <button class="p-2 border-[1px] rounded icono-editar" data-icon="pistas">
+                            <img class="w-full" src="../../imagenes/amenidades/pistas.png" alt="pistas" />
+                        </button>
+                        <button class="p-2 border-[1px] rounded icono-editar" data-icon="parques">
+                            <img class="w-full" src="../../imagenes/amenidades/parques.png" alt="parques" />
+                        </button>
+                        <button class="p-2 border-[1px] rounded icono-editar" data-icon="jardin">
+                            <img class="w-full" src="../../imagenes/amenidades/jardin.png" alt="jardin" />
+                        </button>
+                        <button class="p-2 border-[1px] rounded icono-editar" data-icon="areas-comunes">
+                            <img class="w-full" src="../../imagenes/amenidades/areas-comunes.png" alt="areas-comunes" />
+                        </button>
+                        <button class="p-2 border-[1px] rounded icono-editar" data-icon="biodigestor">
+                            <img class="w-full" src="../../imagenes/amenidades/biodigestor.png" alt="biodigestor" />
+                        </button>
+                        <button class="p-2 border-[1px] rounded icono-editar" data-icon="colegio">
+                            <img class="w-full" src="../../imagenes/amenidades/colegio.png" alt="colegio" />
+                        </button>
+                    </div>
+                    <button id="btnGuardarIconoEditado" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">
+                        Guardar Cambios
+                    </button>
+                </div>
+            </div>
+
+            <!-- Modal para ingresar nombre de amenidad -->
+            <div id="modalNombreAmenidad" class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 items-center justify-center z-[50000]">
+                <div class="bg-white p-4 max-w-[400px] mx-auto rounded shadow-lg">
+                    <h2 class="text-xl mb-4">Ingresa el nombre de la amenidad</h2>
+                    <input type="text" id="inputNombreAmenidad" class="border p-2 mb-4 w-full" />
+                    <button id="btnGuardarAmenidad" class="bg-blue-500 text-white px-4 py-2 rounded">
+                        Crear Amenidad
+                    </button>
+                </div>
+            </div>
+
             <div id="modal-manager-proyect" class="modal-create md-hidden">
-                <div class="form-create" style="width: 500px;">
+                <div class="form-create" style="width: 85%; min-height:80vh">
                     <!-- <form id="form_producto_add"> -->
                     <div class="close-modal">
                         <ion-icon name="close-circle-outline"></ion-icon>
                     </div>
                     <h1 class="text-sm font-bold">Configuración Proyecto</h1>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="w-full md:px-[20px] border-r-2">
+                            <span class="route" style="margin-bottom: 0px !important">
+                                Logo
+                            </span>
+                            <div class="flex" id="content-logo">
+                                <div>
+                                    <div class="relative" id="content-avatar-logo">
+                                        <img id="logo-preview" class="w-[60px] h-[60px] rounded-full object-cover" src="../../img/avatar_default.jpg" alt="">
+                                        <span id="edit-logo" class="bottom-0 cursor-pointer left-7 absolute flex items-center jutify-center  w-[30px] h-[30px] bg-[#ffde00] border-2 border-white dark:border-gray-800 rounded-full">
+                                            <ion-icon class="w-full" aria-hidden="true" name="create"></ion-icon>
 
-                    <span class="route" style="margin-bottom: 0px !important">
-                        Logo
-                    </span>
-                    <div class="flex" id="content-logo">
-                        <div>
-                            <div class="relative" id="content-avatar-logo">
-                                <img id="logo-preview" class="w-[60px] h-[60px] rounded-full object-cover" src="../../img/avatar_default.jpg" alt="">
-                                <span id="edit-logo" class="bottom-0 cursor-pointer left-7 absolute flex items-center jutify-center  w-[30px] h-[30px] bg-[#ffde00] border-2 border-white dark:border-gray-800 rounded-full">
-                                    <ion-icon class="w-full" aria-hidden="true" name="create"></ion-icon>
+                                        </span>
+                                    </div>
+                                    <span class="text-[10px]  tex-gray-300">Max 15 MB</span>
+                                </div>
 
-                                </span>
+                                <input class="hidden" type="file" name="logo_proyect" id="upload_logo">
                             </div>
-                            <span class="text-[10px]  tex-gray-300">Max 15 MB</span>
-                        </div>
-
-                        <input class="hidden" type="file" name="logo_proyect" id="upload_logo">
-                    </div>
-                    <span class="route" style="margin-bottom: 0px !important">
-                        Galeria
-                    </span>
-                    <div id="botones-event-gallery" class="flex items-center gap-3 hidden">
-                        <button id="save_img_gallery" class="p-2 rounded-lg text-[10px] inline-block max-h-max text-white bg-success">Guardar</button>
-                        <button id="cancelar_img_gallery" class="p-2 rounded-lg border-1 border-[#ececec] text-[10px] inline-block max-h-max bg-white text-gray-500">Cancelar</button>
-                    </div>
-
-                    <div id="multimedia_photos_preview" class="grid grid-cols-2 md:grid-cols-4 gap-2">
-                        <div>
-                            <div id="drag-gallery" class="p-3 cursor-pointer justify-center items-center rounded-lg border-2 border-dashed border-[#ececec] flex flex-col gap-3">
-                                <ion-icon name="add-outline" class="font-bold"></ion-icon>
-                                <span class="text-sm text-center font-bold">Agregar fotos</span>
+                            <span class="text-sm block font-bold my-4">
+                                Galeria
+                            </span>
+                            <div id="botones-event-gallery" class="flex items-center gap-3 hidden">
+                                <button id="save_img_gallery" class="p-2 rounded-lg text-[10px] inline-block max-h-max text-white bg-success">Guardar</button>
+                                <button id="cancelar_img_gallery" class="p-2 rounded-lg border-1 border-[#ececec] text-[10px] inline-block max-h-max bg-white text-gray-500">Cancelar</button>
                             </div>
-                            <input accept="image/*" multiple type="file" class="hidden" id="upload-gallery">
+
+                            <div id="multimedia_photos_preview" class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                                <div>
+                                    <div id="drag-gallery" class="p-3 cursor-pointer justify-center items-center rounded-lg border-2 border-dashed border-[#ececec] flex flex-col gap-3">
+                                        <ion-icon name="add-outline" class="font-bold"></ion-icon>
+                                        <span class="text-sm text-center font-bold">Agregar fotos</span>
+                                    </div>
+                                    <input accept="image/*" multiple type="file" class="hidden" id="upload-gallery">
+                                </div>
+                            </div>
+
+                            <span class="text-sm block font-bold my-4">
+                                Video URL
+                            </span>
+                            <div class="my-3 w-full">
+                                <input class="w-full bg-gray-200 rounded p-2" placeholder="Ingresa la url del video de Youtube" type="text" id="videoUrlProyecto">
+                                <iframe class="hidden w-full" id="iframeVideoY" height="315" src="" frameborder="0" allowfullscreen></iframe>
+
+                                <div id="viewbuttonsvideo" class="w-full hidden items-center flex gap-4">
+                                    <button class="bg-gray-100 text-gray-900 text-sm rounded p-3 border cursor-pointer" id="cancelarvideo">Cancelar</button>
+                                    <button class="bg-green-500 text-white text-sm rounded p-3 border cursor-pointer" id="savevideo">Guardar cambios</button>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="w-full md:px-[20px]">
+
+                            <span class="route" style="margin-bottom: 0px !important">
+                                Descripcion del proyecto
+                            </span>
+                            <div class="w-full my-3">
+                                <textarea id="description-proyect" class="rounded p-2 bg-gray-200 text-sm w-full" placeholder="Max 600 letras" id="" maxlength="600" cols="200" rows="4"></textarea>
+                                <div id="viewbuttonsdescription" class="w-full hidden items-center flex gap-4">
+                                    <button class="bg-gray-100 text-gray-900 text-sm rounded p-3 border cursor-pointer" id="cancelardescription">Cancelar</button>
+                                    <button class="bg-green-500 text-white text-sm rounded p-3 border cursor-pointer" id="savedescription">Guardar cambios</button>
+                                </div>
+                            </div>
+                            <span class="route" style="margin-bottom: 0px !important">
+                                Amenidades
+                            </span>
+                            <button id="btnAgregarAmenidad" class="bg-[#310ecd] text-white text-sm px-4 py-2 rounded my-3">
+                                Agregar Amenidad
+                            </button>
+                            <ul id="amenidadesList" class="flex flex-col gap-3"></ul>
+                            <!-- fin de amenidades -->
+                            <div id="changeBtn" class="hidden">
+                                <button id="cancelarCambiosAmenidades" class="px-2 py-3 rounded bg-white text-gray-700 text-xs border border-gray-300">Cancelar</button>
+                                <button id="subirCambiosAmenidades" class="px-2 py-3 rounded bg-green-600 text-white text-xs">Guardar Cambios</button>
+                            </div>
                         </div>
                     </div>
+
+
                 </div>
                 <!-- <div class="card-input buttons-modal">
                         <button id="cancel-form-asigned" class="btn-cancel">Cancelar</button>
@@ -203,6 +381,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
     <script src="../../components/sidebar.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
     <script src="../../js/dinamic/gestion_proyectos_a.js"></script>
+    <script src="./script.js"></script>
 
 <?php } ?>
 

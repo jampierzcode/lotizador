@@ -88,7 +88,7 @@ $links = [
                 <li class="links-menu-dashboard">
                     <div class="link-block">
                         <div class="left-link">
-                            <a class="toggle-drop <?php echo ($currentUrl === "target_user" || $currentUrl === "about.php") ? ' active-link' : ''; ?>" href="../target_user">
+                            <a class="toggle-drop <?php echo ($currentUrl === "target_user" || $currentUrl === "about.php" || $currentUrl === "share.php") ? ' active-link' : ''; ?>" href="../target_user">
                                 <ion-icon name="id-card"></ion-icon>
                                 <p>Tarjeta Asesor</p>
                             </a>

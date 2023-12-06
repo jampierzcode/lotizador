@@ -100,6 +100,12 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                                         Sobre mi
                                     </a>
                                 </li>
+                                <li class="w-full">
+                                    <a class="page-target w-full inline-block p-4 rounded-xl hover:bg-gray-200 ease-out duration-300 flex items-center gap-3 text-[12px]" href="share.php">
+                                        <ion-icon name="share-social"></ion-icon>
+                                        Compartir
+                                    </a>
+                                </li>
                             </ul>
                         </div>
                     </div>
@@ -195,90 +201,12 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                                 <div data-testid="button" class="w-full pt-[20px] pb-[20px] flex justify-center" style="background: linear-gradient(rgba(255, 255, 255, 0) 15%, rgb(255, 255, 255) 100%) rgb(255, 255, 255);">
                                     <div data-testid="button-text-cont" class="rounded-[48px] text-[10px] text-white flex items-center justify-center w-[170px] h-[38px] font-bold" color="primary" variant="contained" style="background-color: rgb(0, 0, 0);">Save Contact</div>
                                 </div>
-                                <div class="jss805" style="background-color: rgb(255, 255, 255); flex-grow: 1;">
-                                    <div data-testid="links-container" style="display: flex; justify-content: center; flex-wrap: wrap; background-color: rgb(255, 255, 255);">
-                                        <div data-testid="not-highlighted" style="display: flex; justify-content: center; margin: 0px 9px 5px;"><a class="jss807" href="tel:+51900366553" target="_blank" style="margin-bottom: 0px; width: 54.58px; height: 74px; box-shadow: none; border-radius: 0px;">
-                                                <svg class="icon-shadow" width="54" height="54" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                    <g filter="url(#c_31)">
-                                                        <path d="M18.0952 0H61.9048C71.9048 0 80 8.09524 80 18.0952V61.9048C80 71.9048 71.9048 80 61.9048 80H18.0952C8.09524 80 0 71.9048 0 61.9048V18.0952C0 8.09524 8.09524 0 18.0952 0Z" fill="url(#paint0_linearс31)"></path>
-                                                        <path d="M14.6819 21.9295C14.4937 19.3883 15.529 17.6001 17.6937 16.2824C18.6349 15.7177 19.576 15.0589 20.5172 14.4942C22.2113 13.4589 23.8113 13.7413 24.9407 15.4354C26.9172 18.353 28.7996 21.1766 30.776 24.0942C32.1878 26.1648 32.0937 27.5766 30.4937 29.4589C30.0231 30.0236 29.5525 30.5883 29.176 31.153C27.8584 32.8471 27.7643 34.353 28.9878 36.1413C30.4937 38.2119 32.1878 40.1883 33.8819 42.1648C36.5172 45.1766 39.6231 47.7177 42.9172 50.1648C44.7055 51.4824 46.3996 51.3883 48.1878 50.2589C48.7525 49.8824 49.4113 49.4118 49.976 49.0354C51.6702 47.7177 52.9878 47.6236 54.8702 48.753C57.7878 50.6354 60.7996 52.4236 63.7172 54.306C65.8819 55.6236 66.2584 57.0354 65.129 59.2942C64.4702 60.5177 63.7172 61.6471 62.8702 62.7766C61.6466 64.5648 59.8584 65.1295 57.7878 65.1295C55.2466 65.2236 52.8937 64.5648 50.6349 63.6236C44.329 61.0824 38.776 57.3177 33.7878 52.8001C27.6702 47.3413 22.3996 41.1295 18.4466 33.8824C16.7525 30.6824 15.3407 27.3883 14.8702 23.8119C14.776 23.153 14.776 22.4942 14.6819 21.9295Z" fill="white"></path>
-                                                    </g>
-                                                    <defs>
-                                                        <filter id="c_31" x="0" y="-1" width="80" height="81" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-                                                            <feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood>
-                                                            <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"></feBlend>
-                                                            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"></feColorMatrix>
-                                                            <feOffset dy="-1"></feOffset>
-                                                            <feGaussianBlur stdDeviation="0.5"></feGaussianBlur>
-                                                            <feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"></feComposite>
-                                                            <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.12 0"></feColorMatrix>
-                                                            <feBlend mode="normal" in2="shape" result="effect1_innerShadow"></feBlend>
-                                                        </filter>
-                                                        <linearGradient id="paint0_linearс31" x1="40" y1="0" x2="40" y2="80" gradientUnits="userSpaceOnUse">
-                                                            <stop stop-color="#8BFB6B"></stop>
-                                                            <stop offset="1" stop-color="#19DB1C"></stop>
-                                                        </linearGradient>
-                                                    </defs>
-                                                </svg>
-                                                <span class="text-icon-target" data-testid="link-title" style="color: rgb(0, 0, 0); overflow: hidden; padding-top: 0px;">Phone</span></a></div>
-                                        <div data-testid="not-highlighted" style="display: flex; justify-content: center; margin: 0px 9px 5px;"><a class="jss807" href="mailto:jampierv127@gmail.com" target="_blank" style="margin-bottom: 0px; width: 54.58px; height: 74px; box-shadow: none; border-radius: 0px;">
-                                                <svg class="icon-shadow" width="54" height="54" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                    <g filter="url(#filterc9)">
-                                                        <path d="M18.0952 0H61.9048C71.9048 0 80 8.09524 80 18.0952V61.9048C80 71.9048 71.9048 80 61.9048 80H18.0952C8.09524 80 0 71.9048 0 61.9048V18.0952C0 8.09524 8.09524 0 18.0952 0Z" fill="url(#paint0_linearc9)"></path>
-                                                        <path d="M66.0163 22H14.4268C13.9581 22 13.5169 22.1379 13.1309 22.3585L13.6823 22.9099L36.8163 46.0714C38.6913 47.9464 41.7519 47.9464 43.6269 46.0714L67.3399 22.386C66.9538 22.1379 66.4851 22 66.0163 22Z" fill="white"></path>
-                                                        <path d="M68.4695 24.454C68.4695 23.9853 68.3316 23.5441 68.111 23.1581L51.0156 40.4189L68.1662 57.5143C68.3592 57.1559 68.4695 56.7423 68.4695 56.3287V24.454Z" fill="white"></path>
-                                                        <path d="M12 24.454C12 23.9853 12.1379 23.5441 12.3585 23.1581L29.4539 40.4189L12.3033 57.5143C12.1103 57.1559 12 56.7423 12 56.3287V24.454Z" fill="white"></path>
-                                                        <path d="M50.1066 41.2185L44.1232 47.2019C41.9725 49.3526 38.4431 49.3526 36.2924 47.2019L30.309 41.2461L13.1309 58.3967C13.5169 58.6173 13.9305 58.7551 14.3992 58.7551H65.9888C66.4575 58.7551 66.8987 58.6173 67.2571 58.3967L66.2369 57.3765L50.1066 41.2185Z" fill="white"></path>
-                                                    </g>
-                                                    <defs>
-                                                        <filter id="filterc9" x="0" y="-1" width="80" height="81" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-                                                            <feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood>
-                                                            <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"></feBlend>
-                                                            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"></feColorMatrix>
-                                                            <feOffset dy="-1"></feOffset>
-                                                            <feGaussianBlur stdDeviation="0.5"></feGaussianBlur>
-                                                            <feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"></feComposite>
-                                                            <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.12 0"></feColorMatrix>
-                                                            <feBlend mode="normal" in2="shape" result="effect1_innerShadow"></feBlend>
-                                                        </filter>
-                                                        <linearGradient id="paint0_linearc9" x1="40" y1="0" x2="40" y2="80" gradientUnits="userSpaceOnUse">
-                                                            <stop stop-color="#1E51EE"></stop>
-                                                            <stop offset="1" stop-color="#19E4FF"></stop>
-                                                        </linearGradient>
-                                                    </defs>
-                                                </svg>
-                                                <span class="text-icon-target" data-testid="link-title" style="color: rgb(0, 0, 0); overflow: hidden; padding-top: 0px;">Email</span></a></div>
-                                        <div data-testid="not-highlighted" style="display: flex; justify-content: center; margin: 0px 9px 5px;"><a class="jss807" href="https://facebook.com/awdawdawd" target="_blank" style="margin-bottom: 0px; width: 54.58px; height: 74px; box-shadow: none; border-radius: 0px;"><img alt="Mi facebook" class="jss809" src="https://firebasestorage.googleapis.com/v0/b/poplco.appspot.com/o/42957129888-icon_dBBcz44rOdrt?alt=media" style="border-radius: 10px; object-fit: cover; width: 54px; height: 54px;"><span data-testid="link-title" style="color: rgb(0, 0, 0); overflow: hidden; padding-top: 0px;">Mi facebook</span></a></div>
-                                        <div data-testid="not-highlighted" style="display: flex; justify-content: center; margin: 0px 9px 5px;"><a class="jss807" href="https://instagram.com/awd" target="_blank" style="margin-bottom: 0px; width: 54.58px; height: 74px; box-shadow: none; border-radius: 0px;"><img alt="awdawd" class="jss809" src="https://firebasestorage.googleapis.com/v0/b/poplco.appspot.com/o/42957129888-icon_IJDI937379JD?alt=media" style="border-radius: 10px; object-fit: cover; width: 54px; height: 54px;"><span data-testid="link-title" style="color: rgb(0, 0, 0); overflow: hidden; padding-top: 0px;">awdawd</span></a></div>
+                                <div class="px-3" style="background-color: rgb(255, 255, 255); flex-grow: 1;">
+                                    <div id="links-container" class="flex justify-center gap-2 flex-wrap" style="background-color: rgb(255, 255, 255);">
+                                        cargando...
 
-                                        <div style="width: 254px; padding: 15px 23px; margin-bottom: 5px;"><span style="display: inline-block; white-space: pre-line; font-size: 13px; font-weight: 600; margin: 0px; line-height: 1.5; color: rgb(0, 0, 0);">Mis skills</span></div>
-                                        <div style="width: 254px; padding: 15px 23px; margin-bottom: 5px;">
-                                            <div>
-                                                <div class="MuiPaper-root MuiAccordion-root jss813 jss820 MuiPaper-elevation1">
-                                                    <div class="MuiButtonBase-root MuiAccordionSummary-root jss816" tabindex="0" role="button" aria-disabled="false" aria-expanded="false" aria-controls="panel1d-content" id="panel1d-header">
-                                                        <div class="MuiAccordionSummary-content jss817"><span style="color: rgb(0, 0, 0);"><strong>gestion</strong></span>
-                                                            <div class="jss812" style="transform: rotate(0deg);"><svg class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-3vmltg" focusable="false" viewBox="0 0 24 24" color="white" aria-hidden="true" data-testid="ArrowForwardIosSharpIcon" style="user-select: none; width: 1em; height: 1em; display: inline-block; fill: rgb(3, 4, 6); flex-shrink: 0; transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms; font-size: 0.9rem;">
-                                                                    <path d="M6.23 20.23 8 22l10-10L8 2 6.23 3.77 14.46 12z"></path>
-                                                                </svg></div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="MuiCollapse-root MuiCollapse-hidden" style="min-height: 0px;">
-                                                        <div class="MuiCollapse-wrapper">
-                                                            <div class="MuiCollapse-wrapperInner">
-                                                                <div aria-labelledby="panel1d-header" id="panel1d-content" role="region">
-                                                                    <div class="MuiAccordionDetails-root jss819"><span style="color: rgb(0, 0, 0); white-space: pre-line;">hola
-                                                                            awdw
-                                                                            awdawd</span></div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
-
                             </div>
                         </div>
                     </div>

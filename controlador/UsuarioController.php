@@ -358,6 +358,7 @@ if ($_POST["funcion"] == "buscar_proyectos") {
             $json[] = array(
                 'id' => $dato->id,
                 'nombreProyecto' => $dato->nombre_proyecto,
+                'description' => $dato->description,
                 'creadorNombre' => $dato->creador_nombre,
                 'creadorApellido' => $dato->creador_apellido,
                 'imgUrl' => $dato->img_url,
@@ -365,6 +366,18 @@ if ($_POST["funcion"] == "buscar_proyectos") {
             );
         }
         $jsonstring = json_encode($json);
+        echo $jsonstring;
+    }
+}
+if ($_POST["funcion"] == "buscar_proyectos_id") {
+    $json = array();
+    $proyecto = $_POST["proyecto"];
+    $usuario->buscar_proyectos_id($proyecto);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+        $jsonstring = json_encode($usuario->datos);
         echo $jsonstring;
     }
 }
@@ -554,6 +567,8 @@ if ($_POST["funcion"] == "buscar_proyectos_admin") {
             $json[] = array(
                 'id' => $dato->id,
                 'nombreProyecto' => $dato->nombre_proyecto,
+                'description' => $dato->description,
+                'video_url' => $dato->video_url,
                 'clienteNombre' => $dato->cliente_nombre,
                 'clienteApellido' => $dato->cliente_apellido,
                 'imgUrl' => $dato->img_url,
@@ -1002,6 +1017,19 @@ if ($_POST["funcion"] == "buscar_user_target_socials") {
         echo $jsonstring;
     }
 }
+if ($_POST["funcion"] == "buscar_by_user_target_socials") {
+    $json = array();
+    $user = $_POST["user"];
+    $usuario->buscar_user_target_socials($user);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+
+        $jsonstring = json_encode($usuario->datos);
+        echo $jsonstring;
+    }
+}
 if ($_POST["funcion"] == "update_social_networks") {
     $user_id = $id_usuario;
     $redes_sociales = json_decode($_POST["redes_sociales"]);
@@ -1037,6 +1065,44 @@ if ($_POST["funcion"] == "subirimagenesgallery") {
     $galeria = $_POST["galeria"];
     $id = $_POST["id"];
     $usuario->subirimagenesgallery($id, $galeria);
+    echo $usuario->mensaje;
+}
+if ($_POST["funcion"] == "subir_amenidades") {
+    $amenidades = json_decode($_POST["amenidades"]);
+
+    $id = $_POST["id"];
+    $usuario->subir_amenidades($id, $amenidades);
+    echo $usuario->mensaje;
+}
+if ($_POST["funcion"] == "update_amenidad") {
+    $amenidad = json_decode($_POST["data"]);
+
+    $usuario->update_amenidad($amenidad);
+    echo $usuario->mensaje;
+}
+if ($_POST["funcion"] == "buscar_amenidades") {
+    $id = $_POST["id"];
+    $usuario->buscar_amenidades($id);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+        $jsonstring = json_encode($usuario->datos);
+        echo $jsonstring;
+    }
+}
+if ($_POST["funcion"] == "subir_description_proyect") {
+    $id = $_POST["id"];
+    $description = $_POST["description"];
+    $usuario->subir_description_proyect($id, $description);
+
+    echo $usuario->mensaje;
+}
+if ($_POST["funcion"] == "subir_video_proyect") {
+    $id = $_POST["id"];
+    $video = $_POST["video"];
+    $usuario->subir_video_proyect($id, $video);
+
     echo $usuario->mensaje;
 }
 if ($_POST["funcion"] == "multimedia_proyecto") {

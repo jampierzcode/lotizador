@@ -402,9 +402,22 @@ class Usuario
 
     function buscar_proyectos()
     {
-        $sql = "SELECT PRO.id, PRO.nombreProyecto as nombre_proyecto, PRO.imgUrl as img_url, PRO.proyectStatus as proyect_status, CREATOR.nombre as creador_nombre, CREATOR.apellido as creador_apellido FROM proyectos as PRO inner join usuario as CREATOR on PRO.createdBy=CREATOR.id_usuario";
+        $sql = "SELECT PRO.id, PRO.nombreProyecto as nombre_proyecto, PRO.description, PRO.imgUrl as img_url, PRO.proyectStatus as proyect_status, CREATOR.nombre as creador_nombre, CREATOR.apellido as creador_apellido FROM proyectos as PRO inner join usuario as CREATOR on PRO.createdBy=CREATOR.id_usuario";
         $query = $this->conexion->prepare($sql);
         $query->execute();
+        $this->datos = $query->fetchAll(); // retorna objetos o no
+        if (!empty($this->datos)) {
+            return $this->datos;
+        } else {
+            $this->mensaje = "no-register";
+            return $this->mensaje;
+        }
+    }
+    function buscar_proyectos_id($proyecto)
+    {
+        $sql = "SELECT * FROM proyectos WHERE id=:proyecto";
+        $query = $this->conexion->prepare($sql);
+        $query->execute(array(":proyecto" => $proyecto));
         $this->datos = $query->fetchAll(); // retorna objetos o no
         if (!empty($this->datos)) {
             return $this->datos;
@@ -745,7 +758,7 @@ class Usuario
     }
     function buscar_proyectos_admin()
     {
-        $sql = "SELECT PRO.id, PRO.nombreProyecto as nombre_proyecto, PRO.imgUrl as img_url, PRO.proyectStatus as proyect_status, USER.nombre as cliente_nombre, USER.apellido as cliente_apellido FROM user_proyect as USPRO inner join proyectos as PRO on USPRO.proyecto_id=PRO.id inner join usuario as USER on USPRO.user_id=USER.id_usuario WHERE USPRO.user_id=:id";
+        $sql = "SELECT PRO.id, PRO.nombreProyecto as nombre_proyecto, PRO.description, PRO.video_url, PRO.imgUrl as img_url, PRO.proyectStatus as proyect_status, USER.nombre as cliente_nombre, USER.apellido as cliente_apellido FROM user_proyect as USPRO inner join proyectos as PRO on USPRO.proyecto_id=PRO.id inner join usuario as USER on USPRO.user_id=USER.id_usuario WHERE USPRO.user_id=:id";
         $query = $this->conexion->prepare($sql);
         $query->execute(array(":id" => $_SESSION["id_usuario"]));
         $this->datos = $query->fetchAll(); // retorna objetos o no
@@ -1562,6 +1575,87 @@ class Usuario
             }
 
             $this->mensaje = "create-sucess";
+            return $this->mensaje;
+        } catch (\Throwable $error) {
+            $this->mensaje = "fatal_error " + $error;
+            return $this->mensaje;
+            //throw $th;
+        }
+    }
+    function buscar_amenidades($id)
+    {
+        try {
+            $sql = "SELECT * FROM amenidades WHERE proyecto_id=:proyecto";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":proyecto" => $id));
+            $this->datos = $query->fetchAll(); // retorna objetos o no
+            if (!empty($this->datos)) {
+                return $this->datos;
+            } else {
+                $this->mensaje = "no-register-amenidades";
+                return $this->mensaje;
+            }
+        } catch (\Throwable $error) {
+            $this->mensaje = "fatal_error " + $error;
+            return $this->mensaje;
+            //throw $th;
+        }
+    }
+    function subir_amenidades($id, $amenidades)
+    {
+        try {
+            $sql = "INSERT INTO amenidades(icono,	nombre,	activo,	proyecto_id) VALUES (:icono, :nombre, :activo, :proyecto)";
+            $query = $this->conexion->prepare($sql);
+            foreach ($amenidades as $a) {
+                # code...
+                $query->execute(array(":icono" => $a->icono, ":nombre" => $a->nombre, ":activo" => $a->activo, ":proyecto" => $id));
+            }
+
+            $this->mensaje = "create-sucess";
+            return $this->mensaje;
+        } catch (\Throwable $error) {
+            $this->mensaje = "fatal_error " + $error;
+            return $this->mensaje;
+            //throw $th;
+        }
+    }
+    function update_amenidad($amenidad)
+    {
+        try {
+            $sql = "UPDATE amenidades SET icono=:icono, nombre=:nombre WHERE id=:id";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":icono" => $amenidad->icono, ":nombre" => $amenidad->nombre, ":id" => $amenidad->id));
+            $this->mensaje = "update-sucess";
+            return $this->mensaje;
+        } catch (\Throwable $error) {
+            $this->mensaje = "fatal_error " + $error;
+            return $this->mensaje;
+            //throw $th;
+        }
+    }
+    function subir_description_proyect($id, $description)
+    {
+        try {
+            $sql = "UPDATE  proyectos SET description=:description WHERE id=:id";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":id" => $id, ":description" => $description));
+
+            $this->mensaje = "update-sucess";
+            return $this->mensaje;
+        } catch (\Throwable $error) {
+            $this->mensaje = "fatal_error " + $error;
+            return $this->mensaje;
+            //throw $th;
+        }
+    }
+    function subir_video_proyect($id, $video)
+    {
+        try {
+            $sql = "UPDATE  proyectos SET video_url=:video WHERE id=:id";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":id" => $id, ":video" => $video));
+
+            $this->mensaje = "update-sucess";
             return $this->mensaje;
         } catch (\Throwable $error) {
             $this->mensaje = "fatal_error " + $error;

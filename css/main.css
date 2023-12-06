@@ -827,7 +827,15 @@ a.link-page {
   margin-top: -200px;
   z-index: 2000;
 }
+.selected-icon {
+  border: 1px solid #38a169 !important;
+  color: #38a169 !important;
+}
 
+.eliminar-btn {
+  color: #e53e3e;
+  cursor: pointer;
+}
 .card-section img {
   width: 100%;
   max-width: 500px;
