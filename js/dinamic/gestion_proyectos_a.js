@@ -3,6 +3,8 @@ $(document).ready(function () {
   var nombreProyecto;
   var descriptionProyecto;
   var changedescriptionProyecto;
+  var dominio = "https://lotizador.mcsolucionesti.com/";
+  // var dominio = "https://lotizador.vivelainmobiliaria.pe";
   // url video variables
   var videoProyecto;
   var changevideoProyecto;
@@ -44,7 +46,7 @@ $(document).ready(function () {
           return `
           <div class="flex-actions">
           <a target="_blank" href="lotizador?id=${data.id}" class="btnLotes"> Ver lotes </a>
-          <button target="_blank" keyProyect="https://lotizador.mcsolucionesti.com/views/Lotizador/Clientes/?proyect=${data.id}" id="rutaEnlace" class="btnLotes"> Copiar Link </button>
+          <button target="_blank" keyProyect="${dominio}/views/Lotizador/Clientes/?proyect=${data.id}" id="rutaEnlace" class="btnLotes"> Copiar Link </button>
           <button id="manager_lotes" key_proyect=${data.id} name="${data.nombreProyecto} type="button" class="p-2 whitespace-nowrap text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">Administrar Lotes</button>
 <a target="_blank" class="btnJsvm default" key="${data.id}" href="./schemalotizador.php?proyect=${data.id}">PDF <ion-icon name="document-text-outline"></ion-icon></a>
              <button key="${data.id}" id="change_settings"><ion-icon name="settings"></ion-icon></button>   
@@ -293,7 +295,7 @@ $(document).ready(function () {
     if (multimedia.length > 0) {
       let template = `
       <div>
-      <div id="drag-gallery" class="p-3 cursor-pointer justify-center items-center rounded-lg border-2 border-dashed border-[#ececec] flex flex-col gap-3">
+      <div id="drag-gallery" class="p-3 h-full cursor-pointer justify-center items-center rounded-lg border-2 border-dashed border-[#ececec] flex flex-col gap-3">
           <ion-icon name="add-outline" class="font-bold"></ion-icon>
           <span class="text-sm text-center font-bold">Agregar fotos</span>
       </div>
@@ -302,8 +304,11 @@ $(document).ready(function () {
 
       multimedia.reverse().forEach((multimedia) => {
         template += `
-      <div class="flex items-center justify-center border-1 border-gray-100">
-        <img class="h-auto max-w-full rounded-lg" src="../../${multimedia.url}" alt="">
+      <div class="image-container flex items-center justify-center border-1 border-gray-100">
+        <div class="overlay">
+        <button data-id="${multimedia.id}" class="text-[8px] eliminar_multimedia rounded px-1 py-1"><ion-icon name="trash"></ion-icon></button>
+        </div>
+      <img class="h-[100px] w-full object-center object-cover rounded-lg" src="../../${multimedia.url}" alt="">
       </div>
       `;
       });
@@ -325,6 +330,27 @@ $(document).ready(function () {
       $("#modal-manager-proyect .form-create").addClass("modal-show");
     }, 10);
   }
+  $(document).on("click", ".eliminar_multimedia", function () {
+    let id_img = $(this).attr("data-id");
+    console.log(id_img);
+    let funcion = "eliminar_img";
+    $.post(
+      "../../controlador/UsuarioController.php",
+      { funcion, id: id_img },
+      (response) => {
+        console.log(response);
+        if (response.trim() === "deleted-success") {
+          // alert("Imagen eliminada");
+          multimedia = multimedia.filter(function (img) {
+            return img.id !== id_img;
+          });
+          pintarMultimediaProeyctos();
+        } else {
+          alert("Hubo un error contacta al administrador");
+        }
+      }
+    );
+  });
   // change setting logo y galery
   $(document).on("click", "#change_settings", function () {
     var id = $(this).attr("key");
@@ -468,10 +494,10 @@ $(document).ready(function () {
   });
 
   $("#modal-manager-proyect .close-modal").click(function () {
-    $("#modal-manager-proyect").addClass("md-hidden");
+    $("#modal-manager-proyect .form-create").removeClass("modal-show");
     setTimeout(function () {
-      $("#modal-manager-proyect .form-create").removeClass("modal-show");
-    }, 10);
+      $("#modal-manager-proyect").addClass("md-hidden");
+    }, 300);
   });
   // subir fotos
   $(document).on("click", "#drag-gallery", function () {
@@ -505,6 +531,7 @@ $(document).ready(function () {
           (response) => {
             if (response.trim() == "create-sucess") {
               alert("se subieron todas las imagenes");
+              imagenesCargadas = [];
               $(".image-card>span").remove();
 
               $("#botones-event-gallery").addClass("hidden");
@@ -755,10 +782,10 @@ $(document).ready(function () {
   });
   // EDIT LOTES MODAL
   $("#modal-manager-lotes .close-modal").click(() => {
+    $("#modal-manager-lotes .form-create").removeClass("modal-show");
     setTimeout(function () {
-      $("#modal-manager-lotes .form-create").removeClass("modal-show");
-    }, 10);
-    $("#modal-manager-lotes").addClass("md-hidden");
+      $("#modal-manager-lotes").addClass("md-hidden");
+    }, 300);
   });
   // ---------
   buscar_proyectos();

@@ -74,6 +74,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
             <span class="route">
                 > Home > Target User
             </span>
+            <input id="id_usuario" type="hidden" value="<?php echo $_SESSION["id_usuario"] ?>">
             <div class="w-full">
 
                 <div class="flex flex-wrap md:flex-nowrap">

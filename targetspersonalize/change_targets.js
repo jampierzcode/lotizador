@@ -154,7 +154,7 @@ $(document).ready(function () {
         "../controlador/TargetController.php",
         { funcion, id: user },
         (response) => {
-          // console.log(response);
+          console.log(response);
           if (response.trim() !== "no-register-target") {
             const user = JSON.parse(response);
             console.log(user);

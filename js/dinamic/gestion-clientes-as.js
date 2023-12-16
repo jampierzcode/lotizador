@@ -1218,10 +1218,10 @@ $(document).ready(function () {
                 console.log(response);
                 if (response.trim() == "add-user-cliente") {
                   alert("Se asigno cliente al asesor");
+                  $("#crear-lead .form-create").removeClass("modal-show");
                   setTimeout(function () {
-                    $("#crear-lead .form-create").removeClass("modal-show");
-                  }, 1000);
-                  $("#crear-lead").addClass("md-hidden");
+                    $("#crear-lead").addClass("md-hidden");
+                  }, 300);
                   buscar_clientes();
                   $("#nombre-lead").val("");
                   $("#apellido-lead").val("");
@@ -1508,8 +1508,10 @@ $(document).ready(function () {
     $("#historial-event .form-create").removeClass("modal-show");
   });
   $("#crear-lead .form-create .close-modal").click(() => {
-    $("#crear-lead").addClass("md-hidden");
     $("#crear-lead .form-create").removeClass("modal-show");
+    setTimeout(() => {
+      $("#crear-lead").addClass("md-hidden");
+    }, 300);
   });
   $("#editar-lead .form-create .close-modal").click(() => {
     $("#editar-lead").addClass("md-hidden");

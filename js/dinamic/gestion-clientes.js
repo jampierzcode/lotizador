@@ -768,6 +768,12 @@ $(document).ready(function () {
       $("#crear-lead .form-create").addClass("modal-show");
     }, 10);
   });
+  $("#crear-lead .close-modal").click(function () {
+    $("#crear-lead .form-create").removeClass("modal-show");
+    setTimeout(function () {
+      $("#crear-lead").addClass("md-hidden");
+    }, 300);
+  });
   $("#registerLead").submit((e) => {
     e.preventDefault();
     let nombre = $("#nombre-lead").val();

@@ -50,7 +50,7 @@
         </button>
     </div>
 
-    <div class="w-full h-[100vh] flex items-center justify-center px-12 py-10 overflow-hidden">
+    <div class="w-full h-[100vh] flex items-center justify-center px-0 md:px-12 py-10 overflow-hidden">
         <div class="w-full max-w-[600px] mx-auto h-[100%]">
 
             <div class="flex items-center flex-wrap md:flex-nowrap h-[100%]">
@@ -88,7 +88,7 @@
 
 
                                 <div class="w-full">
-                                    <iframe class="hidden" width="560" id="urlvideoY" height="315" src="" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                                    <iframe class="hidden w-full max-w-[500px] mx-auto h-[200px] md:h-[355px]" id="urlvideoY" height="355" src="" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
                                 </div>
 
                                 <p id="title-amenidades" class="text-xl font-bold my-4 text-center w-full">Beneficios y amenidades</p>

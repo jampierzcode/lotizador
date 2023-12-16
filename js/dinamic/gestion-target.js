@@ -529,7 +529,7 @@ $(document).ready(function () {
       //   "src",
       //   "https://static.thenounproject.com/png/5647816-200.png"
       // );
-      $(imgPerfil).val("");
+      // $(imgPerfil).val("");
     } else {
       $("#portada_overlay").html(
         `<img class="rounded-lg object-cover w-full h-full dark:ring-gray-500" src="../../${dataTargetUser.cover_photo}" alt="rofile picture">`
@@ -553,7 +553,7 @@ $(document).ready(function () {
         "src",
         "https://static.thenounproject.com/png/5647816-200.png"
       );
-      $(imgPortada).val("");
+      // $(imgPortada).val("");
     } else {
       $("#perfil_overlay").html(
         `<img class="w-[80px] h-[80px] p-1 rounded-full" src="../../${dataTargetUser.picture_perfil}" alt="rofile picture">`

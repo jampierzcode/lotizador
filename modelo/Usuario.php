@@ -1696,6 +1696,21 @@ class Usuario
         // Devolver el resultado como JSON
         return json_encode($resultado);
     }
+    function eliminar_img($id)
+    {
+
+        try {
+            $sql_multimedia = "DELETE FROM multimedia  WHERE id = :id";
+            $query_multimedia = $this->conexion->prepare($sql_multimedia);
+            $query_multimedia->execute(array(":id" => $id));
+            $multimedia = $query_multimedia->fetchAll(PDO::FETCH_ASSOC);
+            $this->mensaje = "deleted-success";
+            return $this->mensaje;
+        } catch (\Throwable $error) {
+            $this->mensaje = "no-deleted" . $error;
+            return $this->mensaje;
+        }
+    }
 
     function buscar_clientes_by_asesor($id_usuario)
     {

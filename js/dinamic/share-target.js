@@ -16,10 +16,11 @@ $(document).ready(function () {
   }
   function pintar_proyectos(proyectos) {
     let template = "";
+    let id_usuario = $("#id_usuario").val();
     proyectos.forEach((p) => {
       template += `
             
-            <li class="border rounded p-3 w-full flex justify-between font-bold items-center gap-3">${p.nombreProyecto} <a target="_blank" class="link-proyect p-2 rounded bg-gray-700 text-white" data-link="targetspersonalize/?user=11&&proyect=${p.id}" href="../../targetspersonalize/?user=11&&proyect=${p.id}">Ir a Targeta</a></li>
+            <li class="border rounded p-3 w-full flex justify-between font-bold items-center gap-3">${p.nombreProyecto} <a target="_blank" class="link-proyect p-2 rounded bg-gray-700 text-white" data-link="targetspersonalize/?user=11&&proyect=${p.id}" href="../../targetspersonalize/?user=${id_usuario}&&proyect=${p.id}">Ir a Targeta</a></li>
             `;
     });
     $("#proyectosList").html(template);

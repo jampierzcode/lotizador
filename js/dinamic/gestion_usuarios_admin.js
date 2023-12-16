@@ -475,10 +475,10 @@ $(document).ready(function () {
     $("#correo-modal").val("");
     $("#username-modal").val("");
     $("#password-modal").val("");
+    $(".modal-create .form-create").removeClass("modal-show");
     setTimeout(function () {
-      $(".modal-create .form-create").removeClass("modal-show");
-    }, 10);
-    $(".modal-create").addClass("md-hidden");
+      $(".modal-create").addClass("md-hidden");
+    }, 300);
   });
 
   $("#cancel-form").click(() => {
@@ -501,10 +501,10 @@ $(document).ready(function () {
     $("#nombres-modal").val("");
     $("#apellidos-modal").val("");
     $("#correo-modal").val("");
+    $("#modal-edit-user .form-create").removeClass("modal-show");
     setTimeout(function () {
-      $("#modal-edit-user .form-create").removeClass("modal-show");
-    }, 10);
-    $("#modal-edit-user").addClass("md-hidden");
+      $("#modal-edit-user").addClass("md-hidden");
+    }, 300);
   });
 
   $("#cancel-form-edit").click(() => {

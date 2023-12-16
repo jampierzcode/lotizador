@@ -1112,6 +1112,13 @@ if ($_POST["funcion"] == "multimedia_proyecto") {
     // Devuelve el JSON al cliente
     echo $json_resultado;
 }
+if ($_POST["funcion"] == "eliminar_img") {
+    $id = $_POST["id"];
+    $usuario->eliminar_img($id);
+
+    // Devuelve el JSON al cliente
+    echo $usuario->mensaje;
+}
 
 if ($_POST["funcion"] == "update_user_target") {
     $json = array();

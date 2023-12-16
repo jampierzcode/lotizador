@@ -30,6 +30,7 @@ $(document).ready(function () {
           // <button target="_blank" keyClient="${data?.id}" id="editClient" class="btnJsvm normal"><ion-icon name="create-sharp"></ion-icon></button>
           return `
             <div class="flex-actions">
+            <button target="_blank" keyMsg="${data?.id}" id="editMsg" class="btnJsvm warning"><ion-icon name="create"></ion-icon></button>
             <button target="_blank" keyMsg="${data?.id}" id="deleteMsg" class="btnJsvm danger"><ion-icon name="trash"></ion-icon></button>
             </div>
   
@@ -46,6 +47,12 @@ $(document).ready(function () {
     let value = $(this).val();
 
     $("#preview-insert-text").text(value);
+    console.log(value);
+  });
+  $("#message-plantilla-edit").on("keyup", function () {
+    let value = $(this).val();
+
+    $("#preview-insert-text-edit").text(value);
     console.log(value);
   });
   buscar_msg();
@@ -81,6 +88,25 @@ $(document).ready(function () {
       );
     }
   });
+  $(document).on("click", "#editMsg", function () {
+    const idMsg = $(this).attr("keyMsg");
+    console.log(idMsg);
+    let plantilla = listMsg.find((m) => m.id === idMsg);
+    console.log(plantilla);
+    $("#name-message-id").val(plantilla.nombre);
+    $("#message-plantilla-edit").val(plantilla.mensaje);
+    $("#preview-insert-text-edit").text(plantilla.mensaje);
+    $("#editar-plantilla").removeClass("md-hidden");
+    setTimeout(() => {
+      $("#editar-plantilla .form-create").addClass("modal-show");
+    }, 10);
+  });
+  $("#editar-plantilla .close-modal").click(function () {
+    $("#editar-plantilla .form-create").removeClass("modal-show");
+    setTimeout(() => {
+      $("#editar-plantilla").addClass("md-hidden");
+    }, 300);
+  });
   $(document).on("click", "#emojiList li", function () {
     let emoji = $(this).html();
     console.log(emoji);
@@ -91,6 +117,17 @@ $(document).ready(function () {
     prevText = prevText + emoji;
     $("#preview-insert-text").text(prevText);
     $("#emojiSelector").toggleClass("hidden");
+  });
+  $(document).on("click", "#emojiListEdit li", function () {
+    let emoji = $(this).html();
+    console.log(emoji);
+    let text = $("#message-plantilla-edit").val();
+    let prevText = $("#preview-insert-text-edit").text();
+    text = text + emoji;
+    $("#message-plantilla-edit").val(text);
+    prevText = prevText + emoji;
+    $("#preview-insert-text-edit").text(prevText);
+    $("#emojiSelectorEdit").toggleClass("hidden");
   });
   $("#active-created").click(function () {
     $("#crear-plantilla").removeClass("md-hidden");
@@ -124,32 +161,35 @@ $(document).ready(function () {
     }
   });
   $("#crear-plantilla .close-modal").click(function () {
-    $("#crear-plantilla").addClass("md-hidden");
+    $("#crear-plantilla .form-create").removeClass("modal-show");
+    setTimeout(() => {
+      $("#crear-plantilla").addClass("md-hidden");
+    }, 300);
   });
 
   // gestion droplist sortable
-  const sortableList = document.querySelector(".sortable-list");
-  const items = sortableList.querySelectorAll(".item");
-  items.forEach((item) => {
-    item.addEventListener("dragstart", () => {
-      // Adding dragging class to item after a delay
-      setTimeout(() => item.classList.add("dragging"), 0);
-    });
-    // Removing dragging class from item on dragend event
-    item.addEventListener("dragend", () => item.classList.remove("dragging"));
-  });
-  const initSortableList = (e) => {
-    // e.preventDefault();
-    const draggingItem = document.querySelector(".dragging");
-    // Getting all items except currently dragging and making array of them
-    let siblings = [...sortableList.querySelectorAll(".item:not(.dragging)")];
-    // Finding the sibling after which the dragging item should be placed
-    let nextSibling = siblings.find((sibling) => {
-      return e.clientY <= sibling.offsetTop + sibling.offsetHeight / 2;
-    });
-    // Inserting the dragging item before the found sibling
-    sortableList.insertBefore(draggingItem, nextSibling);
-  };
-  sortableList.addEventListener("dragover", initSortableList);
+  // const sortableList = document.querySelector(".sortable-list");
+  // const items = sortableList.querySelectorAll(".item");
+  // items.forEach((item) => {
+  //   item.addEventListener("dragstart", () => {
+  //     // Adding dragging class to item after a delay
+  //     setTimeout(() => item.classList.add("dragging"), 0);
+  //   });
+  //   // Removing dragging class from item on dragend event
+  //   item.addEventListener("dragend", () => item.classList.remove("dragging"));
+  // });
+  // const initSortableList = (e) => {
+  //   // e.preventDefault();
+  //   const draggingItem = document.querySelector(".dragging");
+  //   // Getting all items except currently dragging and making array of them
+  //   let siblings = [...sortableList.querySelectorAll(".item:not(.dragging)")];
+  //   // Finding the sibling after which the dragging item should be placed
+  //   let nextSibling = siblings.find((sibling) => {
+  //     return e.clientY <= sibling.offsetTop + sibling.offsetHeight / 2;
+  //   });
+  //   // Inserting the dragging item before the found sibling
+  //   sortableList.insertBefore(draggingItem, nextSibling);
+  // };
+  // sortableList.addEventListener("dragover", initSortableList);
   // sortableList.addEventListener("dragenter", (e) => e.preventDefault());
 });

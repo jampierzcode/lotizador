@@ -110,7 +110,7 @@ $links = [
                         <li class="links-menu-dashboard">
                             <div class="link-block">
                                 <div class="left-link">
-                                    <a class="toggle-drop <?php echo ($currentUrl === "Crm") ? ' active-link' : ''; ?>"" href=" ../Crm">
+                                    <a class="toggle-drop <?php echo ($currentUrl === "Crm" || $currentUrl === "papelera") ? ' active-link' : ''; ?>"" href=" ../Crm">
                                         <ion-icon name="people-sharp"></ion-icon>
                                         <p>CRM</p>
                                     </a>

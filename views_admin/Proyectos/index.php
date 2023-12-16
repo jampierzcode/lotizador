@@ -29,6 +29,45 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
         <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
         <!-- tailwin css -->
         <script src="https://cdn.tailwindcss.com"></script>
+        <style>
+            .image-container {
+                position: relative;
+                margin: 10px;
+                overflow: hidden;
+            }
+
+            .image-container:hover .overlay {
+                transform: translateY(0);
+            }
+
+            .overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.192);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transform: translateY(100%);
+                transition: all 0.3s;
+                z-index: 1000;
+            }
+
+            .overlay button {
+                background-color: #ff0000;
+                color: #fff;
+                padding: 10px 20px;
+                border: none;
+                cursor: pointer;
+                font-size: 16px;
+            }
+
+            .image-container:hover .overlay {
+                opacity: 1;
+            }
+        </style>
         <title>AppLotizador</title>
 
     </head>

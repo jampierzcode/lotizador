@@ -4,7 +4,7 @@ $(document).ready(function () {
   var numero;
   buscar_proyectos();
   var dominio2 = "https://lotizador.mcsolucionesti.com";
-  // var dominio2 = "http://localhost/lotizador";
+  // var dominio2 = "https://lotizador.vivelainmobiliaria.pe/";
 
   function buscar_proyectos() {
     funcion = "buscar_proyectos_agentes";
