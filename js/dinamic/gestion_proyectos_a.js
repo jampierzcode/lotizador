@@ -3,8 +3,8 @@ $(document).ready(function () {
   var nombreProyecto;
   var descriptionProyecto;
   var changedescriptionProyecto;
-  var dominio = "https://lotizador.mcsolucionesti.com/";
-  // var dominio = "https://lotizador.vivelainmobiliaria.pe";
+  // var dominio = "https://lotizador.mcsolucionesti.com/";
+  var dominio = "https://lotizador.vivelainmobiliaria.pe";
   // url video variables
   var videoProyecto;
   var changevideoProyecto;
