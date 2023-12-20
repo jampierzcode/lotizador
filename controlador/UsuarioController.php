@@ -558,7 +558,8 @@ if ($_POST["funcion"] == "buscar_proyectos_agentes") {
 }
 if ($_POST["funcion"] == "buscar_proyectos_admin") {
     $json = array();
-    $usuario->buscar_proyectos_admin();
+    $user = $_SESSION["id_usuario"];
+    $usuario->buscar_proyectos_admin($user);
     if ($usuario->mensaje) {
         echo $usuario->mensaje;
     }
@@ -579,7 +580,19 @@ if ($_POST["funcion"] == "buscar_proyectos_admin") {
         echo $jsonstring;
     }
 }
-if ($_POST["funcion"] == "buscar_user_proyect") {
+if ($_POST["funcion"] == "buscar_proyectos_asesor") {
+
+    $user = $_SESSION["id_usuario"];
+    $usuario->buscar_proyectos_asesor($user);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+        $jsonstring = json_encode($usuario->datos);
+        echo $jsonstring;
+    }
+}
+if ($_POST["funcion"] == "buscar_user_proyect") { //busca a usuarios con respecto a un proyecto
     $json = array();
     $id_proyecto = $_POST["id_proyecto"];
     $usuario->buscar_user_proyect($id_proyecto);
@@ -600,7 +613,7 @@ if ($_POST["funcion"] == "buscar_user_proyect") {
         echo $jsonstring;
     }
 }
-if ($_POST["funcion"] == "buscar_usuarios_admin") {
+if ($_POST["funcion"] == "buscar_usuarios_admin") { //busca a usuarios  de admin
     $json = array();
     $usuario->buscar_usuarios_admin();
     if ($usuario->mensaje) {
