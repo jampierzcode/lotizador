@@ -1,6 +1,7 @@
 $(document).ready(function () {
   var funcion = "";
   var listMsg;
+  var idPlantilla;
   var dataTable = $("#msgList").DataTable({
     pageLength: 5,
     aoColumnDefs: [
@@ -63,8 +64,13 @@ $(document).ready(function () {
       { funcion },
       (response) => {
         $("#spin-load").html("");
-        const msg = JSON.parse(response);
-        listMsg = msg;
+        let msg;
+        if (response.trim() !== "no-register") {
+          msg = JSON.parse(response);
+          listMsg = msg;
+        } else {
+          msg = [];
+        }
         dataTable.clear().rows.add(msg).draw();
       }
     );
@@ -91,9 +97,10 @@ $(document).ready(function () {
   $(document).on("click", "#editMsg", function () {
     const idMsg = $(this).attr("keyMsg");
     console.log(idMsg);
+    idPlantilla = idMsg;
     let plantilla = listMsg.find((m) => m.id === idMsg);
     console.log(plantilla);
-    $("#name-message-id").val(plantilla.nombre);
+    $("#name-message-edit").val(plantilla.nombre);
     $("#message-plantilla-edit").val(plantilla.mensaje);
     $("#preview-insert-text-edit").text(plantilla.mensaje);
     $("#editar-plantilla").removeClass("md-hidden");
@@ -111,22 +118,26 @@ $(document).ready(function () {
     let emoji = $(this).html();
     console.log(emoji);
     let text = $("#message-plantilla").val();
-    let prevText = $("#preview-insert-text").text();
-    text = text + emoji;
-    $("#message-plantilla").val(text);
-    prevText = prevText + emoji;
-    $("#preview-insert-text").text(prevText);
+    const mensajeTextarea = document.getElementById("message-plantilla");
+    const cursorPos = mensajeTextarea.selectionStart;
+    const newContent =
+      text.substring(0, cursorPos) + emoji + text.substring(cursorPos);
+    // text = text + emoji;
+    $("#message-plantilla").val(newContent);
+    $("#preview-insert-text").text(newContent);
     $("#emojiSelector").toggleClass("hidden");
   });
   $(document).on("click", "#emojiListEdit li", function () {
     let emoji = $(this).html();
     console.log(emoji);
     let text = $("#message-plantilla-edit").val();
-    let prevText = $("#preview-insert-text-edit").text();
-    text = text + emoji;
-    $("#message-plantilla-edit").val(text);
-    prevText = prevText + emoji;
-    $("#preview-insert-text-edit").text(prevText);
+    const mensajeTextarea = document.getElementById("message-plantilla-edit");
+    const cursorPos = mensajeTextarea.selectionStart;
+    const newContent =
+      text.substring(0, cursorPos) + emoji + text.substring(cursorPos);
+
+    $("#message-plantilla-edit").val(newContent);
+    $("#preview-insert-text-edit").text(newContent);
     $("#emojiSelectorEdit").toggleClass("hidden");
   });
   $("#active-created").click(function () {
@@ -151,6 +162,35 @@ $(document).ready(function () {
             $("#name-message").val("");
             $("#message-plantilla").val("");
             buscar_msg();
+          } else {
+            alert("Hubo un error, conatcta al administrador");
+          }
+        }
+      );
+    } else {
+      alert("Te faltan llenar los campos del formulario");
+    }
+  });
+  $("#edit-submit-msj").click(function () {
+    let funcion = "edit-msg-plantilla";
+    let nombre = $("#name-message-edit").val();
+    let msg = $("#message-plantilla-edit").val();
+
+    if (nombre !== "") {
+      $.post(
+        "../../controlador/UsuarioController.php",
+        { funcion, nombre, msg, id: idPlantilla },
+        (response) => {
+          console.log(response);
+          if (response.trim() === "edit-msg") {
+            alert("Se actualizo correctamente la plantilla");
+            $("#name-message-edit").val("");
+            $("#message-plantilla-edit").val("");
+            buscar_msg();
+            $("#editar-plantilla .form-create").removeClass("modal-show");
+            setTimeout(() => {
+              $("#editar-plantilla").addClass("md-hidden");
+            }, 300);
           } else {
             alert("Hubo un error, conatcta al administrador");
           }

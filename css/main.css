@@ -16,6 +16,16 @@ body {
   font-family: "Montserrat", sans-serif;
   color: #404040;
 }
+/* datatables */
+.dataTables_length label {
+  font-size: 13px !important;
+  font-weight: bold;
+}
+.dataTables_info {
+  font-size: 13px !important;
+  font-weight: bold;
+}
+
 .toast-app {
   position: relative;
   transition: all 0.5s;

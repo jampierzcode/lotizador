@@ -45,6 +45,15 @@ class Usuario
         $this->datos = $query->fetchAll(); // retorna objetos o no
         return $this->datos;
     }
+    function getUsuario($id_usuario)
+    {
+        $sql = "SELECT * FROM usuario WHERE id_usuario=:id and usuarioStatus = 1";
+        $query = $this->conexion->prepare($sql);
+        $query->execute(array(':id' => $id_usuario));
+        $this->datos = $query->fetchAll(); // retorna objetos o no
+        return $this->datos;
+    }
+
     function buscar_datos_contabilidad($id_usuario)
     {
         $sql = "SELECT count(*) as proyectos, (SELECT count(*) FROM usuario WHERE usuario.createdBy=:id_usuario) as asesores FROM user_proyect where user_proyect.user_id=:id_usuario";
@@ -466,6 +475,19 @@ class Usuario
             return $this->mensaje;
         }
     }
+    function editmsgplantilla($id_plantilla, $nombre, $msg)
+    {
+        $sql = "UPDATE template_user SET nombre=:nombre, mensaje=:msg WHERE id=:id_plantilla";
+        $query = $this->conexion->prepare($sql);
+        try {
+            $query->execute(array(":nombre" => $nombre, ":msg" => $msg, ":id_plantilla" => $id_plantilla));
+            $this->mensaje = "edit-msg";
+            return $this->mensaje;
+        } catch (\Throwable $error) {
+            $this->mensaje = "no-edit-msg" + $error;
+            return $this->mensaje;
+        }
+    }
     // function buscar_proyectos_user($id_usuario, $proyectos)
     // {
     //     foreach ($proyectos as $proyecto) {
@@ -728,7 +750,7 @@ class Usuario
     {
         try {
             # code...
-            $sql = "SELECT PRO.id, PRO.nombreProyecto as nombre_proyecto, USPRO.user_id as id_agente, USER.phone_number FROM user_proyect as USPRO inner join usuario as USER on USPRO.user_id=USER.id_usuario inner join proyectos as PRO on USPRO.proyecto_id=PRO.id WHERE USPRO.user_id=:id_usuario";
+            $sql = "SELECT PRO.id, PRO.nombreProyecto as nombre_proyecto, PRO.logo, USPRO.user_id as id_agente, USER.phone_number FROM user_proyect as USPRO inner join usuario as USER on USPRO.user_id=USER.id_usuario inner join proyectos as PRO on USPRO.proyecto_id=PRO.id WHERE USPRO.user_id=:id_usuario";
             $query = $this->conexion->prepare($sql);
             $query->execute(array(":id_usuario" => $id_usuario));
             $this->datos = $query->fetchAll(); // retorna objetos o no

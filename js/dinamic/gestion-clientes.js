@@ -9,7 +9,7 @@ $(document).ready(function () {
   var selectClientes;
   buscar_clientes();
   var dataTable = $("#usuariosList").DataTable({
-    select: true,
+    // select: true,
     stateSave: false,
     lengthMenu: [5, 10, 25, 50],
     language: {
@@ -33,12 +33,6 @@ $(document).ready(function () {
     fixedColumns: {
       leftColumns: 3,
     },
-    // aoColumnDefs: [
-    //   {
-    //     bSortable: false,
-    //     aTargets: ["nosort"],
-    //   },
-    // ],
 
     columns: [
       { data: "id" },
@@ -718,6 +712,10 @@ $(document).ready(function () {
       );
     });
     alert("Se asignaron todos los clientes");
+    $("#asesor-user-multi").val(null).trigger("change");
+
+    $(".modal-create").addClass("md-hidden");
+
     buscar_clientes();
   });
   // fin de asignar varios clientes a un asesor

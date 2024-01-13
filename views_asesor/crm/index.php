@@ -69,9 +69,27 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
         </div>
 
         <div class="container-dashboard">
-            <span class="route">
-                > Home > CRM
-            </span>
+            <div class="flex items-center mb-3 gap-3">
+
+                <span class="font-bold text-nowrap inline-block">
+                    > Home > CRM
+                </span>
+                <div class="w-full text-end font-bold">Mes actual: <span id="mesNow"></span></div>
+                <div class="justify-center items-center flex gap-4">
+                    <div class="flex bg-blue-600 p-2 rounded-lg gap-4 items-center text-white">
+                        <h1 class="text-[12px] text-nowrap">Visitas Concretadas</h1>
+                        <span id="visits_concretadas" class="text-white">0</span>
+                    </div>
+                    <div class="flex bg-yellow-600 p-2 rounded-lg gap-4 items-center text-white">
+                        <h1 class="text-[12px] text-nowrap">Separaciones</h1>
+                        <span id="separaciones_count" class="text-white">0</span>
+                    </div>
+                    <div class="flex bg-green-600 p-2 rounded-lg gap-4 items-center text-white">
+                        <h1 class="text-[12px] text-nowrap">Ventas</h1>
+                        <span id="ventas_count" class="text-white">0</span>
+                    </div>
+                </div>
+            </div>
             <div class="confirm-popup md-hidden">
                 <div class="form-confirm">
                     <span class="title-confirm">Estas seguro de eliminar el usuario</span>
@@ -239,50 +257,50 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                     </div>
                     <h1 class="font-bold">Editar Lead</h1>
                     <form id="editLead">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="mb-6">
+                        <div class="grid grid-cols-2 gap-2 mb-4">
+                            <div>
                                 <label for="nombres" class="block mb-2 text-[12px] font-medium text-gray-900 dark:text-white">Nombres</label>
                                 <input type="text" id="nombre-lead" placeholder="Ingrese el nombre del cliente" class="bg-white border border-gray-300 text-gray-900 text-[12px] rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
                             </div>
-                            <div class="mb-6">
+                            <div>
                                 <label for="apellidos" class="block mb-2 text-[12px] font-medium text-gray-900 dark:text-white">Apellidos</label>
                                 <input type="text" id="apellido-lead" placeholder="Ingrese los apellidos del cliente" class="bg-white border border-gray-300 text-gray-900 text-[12px] rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
                             </div>
-                            <div class="mb-6">
+                            <div>
                                 <label for="documento" class="block mb-2 text-[12px] font-medium text-gray-900 dark:text-white">Documento</label>
                                 <input type="text" id="documento-lead" placeholder="Ingrese su nro documento" class="bg-white border border-gray-300 text-gray-900 text-[12px] rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
                             </div>
-                            <div class="mb-6">
+                            <div>
                                 <label for="email" class="block mb-2 text-[12px] font-medium text-gray-900 dark:text-white">Email</label>
                                 <input type="email" id="email-lead" placeholder="Ingrese su correo electrónico" class="bg-white border border-gray-300 text-gray-900 text-[12px] rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
                             </div>
-                            <div class="mb-6">
+                            <div>
                                 <label for="celular" class="block mb-2 text-[12px] font-medium text-gray-900 dark:text-white">Celular</label>
                                 <input type="text" id="celular-lead" placeholder="Ingrese su celular" class="bg-white border border-gray-300 text-gray-900 text-[12px] rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
                             </div>
-                            <div class="mb-6">
+                            <div>
                                 <label for="telefono" class="block mb-2 text-[12px] font-medium text-gray-900 dark:text-white">Telefono</label>
                                 <input type="text" id="telefono-lead" placeholder="Ingrese su telefono" class="bg-white border border-gray-300 text-gray-900 text-[12px] rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
                             </div>
-                            <div class="mb-6">
+                            <div>
                                 <label for="pais" class="block mb-2 text-[12px] font-medium text-gray-900 dark:text-white">Pais</label>
                                 <input type="text" id="pais-lead" placeholder="Ingrese el pais del cliente" class="bg-white border border-gray-300 text-gray-900 text-[12px] rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
                             </div>
-                            <div class="mb-6">
+                            <div>
                                 <label for="origen" class="block mb-2 text-[12px] font-medium text-gray-900 dark:text-white">Medio Contactado</label>
                                 <input type="text" id="origen-lead" placeholder="ejm: Facebook, Instagram, Capacitaciones, etc." class="bg-white border border-gray-300 text-gray-900 text-[12px] rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
                             </div>
-                            <div class="mb-6">
+                            <div>
                                 <label for="campania" class="block mb-2 text-[12px] font-medium text-gray-900 dark:text-white">Campaña</label>
                                 <input type="text" id="campania-lead" placeholder="Ingrese si pertenece a una campaña" class="bg-white border border-gray-300 text-gray-900 text-[12px] rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
                             </div>
-                            <div class="mb-6">
+                            <div>
                                 <label for="ciudad" class="block mb-2 text-[12px] font-medium text-gray-900 dark:text-white">Ciudad</label>
                                 <input type="text" id="ciudad-lead" placeholder="Ingrese ciudad de origen" class="bg-white border border-gray-300 text-gray-900 text-[12px] rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
                             </div>
-                            <div class="mb-6">
+                            <div>
                                 <label for="proyecto" class="block mb-2 text-[12px] font-medium text-gray-900 dark:text-white">Proyecto</label>
-                                <select type="text" id="proyecto-lead" placeholder="Ingrese ciudad de origen" class="bg-white border border-gray-300 text-gray-900 text-[12px] rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"></select>
+                                <select disabled type="text" id="proyecto-lead" placeholder="Ingrese ciudad de origen" class="bg-gray-300 border border-gray-600 text-gray-900 text-[12px] rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"></select>
                             </div>
                         </div>
                         <button type="submit" class="btnJsvm info text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-[12px] w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Guardar</button>
@@ -412,7 +430,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
 
                 </div>
             </div>
-            <div class="w-full text-center mb-2">Mes actual: <span id="mesNow"></span></div>
+            <!-- <div class="w-full text-center mb-2">Mes actual: <span id="mesNow"></span></div>
             <div class="justify-center flex gap-4 mb-5">
                 <div class="flex bg-blue-600 p-2 rounded-lg gap-4 items-center text-white">
                     <h1 class="text-[12px]">Visitas Concretadas</h1>
@@ -426,11 +444,11 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                     <h1 class="text-[12px]">Ventas</h1>
                     <span id="ventas_count" class="text-white">0</span>
                 </div>
-            </div>
+            </div> -->
             <div style="display: flex; gap:10px; margin-bottom: 20px">
                 <div class="relative inline-block text-left">
                     <div>
-                        <button type="button" class="inline-flex items-center w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-[12px] font-semibold shadow-sm ring-1 ring-inset ring-gray-300 btn-add hover:bg-white" id="menu-button" aria-expanded="false" aria-haspopup="true">
+                        <button type="button" class="inline-flex items-center w-full justify-center gap-x-1.5 rounded-md bg-[#310ecd] px-3 py-2 text-[12px] font-semibold shadow-sm text-white" id="menu-button" aria-expanded="false" aria-haspopup="true">
 
                             <ion-icon name="people-sharp"></ion-icon>
 
@@ -451,7 +469,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                 </div>
                 <div class="relative inline-block text-left">
                     <div>
-                        <button type="button" class="inline-flex items-center w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-[12px] font-semibold shadow-sm ring-1 ring-inset ring-gray-300 btn-add hover:bg-white" id="menu-button-etiqueta" aria-expanded="false" aria-haspopup="true">
+                        <button type="button" class="inline-flex items-center w-full justify-center gap-x-1.5 rounded-md bg-[#310ecd] px-3 py-2 text-[12px] font-semibold shadow-sm text-white" id="menu-button-etiqueta" aria-expanded="false" aria-haspopup="true">
 
                             <ion-icon name="pricetags"></ion-icon>
 
@@ -471,6 +489,15 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                 </div>
                 <div class="relative inline-block text-left">
                     <div>
+                        <a href="../msj-plantilla/" type="button" class="inline-flex items-center w-full justify-center gap-x-1.5 rounded-md bg-[#310ecd] px-3 py-2 text-[12px] font-semibold shadow-sm text-white" id="menu-button-etiqueta" aria-expanded="false" aria-haspopup="true">
+
+                            <ion-icon name="mail"></ion-icon>
+                            Template MSJ
+                        </a>
+                    </div>
+                </div>
+                <div class="relative inline-block text-left">
+                    <div>
                         <a href="../papelera/" type="button" class="inline-flex items-center w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-[12px] font-semibold shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-white text-red-600" id="menu-button-etiqueta" aria-expanded="false" aria-haspopup="true">
 
                             <ion-icon name="trash"></ion-icon>
@@ -478,21 +505,22 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                         </a>
                     </div>
                 </div>
-                <div class="relative inline-block text-left">
-                    <div>
-                        <a href="../msj-plantilla/" type="button" class="inline-flex items-center w-full justify-center gap-x-1.5 rounded-md bg-blue-600 px-3 py-2 text-[12px] font-semibold shadow-sm ring-1 ring-inset hover:bg-blue-700 text-white" id="menu-button-etiqueta" aria-expanded="false" aria-haspopup="true">
+                <div>
+                    <button type="button" class="flex max-w-max items-center justify-center gap-x-1.5 rounded-md text-white px-3 py-2 text-[12px] font-semibold shadow-sm ring-1 ring-inset ring-gray-300 bg-green-600 hover:bg-blue-900 text-[12px]" id="export_leads" aria-expanded="false" aria-haspopup="true">
 
-                            <ion-icon name="mail"></ion-icon>
-                            Template MSJ
-                        </a>
-                    </div>
+                        <img style="width: 16px;" src="../../img/archivo-excel.png" alt="">
+
+                        <p class="text-[12px] text-nowrap">Exportar</p>
+
+                    </button>
                 </div>
+
                 <!-- <input type="color" value="#5b5b5b"> -->
             </div>
             <div>
-                <p class="text-[12px] text-black">Filtro Avanzado:</p>
+                <!-- <p class="text-[12px] text-black">Filtro Avanzado:</p> -->
             </div>
-            <div class="main-datatable">
+            <div class="main-datatable px-10 py-10 rounded bg-white">
                 <!-- <form> -->
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div>
@@ -520,26 +548,28 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                     </div>
 
                     <div class="relative inline-block">
-                        <div class="flex gap-4">
+                        <div class="flex gap-4 w-full overflow-x-auto">
                             <div>
 
                                 <label for="pendientes-search" class="mb-2 text-[12px] font-medium text-gray-900  dark:text-white"></label> <br>
-                                <button type="button" class="flex max-w-max items-center justify-center gap-x-1.5 rounded-md text-white px-3 py-2 text-[12px] font-semibold shadow-sm ring-1 ring-inset ring-gray-300 bg-blue-600 hover:bg-blue-900 text-[12px]" id="meusers-filtros" aria-expanded="false" aria-haspopup="true">
+                                <button type="button" class="flex max-w-max items-center justify-center gap-x-1.5 rounded-md text-white px-3 py-2 text-[12px] font-semibold shadow-sm bg-[#310ecd] text-[12px]" id="meusers-filtros" aria-expanded="false" aria-haspopup="true">
 
                                     <img style="width: 16px;" src="../../img/corona.png" alt="">
 
-                                    <p class="text-[12px]">Mis leads</p>
+                                    <p class="text-[12px] text-nowrap">Mis leads</p>
 
                                 </button>
                             </div>
+
                             <div>
 
                                 <label for="pendientes-search" class="mb-2 text-[12px] font-medium text-gray-900  dark:text-white"></label> <br>
-                                <button type="button" class="inline-blockmax-w-max items-center justify-center gap-x-1.5 rounded-md text-white px-3 py-2 text-[12px] font-semibold shadow-sm ring-1 ring-inset ring-gray-300 bg-emerald-800 hover:bg-lime-900" id="reset_filtros" aria-expanded="false" aria-haspopup="true">
+                                <button type="button" class="flex max-w-max items-center justify-center gap-x-1.5 rounded-md text-black px-3 py-2 text-[12px] font-semibold shadow-sm bg-yellow-500" id="reset_filtros" aria-expanded="false" aria-haspopup="true">
 
                                     <ion-icon name="refresh"></ion-icon>
 
-                                    Resetear
+
+                                    <p class="text-[12px] text-nowrap">Resetear</p>
 
                                 </button>
                             </div>
@@ -547,16 +577,16 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                     </div>
                 </div>
 
-                <p class="mt-4 text-[12px] text-black">Filtro de Ultimos Estados:</p>
+                <!-- <p class="mt-4 text-[12px] text-black">Filtro de Ultimos Estados:</p> -->
 
                 <!-- <form> -->
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                     <div class="h-auto">
-                        <label for="Fecha Inicio">Del: </label>
+                        <label class="text-[12px] font-medium" for="Fecha Inicio">Fecha Inicio: </label>
                         <input type="date" id="fecha-inicio-status" class="block w-full p-2 text-[12px] text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Buscar por nombre del asesor">
                     </div>
                     <div class="h-auto">
-                        <label for="pendientes-search" class="mb-2 text-[12px] font-medium text-gray-900  dark:text-white">Al:</label>
+                        <label for="pendientes-search" class="mb-2 text-[12px] font-medium text-gray-900  dark:text-white">Fecha Fin:</label>
                         <input disabled type="date" id="fecha-fin-status" class="block w-full p-2 text-[12px] text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Buscar por nombre del asesor">
                     </div>
                     <div>
@@ -602,16 +632,16 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                             <!-- <th>
                                 <div style="width: 50px !important">Apellidos</div>
                             </th> -->
+                            <th>Fecha Hora Creacion</th>
                             <th>Nombres</th>
                             <th>Apellidos</th>
+                            <th>Proyecto</th>
                             <th>Etiquetas</th>
-                            <th>Fecha Hora Creacion</th>
                             <!-- <th>Correo</th> -->
-                            <th>Celular</th>
+                            <!-- <th>Celular</th> -->
                             <!-- <th>Telefono</th>
                             <th>Origen</th>
                             <th>Ciudad</th> -->
-                            <th>Proyecto</th>
                             <th>Estado</th>
                             <th>Message</th>
                             <th>Acciones</th>
@@ -758,7 +788,9 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
     <script src="https://cdn.datatables.net/fixedcolumns/3.2.2/js/dataTables.fixedColumns.min.js"></script>
 
 
-
+    <!-- Asegúrate de incluir la biblioteca SheetJS -->
+    <!-- use version 0.20.1 -->
+    <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
 
     <script src="../../components/sidebar.js"></script>
 

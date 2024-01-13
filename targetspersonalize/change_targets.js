@@ -3,6 +3,7 @@ $(document).ready(function () {
   var user = urlParams.get("user");
   var proyect = urlParams.get("proyect");
   var dataUser;
+  var dataContatUser;
   var multimedia = [];
   var iconsSocials = [
     {
@@ -148,6 +149,7 @@ $(document).ready(function () {
   if (user && proyect) {
     console.log("entro");
     buscar_target();
+    obtenerUsuario();
     function buscar_target() {
       let funcion = "search_target_user_uuid";
       $.post(
@@ -378,40 +380,61 @@ $(document).ready(function () {
     function construirURLDeEmbed(codigoVideo) {
       return `https://www.youtube.com/embed/${codigoVideo}`;
     }
+    function obtenerUsuario() {
+      let funcion = "get_usuario";
+      $.post(
+        "../controlador/TargetController.php",
+        { funcion, id: user },
+        (response) => {
+          let usuario = JSON.parse(response);
+          console.log(usuario);
+          dataContatUser = usuario[0];
+
+          let urlProyecto = `https://lotizador.mcsolucionesti.com/views/Lotizador/?proyect=${proyect}&&phoneNumber=${usuario[0].phone_number}&&agent=${user}`;
+          $("#urlLotizador").attr("href", urlProyecto);
+        }
+      );
+    }
     $("#save_contact").click(() => {
-      var nombre = dataUser.name_user;
-      var telefono = "1234567890";
-      var email = "correo@example.com";
+      // var nombre = dataUser.name_user;
+      var telefono = dataContatUser?.phone_number;
+      // var email = dataContatUser?.correo;
 
-      if ("contacts" in navigator) {
-        // Utiliza el API de Contactos si está disponible en el navegador
-        navigator.contacts
-          .select(["name", "tel", "email"])
-          .then(function (contacts) {
-            var nuevoContacto = navigator.contacts.create();
-            nuevoContacto.name = new ContactName(null, nombre);
-            nuevoContacto.tel = [new ContactField("mobile", telefono)];
-            nuevoContacto.email = [new ContactField("work", email)];
+      // Crear el enlace tel
+      var enlaceTelefono = "tel:" + telefono;
 
-            nuevoContacto.save();
-          });
-      } else {
-        var vcard =
-          "BEGIN:VCARD\nVERSION:3.0\nFN:" +
-          nombre +
-          "\nTEL:" +
-          telefono +
-          "\nEMAIL:" +
-          email +
-          "\nEND:VCARD";
-        var dataUri = "data:text/vcard," + encodeURIComponent(vcard);
+      // Abrir la aplicación de teléfono
+      window.location.href = enlaceTelefono;
 
-        // Crear una ruta para la descarga
-        var downloadUrl = dataUri;
+      // if ("contacts" in navigator) {
+      // Utiliza el API de Contactos si está disponible en el navegador
+      //   navigator.contacts
+      //     .select(["name", "tel", "email"])
+      //     .then(function (contacts) {
+      //       var nuevoContacto = navigator.contacts.create();
+      //       nuevoContacto.name = new ContactName(null, nombre);
+      //       nuevoContacto.tel = [new ContactField("mobile", telefono)];
+      //       nuevoContacto.email = [new ContactField("work", email)];
 
-        // Redirigir al usuario para que descargue el archivo
-        window.location.href = downloadUrl;
-      }
+      //       nuevoContacto.save();
+      //     });
+      // } else {
+      // var vcard =
+      //   "BEGIN:VCARD\nVERSION:3.0\nFN:" +
+      //   nombre +
+      //   "\nTEL:" +
+      //   telefono +
+      //   "\nEMAIL:" +
+      //   email +
+      //   "\nEND:VCARD";
+      // var dataUri = "data:text/vcard," + encodeURIComponent(vcard);
+      // console.log(dataUri);
+      // // Crear una ruta para la descarga
+      // var downloadUrl = dataUri;
+
+      // // Redirigir al usuario para que descargue el archivo
+      // window.location.href = downloadUrl;
+      // }
     });
     buscar_multimedia();
     function buscar_multimedia() {

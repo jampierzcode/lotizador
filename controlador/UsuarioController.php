@@ -4,7 +4,6 @@ $usuario = new Usuario();
 session_start();
 $id_usuario = $_SESSION['id_usuario'];
 
-
 // SECTION DASHBOARD CONTABILIDAD
 if ($_POST["funcion"] == "buscar_datos_contabilidad") {
     $json = array();
@@ -410,6 +409,13 @@ if ($_POST["funcion"] == "register-msg") {
     $usuario->register_msg($user, $nombre, $msg);
     echo $usuario->mensaje;
 }
+if ($_POST["funcion"] == "edit-msg-plantilla") {
+    $id_plantilla = $_POST["id"];
+    $nombre = $_POST["nombre"];
+    $msg = $_POST["msg"];
+    $usuario->editmsgplantilla($id_plantilla, $nombre, $msg);
+    echo $usuario->mensaje;
+}
 
 if ($_POST["funcion"] == "buscar_proyectos_user") {
     $json = array();
@@ -548,6 +554,7 @@ if ($_POST["funcion"] == "buscar_proyectos_agentes") {
             $json[] = array(
                 'id' => $dato->id,
                 'nombreProyecto' => $dato->nombre_proyecto,
+                'logo' => $dato->logo,
                 "phone_number" => $dato->phone_number,
                 "id_agente" => $dato->id_agente,
             );

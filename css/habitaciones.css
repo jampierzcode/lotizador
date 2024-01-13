@@ -190,7 +190,16 @@ table th,
 table td {
   padding: 80px 12px;
   text-align: start;
+}
+table th {
+  padding: 80px 12px;
+  text-align: start;
   font-size: 11px !important;
+}
+table td {
+  padding: 80px 12px;
+  text-align: start;
+  font-size: 10px !important;
 }
 
 /* list caracteristicas */

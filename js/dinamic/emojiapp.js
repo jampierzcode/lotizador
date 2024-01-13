@@ -25,7 +25,9 @@ function loadEmoji(data) {
     li.setAttribute("emoji-name", emoji.slug);
     li.textContent = emoji.character;
     emojiList.appendChild(li);
-    emojiListEdit.appendChild(li);
+    // Clonar el nuevo elemento li y agregarlo a emojiListEdit
+    let liEdit = li.cloneNode(true);
+    emojiListEdit.appendChild(liEdit);
   });
 }
 emojiSearch.addEventListener("keyup", (e) => {

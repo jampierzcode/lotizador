@@ -22,8 +22,11 @@ $(document).ready(function () {
             template += `
             <div class="card-habs" style="background: #310ecd;">
             <div class="body-card">
-                <ion-icon name="home"></ion-icon>
-                <h1>${proyecto.nombreProyecto}</h1>
+            <div class="flex items-center gap-4">
+                <img src="../../${proyecto.logo}" class="w-10 h-10 object-cover object-center border-2 border-gray-200 rounded-full" alt="">
+                                
+                <h1 class="text-white text-sm md:text-md font-bold">${proyecto.nombreProyecto}</h1>
+                </div>
                 <div class="proyectos_cards_link">
                     <a id="rutaEnlace" style="color: #5b5b5b;" href="${dominio2}/views/Lotizador/?proyect=${proyecto.id}&&phoneNumber=${proyecto.phone_number}&&agent=${proyecto.id_agente}" target="_blank" rel="noopener noreferrer">Copiar Enlace</a>
                 </div>

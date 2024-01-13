@@ -157,6 +157,8 @@ a {
   border-color: #d4d4d4 !important;
   border-radius: 40px;
   margin: 5px 3px;
+  font-size: 11px !important;
+  font-weight: bold;
 }
 .main-datatable
   .dataTables_wrapper

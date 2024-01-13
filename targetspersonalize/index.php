@@ -101,10 +101,14 @@
                                 <div class="gallery grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <!-- <h1 class="text-lg font-bold">Galeria</h1> -->
                                 </div>
+                                <p class="text-xl font-bold my-4 text-center w-full">Lotización del proyecto</p>
+                                <div class="flex justify-center flex-col items-center w-full">
+                                    <img src="../img/plano.png" alt="" class="w-[100px]">
+                                    <a id="urlLotizador" href="" class="px-4 py-4 text-white bg-[#310ecd] font-medium rounded">Ver lotes disponibles</a>
+                                </div>
                             </div>
 
                             <div class="w-full" style="background-color: rgb(255, 255, 255); flex-grow: 1;">
-
                                 <p class="text-xl font-bold my-4 text-center w-full">Contactame</p>
                                 <div id="links-container" class="w-full" style="display: flex; justify-content: center; flex-wrap: wrap; background-color: rgb(255, 255, 255);">
 
@@ -112,7 +116,7 @@
                                 </div>
                             </div>
                             <div data-testid="button" class="w-full pt-[20px] py-[40px] flex justify-center" style="background: linear-gradient(rgba(255, 255, 255, 0) 15%, rgb(255, 255, 255) 100%) rgb(255, 255, 255);">
-                                <div id="save_contact" data-testid="button-text-cont" class="cursor-pointer rounded-[48px] text-[10px] text-white flex items-center justify-center w-[170px] h-[38px] font-bold" color="primary" variant="contained" style="background-color: rgb(0, 0, 0);">Guardar Contacto</div>
+                                <div id="save_contact" data-testid="button-text-cont" class="cursor-pointer rounded-[48px] text-[14px] text-white flex gap-2 items-center justify-center w-[170px] h-[38px] font-bold" color="primary" variant="contained" style="background-color: rgb(0, 0, 0);"><ion-icon name="call"></ion-icon> Llamar</div>
                             </div>
 
                         </div>

@@ -6,6 +6,7 @@ $(document).ready(function () {
   var idCliente;
   var proyectosList = [];
   var clientesLastStatus;
+  var clientesFilter;
   var dataTable = $("#usuariosList").DataTable({
     // scrollY: "160px",
     // scrollY: "500px",
@@ -43,6 +44,8 @@ $(document).ready(function () {
 
     columns: [
       // { data: "id" },
+
+      { data: "created_cliente" },
       {
         data: null,
         render: (data) => {
@@ -54,6 +57,15 @@ $(document).ready(function () {
         },
       },
       { data: "apellidos" },
+      {
+        data: null,
+        render: function (data) {
+          let template = `<h1 class="text-[10px] font-bold">`;
+          template += data.nombre_proyecto;
+          template += `</h1>`;
+          return template;
+        },
+      },
       {
         data: null,
         render: function (data) {
@@ -77,17 +89,16 @@ $(document).ready(function () {
           return template;
         },
       },
-      { data: "created_cliente" },
       // { data: "correo" },
-      { data: "celular" },
+      // { data: "celular" },
       // { data: "telefono" },
       // { data: "origen" },
       // { data: "ciudad" },
-      { data: "nombre_proyecto" },
       {
         data: null,
         render: function (data, type, row) {
-          let template_status = imprimirStatus(data?.status); // Cambiar de const a let
+          let template_status = `<div class="flex items-center gap-2">`;
+          template_status += imprimirStatus(data?.status); // Cambiar de const a let
 
           if (data.task_status === "PENDIENTE") {
             template_status += `<span>${
@@ -170,6 +181,7 @@ $(document).ready(function () {
             //       `;
             //   }
           }
+          template_status += `</div>`;
 
           return template_status;
         },
@@ -346,6 +358,7 @@ $(document).ready(function () {
         clienteEstados.push(nuevoCliente);
       }
     });
+    clientesFilter = clienteEstados;
 
     return clienteEstados;
   }
@@ -428,6 +441,20 @@ $(document).ready(function () {
     console.log(meclientes);
     dataTable.clear().rows.add(meclientes).draw();
   });
+
+  // exportar leads
+  function exportar_leads() {
+    // Crear un objeto de libro de Excel
+    var workbook = XLSX.utils.book_new();
+
+    // Convertir el array de JSON a una hoja de trabajo
+    var worksheet = XLSX.utils.json_to_sheet(clientesFilter);
+
+    // Agregar la hoja de trabajo al libro
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Hoja1");
+    XLSX.writeFile(workbook, "Leads.xlsx", { compression: true });
+  }
+  $("#export_leads").on("click", exportar_leads);
 
   // -------register asistencia
   function register_visita_agenda(task, cliente, status) {
@@ -827,6 +854,7 @@ $(document).ready(function () {
       }
       return true;
     });
+    clientesFilter = clientes;
     var estadoActual = {
       page: dataTable.page(), // Página actual
       scrollLeft: $("#usuariosList").parent().scrollLeft(), // Posición de scroll horizontal

@@ -2,6 +2,21 @@
 include_once '../modelo/Usuario.php';
 $usuario = new Usuario();
 
+
+// buscar usuario
+if ($_POST["funcion"] == "get_usuario") {
+    $user  = $_POST["id"];
+    $usuario->getUsuario($user);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+
+        $jsonstring = json_encode($usuario->datos);
+        echo $jsonstring;
+    }
+}
+
 if ($_POST["funcion"] == "buscar_amenidades") {
     $id = $_POST["id"];
     $usuario->buscar_amenidades($id);
