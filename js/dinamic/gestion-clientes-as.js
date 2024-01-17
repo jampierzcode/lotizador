@@ -439,6 +439,7 @@ $(document).ready(function () {
   $("#meusers-filtros").click(function () {
     const meclientes = clientesList.filter((e) => e.asignedUser === "si");
     console.log(meclientes);
+    clientesFilter = meclientes;
     dataTable.clear().rows.add(meclientes).draw();
   });
 
@@ -942,6 +943,7 @@ $(document).ready(function () {
       const result = clientesList.find((c) => c.id === cliente.cliente_id);
       clientesNuevos.push(result);
     });
+    clientesFilter = clientesNuevos;
 
     console.log(clientesNuevos);
 
@@ -1116,8 +1118,21 @@ $(document).ready(function () {
       tipo === "SEPARACION"
     ) {
       $("#fecha_visita").removeClass("hidden");
+      $("#addcalendar").removeClass("hidden");
     } else {
       $("#fecha_visita").addClass("hidden");
+    }
+  });
+
+  async function verificarAuthorizeCalendar() {
+    console.log(gapiInited);
+
+    handleAuthClick();
+  }
+  $("#registercalendar").on("change", function (e) {
+    const ischeck = e.target.checked;
+    if (ischeck) {
+      verificarAuthorizeCalendar();
     }
   });
   function registerVisita(fecha, hora, cliente, tipo, pendiente) {
@@ -1167,7 +1182,13 @@ $(document).ready(function () {
         let fecha = $("#date-visita").val();
         let hora = $("#time-visita").val() + ":00";
         if (fecha && hora) {
+          const result = clientesList.filter(
+            (elemento) => elemento.id === idCliente
+          );
+          let cliente = result[0].nombres + " " + result[0].apellidos;
+          let description = `Nuevo evento:${status} - Cliente:${cliente} - Observaciones: ${observaciones} `;
           registerVisita(fecha, hora, idCliente, status, pendiente);
+          createCustomEvent(description, fecha, hora);
           $("#date-visita").val(null);
           $("#time-visita").val(null);
         } else {

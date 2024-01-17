@@ -372,6 +372,14 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
 
                             </div>
                         </div>
+                        <div id="addcalendar" class="hidden">
+                            <div class="flex items-center mb-4">
+                                <input id="registercalendar" type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                <label for="default-checkbox" class="ms-2 text-sm font-medium text-gray-900 flex items-center gap-1 dark:text-gray-300">
+
+                                    Agregar a <img src="../../img/googlecalendar.png" alt="" class="w-12 bg-white"> Google Calendar</label>
+                            </div>
+                        </div>
                         <div class="mb-6">
 
                             <label for="observaciones" class="block mb-2 text-[12px] font-medium text-gray-900 dark:text-white">Observaciones</label>
@@ -799,7 +807,11 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.9.4/dayjs.min.js" integrity="sha512-XZSHSEFj4QeE0G4pwy4tToyAhF2VXoEcF9CP0t1PSZMP2XHhEEB9PjM9knsdzcEKbi6GRMazdt8tJadz0JTKIQ==" crossorigin="anonymous"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
 
+    <script src="../../js/dinamic/addcalendar.js"></script>
     <script src="../../js/dinamic/gestion-clientes-as.js"></script>
+    <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
+    <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
+
 
     </html>
 <?php } ?>
