@@ -14,7 +14,14 @@ $(document).ready(function () {
     columns: [
       { data: "id" },
       { data: "nombre" },
-      { data: "mensaje" },
+      {
+        data: null,
+        render: function (data) {
+          return `<div class="max-w-[200px] overflow-x-hidden">
+              <p class="text-ellipsis overflow-hidden text-nowrap">${data.mensaje}</p>
+            </div>`;
+        },
+      },
       // {
       //   data: null,
       //   render: function (data, type, row) {

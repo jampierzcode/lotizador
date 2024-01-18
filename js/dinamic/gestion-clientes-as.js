@@ -445,35 +445,50 @@ $(document).ready(function () {
 
   // exportar leads
   function exportar_leads() {
-    // Crear un objeto de libro de Excel
-    var workbook = XLSX.utils.book_new();
+    let clientes = clientesFilter;
+    console.log(clientes);
+    if (clientes !== "" && clientes.length > 0 && clientes !== undefined) {
+      for (let index = 0; index < clientes.length; index++) {
+        delete clientes[index].id;
+        delete clientes[index].createdBy;
+        delete clientes[index].proyecto_id;
+        delete clientes[index].id_task;
+        delete clientes[index].asignedUser;
+      }
 
-    // Convertir el array de JSON a una hoja de trabajo
-    var worksheet = XLSX.utils.json_to_sheet(clientesFilter);
+      // Crear un objeto de libro de Excel
+      var workbook = XLSX.utils.book_new();
 
-    // Agregar la hoja de trabajo al libro
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Hoja1");
-    XLSX.writeFile(workbook, "Leads.xlsx", { compression: true });
+      // Convertir el array de JSON a una hoja de trabajo
+      var worksheet = XLSX.utils.json_to_sheet(clientesFilter);
+
+      // Agregar la hoja de trabajo al libro
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Hoja1");
+      XLSX.writeFile(workbook, "Leads.xlsx", { compression: true });
+    }
   }
   $("#export_leads").on("click", exportar_leads);
 
   // -------register asistencia
-  function register_visita_agenda(task, cliente, status) {
-    let funcion = "register_visita_agenda";
-    $.post(
-      "../../controlador/UsuarioController.php",
-      { funcion, task, cliente, status },
-      (response) => {
-        if (response.trim() === "register") {
-          alert("Se paso asistencia al cliente");
-        } else {
-          console.log(response);
+  async function register_visita_agenda(task, cliente, status) {
+    return new Promise((resolve, reject) => {
+      let funcion = "register_visita_agenda";
+      $.post(
+        "../../controlador/UsuarioController.php",
+        { funcion, task, cliente, status },
+        (response) => {
+          if (response.trim() === "register") {
+            alert("Se paso asistencia al cliente");
+          } else {
+            console.log(response);
+          }
+          resolve();
         }
-      }
-    );
+      );
+    });
   }
 
-  $(document).on("click", "#asistenciaNot, #asistenciaYes", function () {
+  $(document).on("click", "#asistenciaNot, #asistenciaYes", async function () {
     let observacion = "";
     let cliente = $(this).attr("keyClient");
     let task = $(this).attr("keyTask");
@@ -482,36 +497,43 @@ $(document).ready(function () {
     let confirmado = confirm("Esta seguro de esta eleccion");
     if (confirmado) {
       // console.log("yes");
-      seguimiento_cliente(observacion, cliente, status);
-      completarTask(task, cliente, status);
-      encontrar_ventas();
-      register_visita_agenda(task, cliente, status);
+      await seguimiento_cliente(observacion, cliente, status);
+      await completarTask(task, cliente, status);
+      await register_visita_agenda(task, cliente, status);
+      await encontrar_ventas();
     } else {
       console.log("rechazo");
     }
   });
-  function completarTask(id_task) {
-    if (id_task) {
-      let funcion = "completar_tarea";
-      $.post(
-        "../../controlador/UsuarioController.php",
-        { funcion, id_task },
-        (response) => {
-          console.log(response);
-          if (response.trim() == "COMPLETADO") {
-            alert("Tarea completada satisfactoriamente");
-            buscar_clientes();
-            animarProgress();
-          } else {
+  async function completarTask(id_task) {
+    return new Promise((resolve, reject) => {
+      if (id_task) {
+        let funcion = "completar_tarea";
+        $.post(
+          "../../controlador/UsuarioController.php",
+          { funcion, id_task },
+          async (response) => {
             console.log(response);
+            if (response.trim() == "COMPLETADO") {
+              alert("Tarea completada satisfactoriamente");
+              await buscar_clientes();
+              animarProgress();
+              resolve();
+            } else {
+              console.log(response);
+
+              reject({
+                err: response,
+              });
+            }
           }
-        }
-      );
-    } else {
-      alert(
-        "No es un estado pendiente, al parecer ocurrio un error, contacta al administrado"
-      );
-    }
+        );
+      } else {
+        alert(
+          "No es un estado pendiente, al parecer ocurrio un error, contacta al administrado"
+        );
+      }
+    });
   }
 
   $(document).on("click", "#completarTask", function () {
@@ -522,39 +544,43 @@ $(document).ready(function () {
     }
   });
   encontrar_ventas();
-  function encontrar_ventas() {
-    const startOfMonth = dayjs().startOf("month");
-    const endOfMonth = dayjs().endOf("month");
-    dayjs().locale("es");
-    const mesActual = dayjs().format("MMMM");
-    // console.log(mesActual);
-    $("#mesNow").html(mesActual);
-    const fecha_inicio = startOfMonth.format("YYYY-MM-DD"); // Primer día del mes en formato YYYY-MM-DD
-    const fecha_fin = endOfMonth.format("YYYY-MM-DD");
-    // console.log(fecha_inicio, fecha_fin);
-    let funcion = "buscar_resumen_eficiencia_usuario";
-    $.post(
-      "../../controlador/UsuarioController.php",
-      { funcion, fecha_inicio, fecha_fin },
-      (response) => {
-        let visitas;
-        let separaciones;
-        let ventas;
-        if (response.trim() === "no-register") {
-          visitas = 0;
-          separaciones = 0;
-          ventas = 0;
-        } else {
-          let resumen = JSON.parse(response);
-          visitas_concretadas = resumen[0].visitas_concretadas;
-          separaciones = resumen[0].separaciones;
-          ventas = resumen[0].ventas;
+  async function encontrar_ventas() {
+    return new Promise((resolve, reject) => {
+      const startOfMonth = dayjs().startOf("month");
+      const endOfMonth = dayjs().endOf("month");
+      dayjs().locale("es");
+      const mesActual = dayjs().format("MMMM");
+      // console.log(mesActual);
+      $("#mesNow").html(mesActual);
+      const fecha_inicio = startOfMonth.format("YYYY-MM-DD"); // Primer día del mes en formato YYYY-MM-DD
+      const fecha_fin = endOfMonth.format("YYYY-MM-DD");
+      // console.log(fecha_inicio, fecha_fin);
+      let funcion = "buscar_resumen_eficiencia_usuario";
+      $.post(
+        "../../controlador/UsuarioController.php",
+        { funcion, fecha_inicio, fecha_fin },
+        (response) => {
+          console.log(response);
+          let visitas_concretadas;
+          let separaciones;
+          let ventas;
+          if (response.trim() === "no-register") {
+            visitas = 0;
+            separaciones = 0;
+            ventas = 0;
+          } else {
+            let resumen = JSON.parse(response);
+            visitas_concretadas = resumen[0].visitas_concretadas;
+            separaciones = resumen[0].separaciones;
+            ventas = resumen[0].ventas;
+          }
+          $("#ventas_count").html(ventas);
+          $("#separaciones_count").html(separaciones);
+          $("#visits_concretadas").html(visitas_concretadas);
+          resolve();
         }
-        $("#ventas_count").html(ventas);
-        $("#separaciones_count").html(separaciones);
-        $("#visits_concretadas").html(visitas_concretadas);
-      }
-    );
+      );
+    });
   }
   function animarProgress() {
     let funcion = "buscar_visitas_programadas";
@@ -605,24 +631,27 @@ $(document).ready(function () {
 
   buscar_clientes();
   // BUSCAR CLIENTES
-  function buscar_clientes() {
-    funcion = "buscar_clientes_by_asesor";
-    $.post(
-      "../../controlador/UsuarioController.php",
-      { funcion },
-      (response) => {
-        $("#spin-load").html("");
-        if (response.trim() === "no-register-clientes") {
-          dataTable.clear().draw();
-        } else {
-          const clientes = JSON.parse(response);
-          clientesList = clientes;
-          clientesList.sort(compareDatesDesc);
+  async function buscar_clientes() {
+    return new Promise((resolve, reject) => {
+      funcion = "buscar_clientes_by_asesor";
+      $.post(
+        "../../controlador/UsuarioController.php",
+        { funcion },
+        (response) => {
+          $("#spin-load").html("");
+          if (response.trim() === "no-register-clientes") {
+            dataTable.clear().draw();
+          } else {
+            const clientes = JSON.parse(response);
+            clientesList = clientes;
+            clientesList.sort(compareDatesDesc);
 
-          filtrarProyectos();
+            filtrarProyectos();
+          }
+          resolve();
         }
-      }
-    );
+      );
+    });
   }
 
   const compareDates = (a, b) => {
@@ -650,22 +679,24 @@ $(document).ready(function () {
     buscarHistorial(funcion, cliente);
   });
   function buscarHistorial(funcion, cliente) {
-    $.post(
-      "../../controlador/UsuarioController.php",
-      { funcion, cliente },
-      (response) => {
-        console.log(response);
-        if (response.trim() === "no-data") {
-          alert("no hay registro alguno, porfavor cree uno");
-        } else {
-          const historial = JSON.parse(response);
-          console.log(historial);
-          const sortedData = historial.sort(compareDates);
-          console.log(historial);
-          console.log(sortedData);
-          let template = "";
-          sortedData.forEach((history) => {
-            template += `
+    return new Promise((resolve, reject) => {
+      $.post(
+        "../../controlador/UsuarioController.php",
+        { funcion, cliente },
+        (response) => {
+          console.log(response);
+          if (response.trim() === "no-data") {
+            alert("no hay registro alguno, porfavor cree uno");
+            resolve({ msg: "no hay registro alguno" });
+          } else {
+            const historial = JSON.parse(response);
+            console.log(historial);
+            const sortedData = historial.sort(compareDates);
+            console.log(historial);
+            console.log(sortedData);
+            let template = "";
+            sortedData.forEach((history) => {
+              template += `
             <li class="mb-10 ml-4">
             <div class="absolute w-3 h-3 bg-gray-200 rounded-full mt-1.5 -left-1.5 border border-white dark:border-gray-900 dark:bg-gray-700"></div>
             <time class="mb-1 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">${
@@ -681,27 +712,29 @@ $(document).ready(function () {
                             }</p>
                             </li>
                             `;
-          });
-          $("#list-historial").html(template);
-          $("#historial-event").removeClass("md-hidden");
-          setTimeout(function () {
-            $("#historial-event .form-create").addClass("modal-show");
-          }, 10);
+            });
+            $("#list-historial").html(template);
+            $("#historial-event").removeClass("md-hidden");
+            setTimeout(function () {
+              $("#historial-event .form-create").addClass("modal-show");
+            }, 10);
+            resolve();
+          }
         }
-      }
-    );
+      );
+    });
   }
   // INTERACCION CON CLIENTES
   $("#menu-pendientes").click();
 
   // SHOW MODAL registrar seguimiento
-  $(document).on("click", "#contactarSeguimiento", function () {
+  $(document).on("click", "#contactarSeguimiento", async function () {
     let id_cliente = $(this).attr("keyClient");
     console.log(id_cliente);
 
     let observacion = "Cliente contactado";
     let status = "CONTACTADO";
-    seguimiento_cliente(observacion, id_cliente, status);
+    await seguimiento_cliente(observacion, id_cliente, status);
   });
   function imprimirStatus(status) {
     let template = "";
@@ -999,7 +1032,7 @@ $(document).ready(function () {
 
   // filtrarProyectos();
 
-  $("#editar-lead #editLead").submit((e) => {
+  $("#editar-lead #editLead").submit(async (e) => {
     e.preventDefault();
     let nombre = $("#editar-lead #nombre-lead").val();
     let apellido = $("#editar-lead #apellido-lead").val();
@@ -1030,7 +1063,7 @@ $(document).ready(function () {
       $.post(
         "../../controlador/UsuarioController.php",
         { funcion, result, proyecto_id, cliente: idCliente },
-        (response) => {
+        async (response) => {
           console.log(response);
           const data = JSON.parse(response);
           console.log(data);
@@ -1044,7 +1077,7 @@ $(document).ready(function () {
               $("#editar-lead .form-create").removeClass("modal-show");
             }, 1000);
             $("#editar-lead").addClass("md-hidden");
-            buscar_clientes();
+            await buscar_clientes();
 
             $("#editar-lead #nombre-lead").val("");
             $("#editar-lead #apellido-lead").val("");
@@ -1092,11 +1125,11 @@ $(document).ready(function () {
       $.post(
         "../../controlador/UsuarioController.php",
         { funcion, id_cliente },
-        (response) => {
+        async (response) => {
           console.log(response);
           if (response.trim() === "archived-user-cliente") {
             alert("Se archivo correctamente");
-            buscar_clientes();
+            await buscar_clientes();
             animarProgress();
           } else {
             alert("Ocurrio un error, contacta al administrador");
@@ -1135,42 +1168,51 @@ $(document).ready(function () {
       verificarAuthorizeCalendar();
     }
   });
-  function registerVisita(fecha, hora, cliente, tipo, pendiente) {
-    let funcion = "add_visita_cliente";
-    $.post(
-      "../../controlador/UsuarioController.php",
-      { funcion, fecha, hora, cliente, tipo, pendiente },
-      (response) => {
-        console.log(response);
-        if (response.trim() === "add-register-visita") {
-          alert("Se registro" + tipo + " correctamente");
-          animarProgress();
-        } else {
-          alert("No se registro, contacta al administrador");
+  async function registerVisita(fecha, hora, cliente, tipo, pendiente) {
+    return new Promise((resolve, reject) => {
+      let funcion = "add_visita_cliente";
+      $.post(
+        "../../controlador/UsuarioController.php",
+        { funcion, fecha, hora, cliente, tipo, pendiente },
+        (response) => {
+          console.log(response);
+          if (response.trim() === "add-register-visita") {
+            alert("Se registro" + tipo + " correctamente");
+            animarProgress();
+            resolve();
+          } else {
+            alert("No se registro, contacta al administrador");
+            reject({ err: "no se registro, contacta al adminitraor" });
+          }
         }
-      }
-    );
+      );
+    });
   }
   function register_venta(fecha, cliente) {
-    let funcion = "register_venta";
-    $.post(
-      "../../controlador/UsuarioController.php",
-      { funcion, fecha, cliente },
-      (response) => {
-        if (response.trim() === "add-register-venta") {
-          alert("Se registro correctamente la venta");
-        } else {
-          alert("Hubo un error Contacta al administrador");
+    return new Promise((resolve, reject) => {
+      let funcion = "register_venta";
+      $.post(
+        "../../controlador/UsuarioController.php",
+        { funcion, fecha, cliente },
+        (response) => {
+          console.log(response);
+          if (response.trim() === "add-register-venta") {
+            alert("Se registro correctamente la venta");
+            resolve();
+          } else {
+            alert("Hubo un error Contacta al administrador");
+            reject({ err: response });
+          }
         }
-        console.log(response);
-      }
-    );
+      );
+    });
   }
-  $("#registerFormEvento").submit((e) => {
+  $("#registerFormEvento").submit(async (e) => {
     e.preventDefault();
     let status = $("#status-evento").val();
     let observaciones = $("#observaciones-evento").val();
     console.log(status, observaciones);
+
     if (status !== "0") {
       if (
         status === "VISITA" ||
@@ -1181,14 +1223,17 @@ $(document).ready(function () {
         let pendiente = "PENDIENTE";
         let fecha = $("#date-visita").val();
         let hora = $("#time-visita").val() + ":00";
+
         if (fecha && hora) {
           const result = clientesList.filter(
             (elemento) => elemento.id === idCliente
           );
           let cliente = result[0].nombres + " " + result[0].apellidos;
           let description = `Nuevo evento:${status} - Cliente:${cliente} - Observaciones: ${observaciones} `;
-          registerVisita(fecha, hora, idCliente, status, pendiente);
+
+          await registerVisita(fecha, hora, idCliente, status, pendiente);
           createCustomEvent(description, fecha, hora);
+
           $("#date-visita").val(null);
           $("#time-visita").val(null);
         } else {
@@ -1197,14 +1242,16 @@ $(document).ready(function () {
       } else if (status === "VENTA") {
         console.log("VENTA");
         let fecha = dayjs().format("YYYY-MM-DD");
-        register_venta(fecha, idCliente);
+        await register_venta(fecha, idCliente);
       }
-      seguimiento_cliente(observaciones, idCliente, status);
+
+      await seguimiento_cliente(observaciones, idCliente, status);
 
       let funcion = "buscar_historial_seguimiento";
-      buscar_clientes();
-      buscarHistorial(funcion, idCliente);
-      encontrar_ventas();
+      await buscar_clientes();
+      await buscarHistorial(funcion, idCliente);
+      await encontrar_ventas();
+
       $("#status-evento").val("0");
       $("#observaciones-evento").val("");
       setTimeout(function () {
@@ -1263,7 +1310,7 @@ $(document).ready(function () {
             $.post(
               "../../controlador/UsuarioController.php",
               { funcion, id },
-              (response) => {
+              async (response) => {
                 console.log(response);
                 if (response.trim() == "add-user-cliente") {
                   alert("Se asigno cliente al asesor");
@@ -1271,7 +1318,7 @@ $(document).ready(function () {
                   setTimeout(function () {
                     $("#crear-lead").addClass("md-hidden");
                   }, 300);
-                  buscar_clientes();
+                  await buscar_clientes();
                   $("#nombre-lead").val("");
                   $("#apellido-lead").val("");
                   $("#documento-lead").val("");
@@ -1318,28 +1365,32 @@ $(document).ready(function () {
   );
   closeButton.addEventListener("click", hideToast);
 
-  function seguimiento_cliente(observacion, cliente, status) {
-    let funcion = "seguimiento_cliente";
-    var fecha = dayjs().format("DD/MM/YYYY");
-    var hora = dayjs().format("HH:mm:ss");
+  async function seguimiento_cliente(observacion, cliente, status) {
+    return new Promise((resolve, reject) => {
+      let funcion = "seguimiento_cliente";
+      var fecha = dayjs().format("DD/MM/YYYY");
+      var hora = dayjs().format("HH:mm:ss");
 
-    // Imprimir las variables en la consola
-    console.log("Fecha actual:", fecha);
-    console.log("Hora actual:", hora);
-    console.log(cliente);
-    // let hora =
-    $.post(
-      "../../controlador/UsuarioController.php",
-      { funcion, cliente, observacion, status, fecha, hora },
-      (response) => {
-        if (response.trim() == "add-register-contact") {
-          buscar_clientes();
-        } else {
-          alert("Hubo un error contacta con el administrador");
+      // Imprimir las variables en la consola
+      console.log("Fecha actual:", fecha);
+      console.log("Hora actual:", hora);
+      console.log(cliente);
+      // let hora =
+      $.post(
+        "../../controlador/UsuarioController.php",
+        { funcion, cliente, observacion, status, fecha, hora },
+        async (response) => {
+          // console.log(response);
+          if (response.trim() == "add-register-contact") {
+            await buscar_clientes();
+            resolve();
+          } else {
+            alert("Hubo un error contacta con el administrador");
+            reject({ err: "Hubo un error contacta con el administrador" });
+          }
         }
-        console.log(response);
-      }
-    );
+      );
+    });
   }
 
   // remover etiqueta de lead
@@ -1352,7 +1403,7 @@ $(document).ready(function () {
       { funcion, id_etiqueta, cliente: idCliente },
       async (response) => {
         if (response.trim() === "remove-asigned") {
-          buscar_clientes();
+          await buscar_clientes();
           const etiquetas = await buscar_etiquetas_cliente(idCliente);
           console.log(etiquetas);
           let template;
@@ -1510,7 +1561,7 @@ $(document).ready(function () {
       async (response) => {
         if (response.trim() === "add-etiquetas-lead") {
           alert("Se asigno correctamente");
-          buscar_clientes();
+          await buscar_clientes();
           const etiquetas = await buscar_etiquetas_cliente(idCliente);
           console.log(etiquetas);
           let template;
