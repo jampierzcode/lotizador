@@ -207,6 +207,14 @@ $(document).ready(function () {
       //   pdfviewer();
     }
     $("#generar-pdf").click(function () {
+      html2canvas(document.getElementById("map1")).then(function (canvas) {
+        // Crear un enlace para descargar la imagen
+        var link = document.createElement("a");
+        link.href = canvas.toDataURL();
+        link.download = "mapa.png";
+        link.click();
+      });
+
       //   document.querySelector("#map1").print();
       //   var pdf = new jsPDF();
       //   var documento = document.querySelector("#map1");
@@ -290,13 +298,6 @@ $(document).ready(function () {
         );
         doc.save("documento.pdf");
       });
-      //   var pdf = new jsPDF();
-      //   var element = document.body;
-      //   html2canvas(element).then(function (canvas) {
-      //     var imageData = canvas.toDataURL("image/jpeg", 1.0);
-      //     pdf.addImage(imageData, "JPEG", 0, 0, 210, 297); // A4 size
-      //     pdf.save("documento.pdf");
-      //   });
     });
 
     // FUNCION PARA PINTAR LOS LOTES EN EL CARRITO

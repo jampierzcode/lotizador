@@ -11,6 +11,9 @@ if (!empty($_SESSION["id_usuario"])) {
         case 3:
             header("Location: views_asesor/Dashboard");
             break;
+        case 4:
+            header("Location: views_caja/caja");
+            break;
 
         default:
             # code...
@@ -59,7 +62,8 @@ if (!empty($_SESSION["id_usuario"])) {
                         </div>
                         <div class="group-date">
                             <ion-icon name="lock-closed"></ion-icon>
-                            <input name="password" type="password" placeholder="Ingresa la contraseña">
+                            <input id="password_login" name="password" type="password" placeholder="Ingresa la contraseña">
+                            <div class="view-password" key_actived="false"><ion-icon name="eye-off-outline"></ion-icon></div>
                         </div>
                         <button class="btn-submit" type="submit">Iniciar Sesion</button>
                     </div>
@@ -69,6 +73,20 @@ if (!empty($_SESSION["id_usuario"])) {
     </body>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
 
+    <script src="js/jquery.min.js"></script>
+    <script>
+        $(document).on("click", ".view-password", function() {
+            if ($(this).attr("key_actived") === "false") {
+                $(this).attr("key_actived", "true")
+                $("#password_login").attr("type", "text")
+                $(this).html(`<ion-icon name="eye-outline"></ion-icon>`)
+            } else {
+                $(this).attr("key_actived", "false")
+                $("#password_login").attr("type", "password")
+                $(this).html(`<ion-icon name="eye-off-outline"></ion-icon>`)
+            }
+        })
+    </script>
 
     </html>
 <?php } ?>

@@ -34,7 +34,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
 
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <!-- html2canvas -->
+    <script src="https://unpkg.com/leaflet-image@0.4.0/dist/leaflet-image.js"></script>
 
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <script src="./lotizador.js"></script>
 </body>
 

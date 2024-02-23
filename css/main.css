@@ -3,6 +3,9 @@
 
 :root {
   --bg-primario: rgb(48 60 157);
+  --blue-color: #0c2f54;
+  --dark-color: #535b61;
+  --white-color: #fff;
 }
 
 * {

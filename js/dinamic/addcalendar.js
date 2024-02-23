@@ -129,7 +129,12 @@ async function handleSignoutClick() {
 //   }
 // }
 
-async function createCustomEvent(eventDescription, eventDate, eventTime) {
+async function createCustomEvent(
+  summary,
+  eventDescription,
+  eventDate,
+  eventTime
+) {
   const dateTime = `${eventDate}T${eventTime}`;
 
   try {
@@ -159,6 +164,14 @@ async function createCustomEvent(eventDescription, eventDate, eventTime) {
           minutes: 5,
         },
         {
+          method: "popup",
+          minutes: 30,
+        },
+        {
+          method: "email",
+          minutes: 30,
+        }, // Ejemplo: Correo electrónico 10 minutos antes
+        {
           method: "email",
           minutes: 5,
         }, // Ejemplo: Correo electrónico 10 minutos antes
@@ -175,7 +188,8 @@ async function createCustomEvent(eventDescription, eventDate, eventTime) {
     const request = {
       calendarId: calendarId,
       resource: {
-        summary: eventDescription,
+        summary: summary,
+        description: eventDescription,
         start: {
           dateTime: dateTime,
           timeZone: "America/Lima",

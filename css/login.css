@@ -56,13 +56,14 @@
   background: #ececec;
   overflow: hidden;
   padding: 0px 10px;
+  position: relative;
 }
 
 .form-login .body-form .group-date > ion-icon {
   height: auto;
   font-size: 20px;
   padding: 0px 10px;
-  color: #000;
+  color: #858585;
 }
 
 .form-login .body-form .group-date > input {
@@ -72,6 +73,23 @@
   background: transparent;
   color: #000;
   font-size: 14px;
+}
+.form-login .body-form .group-date .view-password {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  color: #242424;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  font-size: 14px;
+  border: 1px solid #000;
+  background-color: #fff;
+
+  border-radius: 20px;
+  cursor: pointer;
 }
 
 .form-login .body-form .btn-submit {

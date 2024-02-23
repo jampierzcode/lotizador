@@ -165,8 +165,8 @@ tr {
 }
 
 table th {
-  background: rgb(244, 246, 248) !important;
-  color: rgb(99, 115, 129);
+  background: #f9fafb !important;
+  color: #374151 !important;
 }
 table.dataTable tbody tr.seleccion {
   border-collapse: collapse;
@@ -177,7 +177,7 @@ table.dataTable tbody tr.seleccion > * {
 }
 
 table tr:nth-child(2n + 1) {
-  background: #f1f1f1 !important;
+  background: #f9fafb !important;
 }
 table tr:hover {
   background: rgb(244, 246, 248) !important;

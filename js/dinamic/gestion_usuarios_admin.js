@@ -323,7 +323,38 @@ $(document).ready(function () {
     bLengthChange: false,
     dom: '<"top">ct<"top"p><"clear">',
   });
+  $(document).on("click", "#no-asigned_user", function () {
+    let proyecto = $(this).attr("key_proyect");
+    let funcion = "removed_asigned_user";
+    $.post(
+      "../../controlador/UsuarioController.php",
+      { funcion, id_usuario: idCliente, id_proyecto: proyecto },
+      async (response) => {
+        if (response.trim() === "remove-asigned") {
+          alert("se quito la asignacion a este proyecto");
+          const proyectos = await buscar_proyectos(idCliente);
+          console.log(proyectos);
+          let template;
+          // let template = `<option value="" selected></option>`;
+          let proyectsAsigned = [];
+          proyectos.forEach((proyect) => {
+            let option = `<option value=${proyect.id}>${proyect.nombreProyecto}</option>`;
+            if (proyect.asignado_usuario === "Asignado") {
+              proyectsAsigned.push(proyect);
+              option = `<option value=${proyect.id} disabled>${proyect.nombreProyecto}</option>`;
+            }
+            template += option;
+          });
+          datatablesProyects.clear().rows.add(proyectsAsigned).draw();
 
+          $(".users_proyect").html(template);
+        } else {
+          alert("Ocurrioi un error contacta al administrador");
+          console.log(response);
+        }
+      }
+    );
+  });
   //   //  EDIT CLIENTES
   $(document).on("click", "#edit_usuario", function () {
     let id_cliente = $(this).attr("key_user");

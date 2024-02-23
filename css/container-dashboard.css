@@ -1,7 +1,7 @@
 .container-dashboard {
   margin-left: 200px;
   background: #f5f7fb;
-  padding: 110px 60px 40px 60px;
+  padding: 110px 20px 40px 20px;
   min-height: calc(100vh);
   transition: margin-left 0.5s;
   position: relative;
@@ -50,19 +50,19 @@ a {
 .main-datatable .cust-datatable > thead > tr > th {
   border-bottom-width: 0;
   color: #443f3f;
-  font-weight: 600;
+  font-weight: 700;
   padding: 16px 15px;
   vertical-align: middle;
   padding-left: 18px;
-  text-align: center;
+  text-align: start;
 }
 .main-datatable .cust-datatable > tbody td {
   padding: 10px 15px 10px 18px;
-  color: #333232;
+  color: #6b7280;
   font-size: 13px;
   font-weight: 500;
   border-color: #eee;
-  text-align: center;
+  text-align: start;
   vertical-align: middle;
 }
 .main-datatable .cust-datatable > tbody tr {

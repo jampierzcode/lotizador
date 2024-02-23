@@ -9,7 +9,6 @@ $(document).ready(function () {
     { readCol: "telefono" },
     { readCol: "campaña" },
     { readCol: "ciudad" },
-    { readCol: "origen" },
     { readCol: "direccion" },
     { readCol: "correo" },
   ];
@@ -103,6 +102,7 @@ $(document).ready(function () {
   $("body").on("click", "#subirData", async function () {
     const asignaciones = [];
     const proyecto_id = $("#listMyProyects").val();
+    const origen_name = $("#listOrigen").val();
     let contadorAsignacion = 0;
     $('select[name="etiqueta-field-data"]').each(function () {
       const position = $(this).attr("propPosition");
@@ -137,68 +137,82 @@ $(document).ready(function () {
       const obj = { ...camposPredefinidos };
       asignaciones.forEach((asignacion) => {
         const { position, key, value } = asignacion;
-        obj[value] = registro[position];
+        obj[value] =
+          registro[position] !== "" && registro[position] !== null
+            ? registro[position]
+            : "";
       });
       return obj;
     });
     console.log(asignaciones);
     console.log(contadorAsignacion);
+    let fechaActual = dayjs().format("YYYY-MM-DD");
+    let horaActual = dayjs().format("HH:mm:ss");
+    resultado.forEach((objeto) => {
+      objeto.fecha = fechaActual;
+      objeto.hora = horaActual;
+    });
+    console.log(resultado);
     if (asignaciones.length === contadorAsignacion) {
       if (proyecto_id !== "0") {
-        try {
-          // Array para almacenar todas las promesas de las solicitudes AJAX
-          const promesas = resultado.map((result) => {
-            return new Promise((resolve, reject) => {
-              let funcion = "add_cliente";
-              $.post(
-                "../../controlador/UsuarioController.php",
-                { funcion, result, proyecto_id },
-                (response) => {
-                  console.log(response);
-                  const data = JSON.parse(response);
-                  console.log(data);
+        if (origen_name !== "0") {
+          try {
+            let funcion = "add_cliente2";
+            $.post(
+              "../../controlador/UsuarioController.php",
+              {
+                funcion,
+                result: JSON.stringify(resultado),
+                proyecto_id,
+                origen_name,
+              },
+              (response) => {
+                const data = JSON.parse(response);
+                console.log(data);
 
-                  if (data.hasOwnProperty("error")) {
-                    // Si la respuesta contiene un mensaje de error, rechaza la promesa
-                    reject(data.error);
-                  } else {
-                    let funcion = "add_user_cliente_asesor";
-                    let id = data.id;
-                    $.post(
-                      "../../controlador/UsuarioController.php",
-                      { funcion, id },
-                      (response) => {
-                        console.log(response);
-                        if (response.trim() == "add-user-cliente") {
-                          // buscar_clientes();
-                          resolve(); // Resuelve la promesa si la solicitud AJAX se completa con éxito
-                        } else {
-                          reject("No se asigno, contacta al administrador"); // Rechaza la promesa si hay un error
-                        }
+                if (data.hasOwnProperty("error")) {
+                  // Si la respuesta contiene un mensaje de error, rechaza la promesa
+                  console.log(data.error);
+                } else {
+                  let funcion = "add_user_cliente_asesor";
+
+                  $.post(
+                    "../../controlador/UsuarioController.php",
+                    {
+                      funcion,
+                      ids_clientes: JSON.stringify(data.ids_clientes),
+                      fecha_now: fechaActual,
+                      hora_now: horaActual,
+                    },
+                    (response) => {
+                      console.log(response);
+                      if (response.trim() == "add-user-cliente") {
+                        alert("Se subieron correctamente todos los datos");
+                        var urlActual = window.location.href;
+
+                        // Eliminar la última parte de la URL (la carpeta actual)
+                        var urlPadre = urlActual.substring(
+                          0,
+                          urlActual.lastIndexOf("/")
+                        );
+                        console.log(urlPadre);
+                        // Redireccionar a la carpeta anterior
+                        window.location.href = urlPadre;
+                      } else {
+                        alert("No se asigno, contacta al administrador"); // Rechaza la promesa si hay un error
                       }
-                    );
-                  }
+                    }
+                  );
                 }
-              );
-            });
-          });
-
-          // Espera a que todas las promesas se resuelvan o se rechacen
-          await Promise.all(promesas);
-
-          alert("Se subieron correctamente todos los datos");
-          var urlActual = window.location.href;
-
-          // Eliminar la última parte de la URL (la carpeta actual)
-          var urlPadre = urlActual.substring(0, urlActual.lastIndexOf("/"));
-          console.log(urlPadre);
-          // Redireccionar a la carpeta anterior
-          window.location.href = urlPadre;
-        } catch (error) {
-          alert(error);
+              }
+            );
+          } catch (error) {
+            alert(error);
+          }
+        } else {
+          alert("Debes seleccionar un origen de donde provienen los clientes");
         }
       } else {
-        alert("Debes seleccionar un proyecto a donde asignar los clientes");
       }
     } else {
       alert("Te faltan agregar asignaciones");

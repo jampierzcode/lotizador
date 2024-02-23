@@ -41,7 +41,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
         ?>
         <div class="container-dashboard">
             <span class="route">
-                > Home > CRM </span>
+                > Home > CRM > Validar </span>
 
             <div class="confirm-popup md-hidden">
                 <div class="form-confirm">
@@ -414,42 +414,13 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
             <button id="create-clients" class="btn-add">+ Crear</button>
         </div> -->
             <div style="display: flex; gap:10px; margin: 20px 0px">
+
                 <div class="relative inline-block text-left">
                     <div>
-                        <button type="button" class="inline-flex items-center w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 btn-add hover:bg-gray-50" id="menu-button" aria-expanded="false" aria-haspopup="true">
-
-                            <ion-icon name="people-sharp"></ion-icon>
-
-                            Leads
-                            <svg class="-mr-1 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
-                            </svg>
-                        </button>
-                    </div>
-
-                    <div id="expand_file" class="absolute left-0 z-10 mt-2 w-56 origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none hidden" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
-                        <div class="py-1" role="none">
-                            <li id="modal-lead" class="flex items-center gap-2 cursor-pointer hover:bg-slate-200 text-gray-700 block px-4 py-2 text-sm" role="menuitem" tabindex="-1" id="menu-item-0"><ion-icon name="add-outline"></ion-icon> Agregar Lead</li>
-                            <a href="./importar.php" id="import-leads" class="flex items-center gap-2 cursor-pointer hover:bg-slate-200 text-gray-700 block px-4 py-2 text-sm" role="menuitem" tabindex="-1" id="menu-item-0"> <ion-icon name="cloud-upload-outline"></ion-icon> Importar</a>
-
-                        </div>
-                    </div>
-                </div>
-                <div class="relative inline-block text-left">
-                    <div>
-                        <a href="../papelera/" type="button" class="inline-flex items-center w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 text-red-600">
+                        <a href="../Crm/" type="button" class="inline-flex items-center w-full justify-center gap-x-1.5 rounded-md bg-[#310ecd] px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 text-white">
 
                             <ion-icon name="trash"></ion-icon>
-                            Ver Archivados
-                        </a>
-                    </div>
-                </div>
-                <div class="relative inline-block text-left">
-                    <div>
-                        <a href="../validar/" type="button" class="inline-flex items-center w-full justify-center gap-x-1.5 rounded-md bg-yellow-400 px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 text-gray-800">
-
-                            <ion-icon name="bag-check"></ion-icon>
-                            Validaciones
+                            Ver todos los leads
                         </a>
                     </div>
                 </div>
@@ -505,8 +476,8 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
 
                         <div id="expand-acciones" class="absolute top-full left-0 z-10 mt-2 w-56 origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none hidden" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
                             <div class="py-1" role="none">
-                                <li active="true" id="asigned_usuarios_actions" class="flex items-center gap-2 cursor-pointer hover:bg-slate-200 text-gray-700 block px-4 py-2 text-sm" role="menuitem" tabindex="-1" id="menu-item-0"><ion-icon name="add-outline"></ion-icon> Asignar asesor</li>
-                                <li id="modal-lead-group-archived" class="flex items-center gap-2 cursor-pointer hover:bg-slate-200 text-gray-700 block px-4 py-2 text-sm" role="menuitem" tabindex="-1" id="menu-item-0"> <ion-icon name="trash"></ion-icon> Archivar lead(s)</li>
+                                <li active="true" id="asigned_usuarios_actions" class="flex items-center gap-2 cursor-pointer hover:bg-slate-200 text-gray-700 block px-4 py-2 text-sm" role="menuitem" tabindex="-1"><ion-icon name="bag-check"></ion-icon> Validar Grupo</li>
+                                <!-- <li id="modal-lead-group-archived" class="flex items-center gap-2 cursor-pointer hover:bg-slate-200 text-gray-700 block px-4 py-2 text-sm" role="menuitem" tabindex="-1"> <ion-icon name="trash"></ion-icon> Archivar lead(s)</li> -->
 
 
                             </div>
@@ -526,15 +497,16 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
                             <th></th>
                             <th>Nombres</th>
                             <th>Apellidos</th>
-                            <th>Fecha Hora Creacion</th>
                             <th>Correo</th>
                             <th>Celular</th>
+                            <th>Fecha Registro</th>
+                            <th>Hora Registro</th>
                             <!-- <th>Telefono</th>
                             <th>Origen</th>
                             <th>Ciudad</th> -->
                             <th>Proyecto</th>
                             <th>Agente</th>
-                            <th>Status</th>
+                            <th>Tipo de evento</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -543,62 +515,6 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
         </div>
         </div>
         <script>
-            // Obtiene el botón y el menú desplegable
-            var button = document.getElementById('menu-button');
-            var menu = document.getElementById('expand_file');
-
-            // Agrega un evento de clic al botón para mostrar/ocultar el menú desplegable
-            menu.addEventListener('click', function() {
-                var expanded = button.getAttribute('aria-expanded') === 'true' || false;
-                button.setAttribute('aria-expanded', !expanded);
-
-                if (!expanded) {
-                    menu.style.transformOrigin = 'left top';
-                    menu.style.transform = 'scale(0)';
-                    menu.style.opacity = '0';
-                    setTimeout(function() {
-                        menu.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
-                        menu.style.transform = 'scale(1)';
-                        menu.style.opacity = '1';
-                    }, 0);
-                    menu.classList.remove('hidden');
-                } else {
-                    menu.style.transformOrigin = 'left top';
-                    menu.style.opacity = '1';
-                    menu.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
-                    menu.style.transform = 'scale(0)';
-                    menu.style.opacity = '0';
-                    setTimeout(function() {
-                        menu.classList.add('hidden');
-                    }, 300);
-                }
-            });
-            button.addEventListener('click', function() {
-                var expanded = button.getAttribute('aria-expanded') === 'true' || false;
-                button.setAttribute('aria-expanded', !expanded);
-
-                if (!expanded) {
-                    menu.style.transformOrigin = 'left top';
-                    menu.style.transform = 'scale(0)';
-                    menu.style.opacity = '0';
-                    setTimeout(function() {
-                        menu.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
-                        menu.style.transform = 'scale(1)';
-                        menu.style.opacity = '1';
-                    }, 0);
-                    menu.classList.remove('hidden');
-                } else {
-                    menu.style.transformOrigin = 'left top';
-                    menu.style.opacity = '1';
-                    menu.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
-                    menu.style.transform = 'scale(0)';
-                    menu.style.opacity = '0';
-                    setTimeout(function() {
-                        menu.classList.add('hidden');
-                    }, 300);
-                }
-            });
-
             // Obtiene el botón y el menú desplegable etiqueta
             var button_acciones = document.getElementById('menu-button-acciones');
             var menu_acciones = document.getElementById('expand-acciones');
@@ -646,7 +562,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
 
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.9.4/dayjs.min.js" integrity="sha512-XZSHSEFj4QeE0G4pwy4tToyAhF2VXoEcF9CP0t1PSZMP2XHhEEB9PjM9knsdzcEKbi6GRMazdt8tJadz0JTKIQ==" crossorigin="anonymous"></script>
-    <script src="../../js/dinamic/gestion-clientes.js"></script>
+    <script src="../../js/dinamic/gestion-validaciones.js"></script>
 
     </html>
 <?php } ?>

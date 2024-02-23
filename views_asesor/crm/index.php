@@ -13,11 +13,14 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="../../css/main.css">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
         <link rel="stylesheet" href="../../css/sidebar.css">
         <link rel="stylesheet" href="../../css/navdashboard.css">
         <link rel="stylesheet" href="../../css/container-dashboard.css">
         <link rel="stylesheet" href="../../css/habitaciones.css">
         <link rel="stylesheet" href="../../css/productos.css">
+        <link rel="stylesheet" href="../../css/proforma.css">
         <link rel="icon" href="../../img/logo.jpg">
         <!-- data table CDN -->
         <link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css" />
@@ -88,6 +91,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                         <h1 class="text-[12px] text-nowrap">Ventas</h1>
                         <span id="ventas_count" class="text-white">0</span>
                     </div>
+                    <button id="analysis-leads" class="p-2 max-w-max flex items-center bg-white rounded text-sm font-bold gap-2 hover:bg-violet-200 duration-300"><ion-icon class="text-xl" name="trending-up-outline"></ion-icon> Rendimiento</button>
                 </div>
             </div>
             <div class="confirm-popup md-hidden">
@@ -108,6 +112,192 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                 </div>
                 <p><span id="numberVisit"></span> visitas</p>
             </div> -->
+            <div id="generar-proforma" class="modal-create md-hidden">
+                <div class="form-create" style="max-width: 850px !important; width: 100%">
+                    <!-- <form id="form_producto_add"> -->
+                    <div class="close-modal">
+                        <ion-icon name="close-outline"></ion-icon>
+                    </div>
+                    <h1 class="font-bold">Generar proforma</h1>
+                    <div class="formulario grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="h-auto">
+
+                            <label for="description">Descripcion</label>
+                            <input id="description-proforma" type="text" class="w-full text-sm px-4 py-2 rounded bg-gray-100" placeholder="Ingresa una breve descripcion">
+                        </div>
+                        <div class="h-auto">
+
+                            <label for="precio">Precio</label>
+                            <div class="flex items-center gap-4">
+                                <div class="campo">
+                                    <select id="tipomoneda" class="text-sm px-4 py-2 rounded bg-gray-100">
+                                        <option value="$">$</option>
+                                        <option value="S/">S/</option>
+                                    </select>
+                                </div>
+                                <div class="campo">
+
+                                    <input id="precio-proforma" type="text" class="w-full text-sm px-4 py-2 rounded bg-gray-100" placeholder="Ingresa un precio">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="h-auto flex items-end rounded">
+                            <button id="cart-proforma" class="px-3 py-2 bg-yellow-400 text-black font-bold">Agregar</button>
+                        </div>
+
+                    </div>
+                    <table class="w-full border cart-proforma">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <th class="px-4 py-2">#</th>
+                                <th class="px-4 py-2">Descripción</th>
+                                <th class="px-4 py-2">Cantidad</th>
+                                <th class="px-4 py-2">Precio</th>
+                                <th class="px-4 py-2">Subtotal</th>
+                                <th class="px-4 py-2">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cart-items">
+                            <!-- Aquí se generan las filas dinámicamente -->
+                        </tbody>
+                    </table>
+                    <div>
+                        <div class="flex items-center mb-4">
+                            <input id="financiamiento_check" type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                            <label for="financiamiento_check" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Financiamento?</label>
+                        </div>
+                        <div id="container-financiamento" class="hidden grid gap-4 grid-cols-1 md:grid-cols-3">
+
+                            <div>
+                                <label class="text-sm font-medium text-gray-900 dark:text-gray-300" for="inicial">Monto Inicia</label>
+                                <input id="monto_inicial_fn" class="px-3 py-2 rounded bg-gray-100 w-full" type="text" placeholder="Ingrese el monto inicial">
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-gray-900 dark:text-gray-300" for="cuotas">N-cuotas</label>
+                                <input id="numero_cuotas_fn" class="px-3 py-2 rounded bg-gray-100 w-full" type="text" placeholder="Numero de cuotas">
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-gray-900 dark:text-gray-300" for="cuotas">Monto por cuota</label>
+                                <input id="monto_cuotas_fn" class="px-3 py-2 rounded bg-gray-100 w-full" type="text" placeholder="Numero de cuotas">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-violet-800 w-full py-2 mt-[40px] flex items-center justify-center">
+                        <h1 class="text-sm font-bold text-white tet-center">Vista Previa</h1>
+                    </div>
+                    <!-- Creating an HTML element to be converted to a PDF -->
+                    <div class="border border-gray-500">
+                        <div class="invoice-wrapper">
+                            <div id="proforma-print" class="invoice">
+                                <div class="invoice-container">
+                                    <div class="invoice-head">
+                                        <div class="invoice-head-top">
+                                            <div class="invoice-head-top-left text-start">
+                                                <img id="logoproyecto-proforma" src="">
+
+                                                <p id="name-proyecto-proforma">...</p>
+                                            </div>
+                                            <div class="invoice-head-top-right text-end">
+                                                <h3>Proforma</h3>
+                                            </div>
+                                        </div>
+                                        <div class="hr"></div>
+                                        <div class="invoice-head-middle">
+                                            <div class="invoice-head-middle-left text-start">
+                                                <p><span class="text-bold">Fecha</span>: <span id="fecha-proforma">05/12/2020</span> </p>
+                                            </div>
+                                            <div class="invoice-head-middle-right text-end">
+                                                <p>
+                                                    <spanf class="text-bold">Proforma No:</span>16789
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="hr"></div>
+                                        <div class="invoice-head-bottom">
+                                            <div class="invoice-head-bottom-left">
+                                                <ul>
+                                                    <li class='text-bold'>Cliente:</li>
+                                                    <li id="name-cliente-proforma">Smith Rhodes</li>
+                                                    <li id="contact-cliente-proforma">Smith Rhodes</li>
+                                                </ul>
+                                            </div>
+                                            <div class="invoice-head-bottom-right">
+                                                <ul class="text-end">
+                                                    <div id="datos-asesor" class="flex gap-4">
+                                                        <img class="w-4 h-4 rounded-full" src="" alt="">
+                                                    </div>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="overflow-view">
+                                        <div class="invoice-body">
+                                            <table>
+                                                <thead>
+                                                    <tr>
+                                                        <td class="text-bold">Descripcion</td>
+                                                        <td class="text-bold">Precio</td>
+                                                        <td class="text-bold">Cantidad</td>
+                                                        <td class="text-bold">Subtotal</td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="carrito-proforma">
+
+                                                </tbody>
+                                            </table>
+                                            <div class="invoice-body-bottom">
+
+                                                <div class="invoice-body-info-item">
+                                                    <div class="info-item-td text-end text-bold">Total:</div>
+                                                    <div class="info-item-td text-end" id="total-proforma">$00.00</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div id="proforma_financiamiento" class="hidden">
+                                    <h1 class="w-full text-sm font-bold my-8 text-gray-800">Financiamiento</h1>
+                                    <div class="flex w-full">
+                                        <div class="flex gap-4 text-sm">Monto Inicial: <span class="font-bold" id="inicial_fn_pr"></span></div>
+                                    </div>
+                                    <div class="flex w-full">
+                                        <div class="flex gap-4 text-sm">Numero de cuotas: <span class="font-bold" id="ncuotas_fn_pr"></span></div>
+                                    </div>
+                                    <div class="flex w-full">
+                                        <div class="flex gap-4 text-sm">Monto Cuotas: <span class="font-bold" id="montocuotas_fn_pr"></span></div>
+                                    </div>
+
+                                </div>
+                                <div class="view-amenidades mt-8 hidden">
+
+                                    <h1 class="w-full text-sm font-bold my-8 text-gray-800">Amenidades del proyecto</h1>
+
+                                    <div id="list-amenidades-proforma" class="w-full grid grid-cols-4 gap-3">
+
+                                    </div>
+
+                                </div>
+                                <h1 class="w-full text-sm font-bold my-8 text-gray-800">Plano lotizador</h1>
+                            </div>
+                        </div>
+                        <div id="mapacontainer" class="relative w-full h-[500px]">
+                            <div id="loading_lotizador" style="z-index: 40000;" class="w-full gap-4 bg-blue-600 flex flex-col items-center justify-center absolute top-0 left-0 right-0 bottom-0 h-100" role="status">
+                                <svg aria-hidden="true" class="inline w-10 h-10 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor" />
+                                    <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill" />
+                                </svg>
+                                <h1 class="text-sm text-white">Cargando Lotizador...</h1>
+                            </div>
+                            <div id="map1" class="px-[70px] border-2 border-gray-200 rounded h-[500px]"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <button id="generar-proforma-pdf" class="px-4 py-3 bg-violet-700 text-white text-sm font-bold">Generar proforma</button>
+                    </div>
+                </div>
+            </div>
             <div id="crear-lead" class="modal-create md-hidden">
                 <div class="form-create">
                     <!-- <form id="form_producto_add"> -->
@@ -147,7 +337,18 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                             </div>
                             <div class="mb-6">
                                 <label for="origen" class="block mb-2 text-[12px] font-medium text-gray-900 dark:text-white">Medio Contactado</label>
-                                <input type="text" id="origen-lead" placeholder="ejm: Facebook, Instagram, Capacitaciones, etc." class="bg-white border border-gray-300 text-gray-900 text-[12px] rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                                <select class="bg-white border border-gray-300 text-gray-900 text-[12px] rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" name="" id="origen-lead">
+                                    <option value="0">Seleccionar Origen</option>
+                                    <option value="Facebook Ads">Facebook Ads</option>
+                                    <option value="Marketplace">Marketplace</option>
+                                    <option value="WhatsApp">WhatsApp</option>
+                                    <option value="Messenger">Messenger</option>
+                                    <option value="Tiktok">Tiktok</option>
+                                    <option value="Instagram">Instagram</option>
+                                    <option value="Llamada">Llamada</option>
+                                    <option value="Prospección">Prospección</option>
+                                    <option value="otro">otro</option>
+                                </select>
                             </div>
                             <div class="mb-6">
                                 <label for="campania" class="block mb-2 text-[12px] font-medium text-gray-900 dark:text-white">Campaña</label>
@@ -162,7 +363,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                                 <select type="text" id="proyecto-lead" placeholder="Ingrese ciudad de origen" class="bg-white border border-gray-300 text-gray-900 text-[12px] rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"></select>
                             </div>
                         </div>
-                        <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-[12px] w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Registrar</button>
+                        <button type="submit" id="registrar_lead_btn" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-[12px] w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Registrar</button>
                     </form>
 
                     <!-- <div class="card-input buttons-modal">
@@ -170,6 +371,176 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                         <button id="add-user-form" class="btn-create">Crear</button>
                     </div> -->
                     <!-- </form> -->
+                </div>
+            </div>
+            <div id="rendimiento-asesor" class="modal-create md-hidden">
+                <div style="width:100%; max-width: 900px !important;" class="form-create">
+                    <!-- <form id="form_producto_add"> -->
+                    <div class="close-modal">
+                        <ion-icon name="close-outline"></ion-icon>
+                    </div>
+
+                    <h1 class="font-bold">Mi rendimiento</h1>
+                    <div class="grid gap-3 grid-cols-1 md:grid-cols-4">
+                        <div class="w-full relative">
+                            <span class="text-sm font-bold mb-2"> -</span>
+                            <select id="filter_date_analisis" type="date" class="w-full p-3 bg-white rounded-md text-sm border border-gray-300">
+                                <option value="this-month">Este Mes</option>
+                                <option value="last-month">Ultimos 30 dias</option>
+                                <option value="last-week">Hace 7 dias</option>
+                            </select>
+                        </div>
+                        <div class="w-full relative">
+                            <span class="text-sm font-bold mb-2"> Proyectos</span>
+                            <select id="proyectos_analisis" type="date" class="w-full p-3 bg-white rounded-md text-sm border border-gray-300">
+                                <option value="Todos">Todos</option>
+                            </select>
+                        </div>
+                        <div class="w-full relative">
+                            <span class="text-sm font-bold mb-2"> Fecha Inicio</span>
+                            <input id="fecha_analisis_start" type="date" class="w-full p-3 bg-white rounded-md text-sm border border-gray-300">
+                        </div>
+                        <div class="w-full relative">
+                            <span class="text-sm font-bold mb-2"> Fecha fin</span>
+                            <input id="fecha_analisis_end" type="date" class="w-full p-3 bg-white rounded-md text-sm border border-gray-300">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        <div class="flex flex-col gap-3 divide-y">
+                            <div class="flex items-center justify-between">
+                                <h1 class="text-sm font-bold">VISITAS CONCRETADAS</h1>
+                                <span id="visitas_analisis">0</span>
+                            </div>
+                            <!-- lista de visitas concretadas -->
+                            <div class="w-full">
+                                <div class="max-w-3xl mx-auto bg-white shadow-md rounded-md overflow-x-auto">
+                                    <table id="table-visitas-concretadas" class="min-w-full divide-y divide-gray-200">
+                                        <thead class="bg-gray-50">
+                                            <tr>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Nombres
+                                                </th>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Fecha
+                                                </th>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Proyecto
+                                                </th>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Status
+                                                </th>
+                                                <!-- Agrega más columnas según sea necesario -->
+                                            </tr>
+                                        </thead>
+                                        <tbody class="bg-white divide-y divide-gray-200">
+                                            <!-- Filas de datos -->
+
+                                            <!-- Agrega más filas según sea necesario -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <h1 class="text-sm font-bold">VISITAS NO CONCRETADAS</h1>
+                                <span id="no_visitas_analisis">0</span>
+                            </div>
+                            <!-- lista de visitas no concretadas -->
+                            <div class="w-full">
+                                <div class="max-w-3xl mx-auto bg-white shadow-md rounded-md overflow-x-auto">
+                                    <table id="table-visitas-no-concretadas" class="min-w-full divide-y divide-gray-200">
+                                        <thead class="bg-gray-50">
+                                            <tr>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Nombres
+                                                </th>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Fecha
+                                                </th>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Proyecto
+                                                </th>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Status
+                                                </th>
+                                                <!-- Agrega más columnas según sea necesario -->
+                                            </tr>
+                                        </thead>
+                                        <tbody class="bg-white divide-y divide-gray-200">
+                                            <!-- Filas de datos -->
+
+                                            <!-- Agrega más filas según sea necesario -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <h1 class="text-sm font-bold">SEPARACIONES</h1>
+                                <span id="separaciones_analisis">0</span>
+                            </div>
+                            <!-- lista de separaciones -->
+                            <div class="w-full">
+                                <div class="max-w-3xl mx-auto bg-white shadow-md rounded-md overflow-x-auto">
+                                    <table id="table-separaciones" class="min-w-full divide-y divide-gray-200">
+                                        <thead class="bg-gray-50">
+                                            <tr>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Nombres
+                                                </th>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Fecha
+                                                </th>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Proyecto
+                                                </th>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Status
+                                                </th>
+                                                <!-- Agrega más columnas según sea necesario -->
+                                            </tr>
+                                        </thead>
+                                        <tbody class="bg-white divide-y divide-gray-200">
+                                            <!-- Filas de datos -->
+
+                                            <!-- Agrega más filas según sea necesario -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <h1 class="text-sm font-bold">VENTAS</h1>
+                                <span id="ventas_analisis">0</span>
+                            </div>
+
+                            <!-- lista de ventas -->
+                            <div class="w-full">
+                                <div class="max-w-3xl mx-auto bg-white shadow-md rounded-md overflow-x-auto">
+                                    <table id="table-ventas" class="min-w-full divide-y divide-gray-200">
+                                        <thead class="bg-gray-50">
+                                            <tr>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Nombres
+                                                </th>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Fecha
+                                                </th>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Proyecto
+                                                </th>
+                                                <!-- Agrega más columnas según sea necesario -->
+                                            </tr>
+                                        </thead>
+                                        <tbody class="bg-white divide-y divide-gray-200">
+                                            <!-- Filas de datos -->
+
+                                            <!-- Agrega más filas según sea necesario -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="resumen-vsv" class="w-full -mt-3" style="height:500px;"></div>
+
+                    </div>
                 </div>
             </div>
             <div id="crear-etiqueta" class="modal-create md-hidden">
@@ -256,6 +627,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                         <ion-icon name="close-outline"></ion-icon>
                     </div>
                     <h1 class="font-bold">Editar Lead</h1>
+                    <span class="inline-block tetx-sm font-bold" id="asignedcliente_user"></span>
                     <form id="editLead">
                         <div class="grid grid-cols-2 gap-2 mb-4">
                             <div>
@@ -300,7 +672,8 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                             </div>
                             <div>
                                 <label for="proyecto" class="block mb-2 text-[12px] font-medium text-gray-900 dark:text-white">Proyecto</label>
-                                <select disabled type="text" id="proyecto-lead" placeholder="Ingrese ciudad de origen" class="bg-gray-300 border border-gray-600 text-gray-900 text-[12px] rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"></select>
+                                <select type="text" id="proyecto-lead" placeholder="Ingrese ciudad de origen" class="bg-gray-100 border border-gray-600 text-gray-900 text-[12px] rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"></select>
+                                <label id="detalle_lead_asignado" class="block mt-2 text-xs text-gray-900 dark:text-white"></label>
                             </div>
                         </div>
                         <button type="submit" class="btnJsvm info text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-[12px] w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Guardar</button>
@@ -374,7 +747,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                         </div>
                         <div id="addcalendar" class="hidden">
                             <div class="flex items-center mb-4">
-                                <input id="registercalendar" type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                <input id="registercalendar" type="checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                                 <label for="default-checkbox" class="ms-2 text-sm font-medium text-gray-900 flex items-center gap-1 dark:text-gray-300">
 
                                     Agregar a <img src="../../img/googlecalendar.png" alt="" class="w-12 bg-white"> Google Calendar</label>
@@ -388,7 +761,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                         </div>
                         <div class="flex justify-end w-full">
 
-                            <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-[12px] w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 btnJsvm info">Registrar</button>
+                            <button id="register_event_btn" type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-[12px] w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 btnJsvm info">Registrar</button>
                         </div>
                     </form>
 
@@ -438,21 +811,6 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
 
                 </div>
             </div>
-            <!-- <div class="w-full text-center mb-2">Mes actual: <span id="mesNow"></span></div>
-            <div class="justify-center flex gap-4 mb-5">
-                <div class="flex bg-blue-600 p-2 rounded-lg gap-4 items-center text-white">
-                    <h1 class="text-[12px]">Visitas Concretadas</h1>
-                    <span id="visits_concretadas" class="text-white">0</span>
-                </div>
-                <div class="flex bg-yellow-600 p-2 rounded-lg gap-4 items-center text-white">
-                    <h1 class="text-[12px]">Separaciones</h1>
-                    <span id="separaciones_count" class="text-white">0</span>
-                </div>
-                <div class="flex bg-green-600 p-2 rounded-lg gap-4 items-center text-white">
-                    <h1 class="text-[12px]">Ventas</h1>
-                    <span id="ventas_count" class="text-white">0</span>
-                </div>
-            </div> -->
             <div style="display: flex; gap:10px; margin-bottom: 20px">
                 <div class="relative inline-block text-left">
                     <div>
@@ -560,13 +918,24 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                             <div>
 
                                 <label for="pendientes-search" class="mb-2 text-[12px] font-medium text-gray-900  dark:text-white"></label> <br>
-                                <button type="button" class="flex max-w-max items-center justify-center gap-x-1.5 rounded-md text-white px-3 py-2 text-[12px] font-semibold shadow-sm bg-[#310ecd] text-[12px]" id="meusers-filtros" aria-expanded="false" aria-haspopup="true">
+                                <div class="flex items-center gap-4">
 
-                                    <img style="width: 16px;" src="../../img/corona.png" alt="">
+                                    <button type="button" class="flex max-w-max items-center justify-center gap-x-1.5 rounded-md text-white px-3 py-2 text-[12px] font-semibold shadow-sm bg-[#310ecd] text-[12px]" id="meusers-filtros" aria-expanded="false" aria-haspopup="true">
 
-                                    <p class="text-[12px] text-nowrap">Mis leads</p>
+                                        <img style="width: 16px;" src="../../img/corona.png" alt="">
 
-                                </button>
+                                        <p class="text-[12px] text-nowrap">Mis leads</p>
+
+                                    </button>
+                                    <button type="button" class="flex max-w-max items-center justify-center gap-x-1.5 rounded-md text-gray-700 px-3 py-2 font-semibold shadow-sm bg-gray-300 text-[12px]" id="asignedusers-filtros" aria-expanded="false" aria-haspopup="true">
+
+                                        <img style="width: 16px;" src="https://png.pngtree.com/png-clipart/20230817/original/pngtree-users-up-upload-user-arrow-picture-image_7996791.png" alt="">
+
+                                        <p class="text-[12px] text-nowrap">Asignados</p>
+
+                                    </button>
+
+                                </div>
                             </div>
 
                             <div>
@@ -589,12 +958,13 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
 
                 <!-- <form> -->
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+
                     <div class="h-auto">
-                        <label class="text-[12px] font-medium" for="Fecha Inicio">Fecha Inicio: </label>
+                        <label class="text-[12px] font-medium" for="Fecha Inicio">Rango Fecha (creacion) </label>
                         <input type="date" id="fecha-inicio-status" class="block w-full p-2 text-[12px] text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Buscar por nombre del asesor">
                     </div>
                     <div class="h-auto">
-                        <label for="pendientes-search" class="mb-2 text-[12px] font-medium text-gray-900  dark:text-white">Fecha Fin:</label>
+                        <label for="pendientes-search" class="mb-2 text-[12px] font-medium text-gray-900  dark:text-white">-</label>
                         <input disabled type="date" id="fecha-fin-status" class="block w-full p-2 text-[12px] text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Buscar por nombre del asesor">
                     </div>
                     <div>
@@ -628,6 +998,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
 
                     </div>
                 </div>
+                <div class="bg-gray-300 h-[2px] w-full my-3"></div>
 
                 <table id="usuariosList" class="table cust-datatable dataTable no-footer" style="width:100%;">
                     <thead>
@@ -646,7 +1017,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                             <th>Proyecto</th>
                             <th>Etiquetas</th>
                             <!-- <th>Correo</th> -->
-                            <!-- <th>Celular</th> -->
+                            <th>Celular</th>
                             <!-- <th>Telefono</th>
                             <th>Origen</th>
                             <th>Ciudad</th> -->
@@ -795,7 +1166,12 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
     <script src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/fixedcolumns/3.2.2/js/dataTables.fixedColumns.min.js"></script>
 
+    <!-- leafletjs -->
 
+    <script src="https://unpkg.com/leaflet-snap"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
     <!-- Asegúrate de incluir la biblioteca SheetJS -->
     <!-- use version 0.20.1 -->
     <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
@@ -806,7 +1182,16 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
 
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.9.4/dayjs.min.js" integrity="sha512-XZSHSEFj4QeE0G4pwy4tToyAhF2VXoEcF9CP0t1PSZMP2XHhEEB9PjM9knsdzcEKbi6GRMazdt8tJadz0JTKIQ==" crossorigin="anonymous"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js" integrity="sha512-EmNxF3E6bM0Xg1zvmkeYD3HDBeGxtsG92IxFt1myNZhXdCav9MzvuH/zNMBU1DmIPN6njrhX1VTbqdJxQ2wHDg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.5.1/chart.min.js" integrity="sha512-Wt1bJGtlnMtGP0dqNFH1xlkLBNpEodaiQ8ZN5JLA5wpc1sUlk/O5uuOMNgvzddzkpvZ9GLyYNa8w2s7rqiTk5Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <!-- Adding the html2pdf.js library -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
+    <script src="../../js/dinamic/html2canvas.js"></script>
+    <script src="../../js/dinamic/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js" integrity="sha512-YcsIPGdhPK4P/uRW6/sruonlYj+Q7UHWeKfTAkBW+g83NKM+jMJFJ4iAPfSnVp7BKD4dKMHmVSvICUbE/V1sSw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="../../js/dinamic/addcalendar.js"></script>
     <script src="../../js/dinamic/gestion-clientes-as.js"></script>
     <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>

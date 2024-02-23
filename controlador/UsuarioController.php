@@ -120,14 +120,18 @@ if ($_POST["funcion"] == "update_asigned_etiqueta") {
 }
 if ($_POST["funcion"] == "add_user_cliente") {
     $asesor = $_POST["asesor"];
-    $id_cliente = $_POST["id"];
-    $usuario->add_user_cliente($id_cliente, $asesor);
+    $data = json_decode($_POST["ids_clientes"]);
+    $fecha = $_POST["fecha_now"];
+    $hora = $_POST["hora_now"];
+    $usuario->add_user_cliente($data, $asesor, $fecha, $hora);
     echo $usuario->mensaje;
 }
 if ($_POST["funcion"] == "add_user_cliente_asesor") {
     $asesor = $_SESSION["id_usuario"];
-    $id_cliente = $_POST["id"];
-    $usuario->add_user_cliente($id_cliente, $asesor);
+    $data = json_decode($_POST["ids_clientes"]);
+    $fecha = $_POST["fecha_now"];
+    $hora = $_POST["hora_now"];
+    $usuario->add_user_cliente($data, $asesor, $fecha, $hora);
     echo $usuario->mensaje;
 }
 // fin de seccion usuarios
@@ -528,12 +532,85 @@ if ($_POST["funcion"] == "buscar_resumen_eficiencia_asesor") {
         echo $jsonstring;
     }
 }
+if ($_POST["funcion"] == "buscar_resumen_eficiencia_group_asesor") {
+    $fecha_inicio = $_POST["fecha_inicio"];
+    $data =  json_decode($_POST["asesores"]);
+    $asesores = $data->asesores;
+    // echo $data["asesores"];
+    $fecha_fin = $_POST["fecha_fin"];
+    $usuario->buscar_resumen_eficiencia_group_asesor($fecha_inicio, $fecha_fin, $asesores);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+        $jsonstring = json_encode($usuario->datos);
+        echo $jsonstring;
+    }
+}
 if ($_POST["funcion"] == "buscar_resumen_eficiencia_usuario") {
 
     $fecha_inicio = $_POST["fecha_inicio"];
     $fecha_fin = $_POST["fecha_fin"];
     $user = $id_usuario;
     $usuario->buscar_resumen_eficiencia_asesor($fecha_inicio, $fecha_fin, $user);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+        $jsonstring = json_encode($usuario->datos);
+        echo $jsonstring;
+    }
+}
+if ($_POST["funcion"] == "buscar_resumen_eficiencia_usuario_proyecto") {
+
+    $fecha_inicio = $_POST["fecha_inicio"];
+    $fecha_fin = $_POST["fecha_fin"];
+    $proyecto = $_POST["proyecto"];
+    $user = $id_usuario;
+    $usuario->buscar_resumen_eficiencia_usuario_proyecto($fecha_inicio, $fecha_fin, $user, $proyecto);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+        $jsonstring = json_encode($usuario->datos);
+        echo $jsonstring;
+    }
+}
+if ($_POST["funcion"] == "buscar_clientes_rendimiento") {
+
+    $fecha_inicio = $_POST["fecha_inicio"];
+    $fecha_fin = $_POST["fecha_fin"];
+    $user = $id_usuario;
+    $usuario->buscar_clientes_rendimiento($fecha_inicio, $fecha_fin, $user);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+        $jsonstring = json_encode($usuario->datos);
+        echo $jsonstring;
+    }
+}
+if ($_POST["funcion"] == "buscar_clientes_rendimiento_by_asesor") {
+
+    $fecha_inicio = $_POST["fecha_inicio"];
+    $fecha_fin = $_POST["fecha_fin"];
+    $user = $_POST["usuario"];
+    $usuario->buscar_clientes_rendimiento($fecha_inicio, $fecha_fin, $user);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+        $jsonstring = json_encode($usuario->datos);
+        echo $jsonstring;
+    }
+}
+if ($_POST["funcion"] == "buscar_clientes_rendimiento_group_asesor") {
+
+    $fecha_inicio = $_POST["fecha_inicio"];
+    $fecha_fin = $_POST["fecha_fin"];
+    $data =  json_decode($_POST["asesores"]);
+    $asesores = $data->asesores;
+    $usuario->buscar_clientes_rendimiento_group_asesor($fecha_inicio, $fecha_fin, $asesores);
     if ($usuario->mensaje) {
         echo $usuario->mensaje;
     }
@@ -555,6 +632,7 @@ if ($_POST["funcion"] == "buscar_proyectos_agentes") {
                 'id' => $dato->id,
                 'nombreProyecto' => $dato->nombre_proyecto,
                 'logo' => $dato->logo,
+                'img_lotizador' => $dato->img_lotizador,
                 "phone_number" => $dato->phone_number,
                 "id_agente" => $dato->id_agente,
             );
@@ -576,6 +654,7 @@ if ($_POST["funcion"] == "buscar_proyectos_admin") {
                 'id' => $dato->id,
                 'nombreProyecto' => $dato->nombre_proyecto,
                 'description' => $dato->description,
+                'logo' => $dato->logo,
                 'video_url' => $dato->video_url,
                 'clienteNombre' => $dato->cliente_nombre,
                 'clienteApellido' => $dato->cliente_apellido,
@@ -924,7 +1003,8 @@ if ($_POST["funcion"] == "add_cliente2") {
     $jsonData = $_POST["result"];
     $data = json_decode($jsonData);
     $proyect_id = $_POST["proyecto_id"];
-    $usuario->add_cliente2($data, $proyect_id, $_SESSION["id_usuario"]);
+    $origen_name = $_POST["origen_name"];
+    $usuario->add_cliente2($data, $proyect_id, $origen_name, $_SESSION["id_usuario"]);
     echo json_encode($usuario->mensaje);
 }
 if ($_POST["funcion"] == "add_etiqueta") {
@@ -955,6 +1035,12 @@ if ($_POST["funcion"] == "delete_cliente_asesor") {
     $cliente = intVal($_POST["id_cliente"]);
     $asesor = intVal($_SESSION["id_usuario"]);
     $usuario->delete_cliente_asesor($cliente, $asesor);
+    echo $usuario->mensaje;
+}
+if ($_POST["funcion"] == "unassign_my_asesor") {
+    $cliente = intVal($_POST["id_cliente"]);
+    $asesor = intVal($_SESSION["id_usuario"]);
+    $usuario->unassign_my_asesor($cliente, $asesor);
     echo $usuario->mensaje;
 }
 // BUSCAR CLIENTES
@@ -990,7 +1076,8 @@ if ($_POST["funcion"] == "buscar_clientes") {
                 'origen' => $dato->origen,
                 'ciudad' => $dato->ciudad,
                 'nombre_proyecto' => $dato->nombre_proyecto,
-                'created_cliente' => $dato->created_cliente,
+                'fecha_creacion' => $dato->fecha_creation,
+                'hora_creacion' => $dato->hora_creation,
                 'proyecto_id' => $dato->proyet_id,
                 'asignado_usuario' => $dato->asignado_usuario,
                 'status' => $dato->status
@@ -1000,9 +1087,69 @@ if ($_POST["funcion"] == "buscar_clientes") {
         echo $jsonstring;
     }
 }
+if ($_POST["funcion"] == "buscar_clientes_validar") {
+    $json = array();
+    $user = $_SESSION["id_usuario"];
+    $usuario->buscar_clientes_validar($user);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+        echo json_encode($usuario->datos);
+    }
+}
+if ($_POST["funcion"] == "buscar_group_clientes_fecha") {
+
+    $fecha_inicio = $_POST["fecha_inicio"];
+    $fecha_fin = $_POST["fecha_fin"];
+    $data =  json_decode($_POST["asesores"]);
+    $asesores = $data->asesores;
+    $usuario->buscar_group_clientes_fecha($fecha_inicio, $fecha_fin, $asesores);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+
+        $jsonstring = json_encode($usuario->datos);
+        echo $jsonstring;
+    }
+}
+if ($_POST["funcion"] == "buscar_group_asignados_fecha") {
+    $adminuser = $_SESSION["id_usuario"];
+    $fecha_inicio = $_POST["fecha_inicio"];
+    $fecha_fin = $_POST["fecha_fin"];
+    $data =  json_decode($_POST["asesores"]);
+    $asesores = $data->asesores;
+    $usuario->buscar_group_asignados_fecha($adminuser, $fecha_inicio, $fecha_fin, $asesores);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+
+        $jsonstring = json_encode($usuario->datos);
+        echo $jsonstring;
+    }
+}
 if ($_POST["funcion"] == "completar_tarea") {
     $id_task = $_POST["id_task"];
     $usuario->completar_tarea($id_task);
+    echo $usuario->mensaje;
+}
+if ($_POST["funcion"] == "validar_tarea") {
+    $id_task = $_POST["id_task"];
+    $usuario->validar_tarea($id_task);
+    echo $usuario->mensaje;
+}
+if ($_POST["funcion"] == "validar_interaccion") {
+    $id_task = $_POST["id_task"];
+    $status = $_POST["status"];
+    $usuario->validar_interaccion($id_task, $status);
+    echo $usuario->mensaje;
+}
+if ($_POST["funcion"] == "validar_venta") {
+    $id_task = $_POST["id_task"];
+    $status = $_POST["status"];
+    $usuario->validar_venta($id_task, $status);
     echo $usuario->mensaje;
 }
 if ($_POST["funcion"] == "register_visita_agenda") {
@@ -1016,6 +1163,18 @@ if ($_POST["funcion"] == "register_visita_agenda") {
 if ($_POST["funcion"] == "buscar_user_target") {
     $json = array();
     $usuario->buscar_user_target($_SESSION["id_usuario"]);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+
+        $jsonstring = json_encode($usuario->datos);
+        echo $jsonstring;
+    }
+}
+if ($_POST["funcion"] == "buscar_user_asesor") {
+    $json = array();
+    $usuario->buscar_user_asesor($_SESSION["id_usuario"]);
     if ($usuario->mensaje) {
         echo $usuario->mensaje;
     }
@@ -1174,7 +1333,8 @@ if ($_POST["funcion"] == "buscar_clientes_by_asesor") {
                 'campania' => $dato->campania,
                 'Pais' => $dato->pais,
                 'nombre_proyecto' => $dato->nombre_proyecto,
-                'created_cliente' => $dato->created_cliente,
+                'fecha_creacion' => $dato->fecha_creation,
+                'hora_creacion' => $dato->hora_creation,
                 'proyecto_id' => $dato->proyet_id,
                 'id_task' => $dato->id_task,
                 'task_status' => $dato->task_status,

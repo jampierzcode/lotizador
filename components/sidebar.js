@@ -11,4 +11,7 @@ $(document).ready(function () {
     $(".container-dashboard").toggleClass("close_sidebar");
     $(".overlay-sidebar").toggleClass("overlay-sidebar-show");
   });
+  $(".menu-wrapper").click(function () {
+    $(this).next(".dropdown_menu").toggleClass("hidden");
+  });
 });

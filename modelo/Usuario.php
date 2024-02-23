@@ -665,11 +665,115 @@ class Usuario
         try {
             # code...
             $sql = "SELECT 
-            (SELECT COUNT(*) FROM interaccion_cliente ic inner join visitas_agenda va on ic.id=va.interaccion_id WHERE va.interaccion_id=ic.id AND va.status ='ASISTIO'  AND ic.user_id =:id_usuario) as visitas_concretadas,
-            (SELECT COUNT(*) FROM interaccion_cliente ic WHERE ic.tipo = 'SEPARACION' AND ic.user_id = :id_usuario AND ic.fecha_visita BETWEEN :fecha_inicio AND :fecha_fin) AS separaciones,
-            (SELECT COUNT(*) FROM ventas v WHERE v.user_id = :id_usuario AND v.fecha_venta BETWEEN :fecha_inicio AND :fecha_fin) AS ventas;";
+            (SELECT COUNT(*) FROM interaccion_cliente ic inner join visitas_agenda va on ic.id=va.interaccion_id WHERE va.interaccion_id=ic.id AND va.status ='ASISTIO' AND ic.status='VALIDADO'  AND ic.user_id =:id_usuario AND ic.fecha_visita BETWEEN :fecha_inicio AND :fecha_fin) as visitas_concretadas,
+            (SELECT COUNT(*) FROM interaccion_cliente ic inner join visitas_agenda va on ic.id=va.interaccion_id WHERE va.interaccion_id=ic.id AND va.status ='NO ASISTIO'  AND ic.user_id =:id_usuario AND ic.fecha_visita BETWEEN :fecha_inicio AND :fecha_fin) as visitas_no_concretadas,
+            (SELECT COUNT(*) FROM interaccion_cliente ic WHERE ic.tipo = 'SEPARACION' AND ic.status='VALIDADO' AND ic.user_id = :id_usuario AND ic.fecha_visita BETWEEN :fecha_inicio AND :fecha_fin) AS separaciones,
+            (SELECT COUNT(*) FROM ventas v WHERE v.user_id = :id_usuario AND v.status='VALIDADO' AND v.fecha_venta BETWEEN :fecha_inicio AND :fecha_fin) AS ventas;";
             $query = $this->conexion->prepare($sql);
             $query->execute(array(':fecha_inicio' => $fecha_inicio, ':fecha_fin' => $fecha_fin, ":id_usuario" => $id_usuario));
+            $this->datos = $query->fetchAll(); // retorna objetos o no
+            if (!empty($this->datos)) {
+                return $this->datos;
+            } else {
+                $this->mensaje = "no-register";
+                return $this->mensaje;
+            }
+        } catch (\Throwable $error) {
+            $this->mensaje = "fatal-error" . $error;
+            return $this->mensaje;
+        }
+    }
+    function buscar_resumen_eficiencia_usuario_proyecto($fecha_inicio, $fecha_fin, $id_usuario, $proyecto)
+    {
+        try {
+            # code...
+            $sql = "SELECT 
+            (SELECT COUNT(*) FROM interaccion_cliente ic inner join visitas_agenda va on ic.id=va.interaccion_id inner join cliente c on ic.cliente_id=c.id_cliente WHERE c.proyet_id=:proyecto AND va.interaccion_id=ic.id AND va.status ='ASISTIO'  AND ic.user_id =:id_usuario AND ic.fecha_visita BETWEEN :fecha_inicio AND :fecha_fin) as visitas_concretadas,
+            (SELECT COUNT(*) FROM interaccion_cliente ic inner join visitas_agenda va on ic.id=va.interaccion_id inner join cliente c on ic.cliente_id=c.id_cliente WHERE c.proyet_id=:proyecto AND va.interaccion_id=ic.id AND va.status ='NO ASISTIO'  AND ic.user_id =:id_usuario AND ic.fecha_visita BETWEEN :fecha_inicio AND :fecha_fin) as visitas_no_concretadas,
+            (SELECT COUNT(*) FROM interaccion_cliente ic inner join cliente c on ic.cliente_id=c.id_cliente WHERE c.proyet_id=:proyecto AND ic.tipo = 'SEPARACION' AND ic.user_id = :id_usuario AND ic.fecha_visita BETWEEN :fecha_inicio AND :fecha_fin) AS separaciones,
+            (SELECT COUNT(*) FROM ventas v inner join cliente c on v.cliente_id=c.id_cliente WHERE c.proyet_id=:proyecto AND v.user_id = :id_usuario AND v.fecha_venta BETWEEN :fecha_inicio AND :fecha_fin) AS ventas;";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(':fecha_inicio' => $fecha_inicio, ':fecha_fin' => $fecha_fin, ":id_usuario" => $id_usuario, ":proyecto" => $proyecto));
+            $this->datos = $query->fetchAll(); // retorna objetos o no
+            if (!empty($this->datos)) {
+                return $this->datos;
+            } else {
+                $this->mensaje = "no-register";
+                return $this->mensaje;
+            }
+        } catch (\Throwable $error) {
+            $this->mensaje = "fatal-error" . $error;
+            return $this->mensaje;
+        }
+    }
+    function buscar_clientes_rendimiento($fecha_inicio, $fecha_fin, $id_usuario)
+    {
+        try {
+            # code...
+            $sql = "SELECT c.id_cliente, c.proyet_id, p.nombreProyecto as proyecto, c.nombres, c.apellidos, ic.status, ic.fecha_visita as fecha_registro, ic.tipo, va.status as asistencia FROM interaccion_cliente ic inner join cliente c on ic.cliente_id=c.id_cliente left join proyectos p on c.proyet_id=p.id left join visitas_agenda va on ic.id=va.interaccion_id WHERE ic.user_id=:id_usuario AND ic.fecha_visita BETWEEN :fecha_inicio AND :fecha_fin UNION ALL SELECT c.id_cliente, c.proyet_id, p.nombreProyecto, c.nombres, c.apellidos,  v.status, v.fecha_venta as fecha_registro, 'VENTA' as tipo, '' as asistencia FROM ventas v inner join cliente c on v.cliente_id=c.id_cliente left join proyectos p on c.proyet_id=p.id WHERE v.user_id = :id_usuario AND v.fecha_venta BETWEEN :fecha_inicio AND :fecha_fin";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(':fecha_inicio' => $fecha_inicio, ':fecha_fin' => $fecha_fin, ":id_usuario" => $id_usuario));
+            $this->datos = $query->fetchAll(); // retorna objetos o no
+            if (!empty($this->datos)) {
+                return $this->datos;
+            } else {
+                $this->mensaje = "no-register";
+                return $this->mensaje;
+            }
+        } catch (\Throwable $error) {
+            $this->mensaje = "fatal-error" . $error;
+            return $this->mensaje;
+        }
+    }
+    function buscar_clientes_rendimiento_group_asesor($fecha_inicio, $fecha_fin, $asesores)
+    {
+        try {
+            $idUsuarios = array_map(function ($asesor) {
+                return $asesor->id_usuario;
+            }, $asesores);
+            # code...
+            $sql = "SELECT c.id_cliente, c.proyet_id, ic.user_id, p.nombreProyecto as proyecto, c.nombres, c.apellidos, ic.status, ic.fecha_visita as fecha_registro, ic.tipo, va.status as asistencia FROM interaccion_cliente ic inner join cliente c on ic.cliente_id=c.id_cliente left join proyectos p on c.proyet_id=p.id left join visitas_agenda va on ic.id=va.interaccion_id WHERE ic.user_id IN (" . implode(',', $idUsuarios) . ") AND ic.fecha_visita BETWEEN :fecha_inicio AND :fecha_fin UNION ALL SELECT c.id_cliente, c.proyet_id, v.user_id, p.nombreProyecto, c.nombres, c.apellidos, v.status, v.fecha_venta as fecha_registro, 'VENTA' as tipo, '' as asistencia FROM ventas v inner join cliente c on v.cliente_id=c.id_cliente left join proyectos p on c.proyet_id=p.id WHERE v.user_id IN (" . implode(',', $idUsuarios) . ") AND v.fecha_venta BETWEEN :fecha_inicio AND :fecha_fin";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(':fecha_inicio' => $fecha_inicio, ':fecha_fin' => $fecha_fin));
+            $this->datos = $query->fetchAll(); // retorna objetos o no
+            if (!empty($this->datos)) {
+                return $this->datos;
+            } else {
+                $this->mensaje = "no-register";
+                return $this->mensaje;
+            }
+        } catch (\Throwable $error) {
+            $this->mensaje = "fatal-error" . $error;
+            return $this->mensaje;
+        }
+    }
+    function buscar_resumen_eficiencia_group_asesor($fecha_inicio, $fecha_fin, $asesores)
+    {
+        try {
+            # code...
+            // Extraer los ID de usuario del array de JSON
+            $idUsuarios = array_map(function ($asesor) {
+                return $asesor->id_usuario;
+            }, $asesores);
+
+            // Construcción de la lista de parámetros para la cláusula IN
+            $sql = "SELECT
+            ic.user_id AS id_usuario,
+            COUNT(DISTINCT CASE WHEN va.status = 'ASISTIO' THEN va.interaccion_id END) AS visitas_concretadas,
+            COUNT(DISTINCT CASE WHEN ic.tipo = 'SEPARACION' THEN ic.id END) AS separaciones,
+            COUNT(DISTINCT CASE WHEN v.user_id IS NOT NULL THEN v.id END) AS ventas
+        FROM
+            interaccion_cliente ic
+        LEFT JOIN
+            visitas_agenda va ON ic.id = va.interaccion_id AND va.status = 'ASISTIO'
+        LEFT JOIN
+            ventas v ON ic.cliente_id = v.cliente_id
+        WHERE
+            ic.user_id IN (" . implode(',', $idUsuarios) . ") AND ic.fecha_visita BETWEEN :fecha_inicio AND :fecha_fin
+        GROUP BY
+            ic.user_id;";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(':fecha_inicio' => $fecha_inicio, ':fecha_fin' => $fecha_fin));
             $this->datos = $query->fetchAll(); // retorna objetos o no
             if (!empty($this->datos)) {
                 return $this->datos;
@@ -735,7 +839,7 @@ class Usuario
     {
         try {
             # code...
-            $sql = "SELECT PRO.id, PRO.nombreProyecto as nombre_proyecto, PRO.logo, USPRO.user_id as id_agente, USER.phone_number FROM user_proyect as USPRO inner join usuario as USER on USPRO.user_id=USER.id_usuario inner join proyectos as PRO on USPRO.proyecto_id=PRO.id WHERE USPRO.user_id=:id_usuario";
+            $sql = "SELECT PRO.id, PRO.nombreProyecto as nombre_proyecto, PRO.logo, PRO.imgUrl as img_lotizador, USPRO.user_id as id_agente, USER.phone_number FROM user_proyect as USPRO inner join usuario as USER on USPRO.user_id=USER.id_usuario inner join proyectos as PRO on USPRO.proyecto_id=PRO.id WHERE USPRO.user_id=:id_usuario";
             $query = $this->conexion->prepare($sql);
             $query->execute(array(":id_usuario" => $id_usuario));
             $this->datos = $query->fetchAll(); // retorna objetos o no
@@ -765,7 +869,7 @@ class Usuario
     }
     function buscar_proyectos_admin($user)
     {
-        $sql = "SELECT PRO.id, PRO.nombreProyecto as nombre_proyecto, PRO.description, PRO.video_url, PRO.imgUrl as img_url, PRO.proyectStatus as proyect_status, USER.nombre as cliente_nombre, USER.apellido as cliente_apellido FROM user_proyect as USPRO inner join proyectos as PRO on USPRO.proyecto_id=PRO.id inner join usuario as USER on USPRO.user_id=USER.id_usuario WHERE USPRO.user_id=:id";
+        $sql = "SELECT PRO.id, PRO.nombreProyecto as nombre_proyecto, PRO.logo, PRO.description, PRO.video_url, PRO.imgUrl as img_url, PRO.proyectStatus as proyect_status, USER.nombre as cliente_nombre, USER.apellido as cliente_apellido FROM user_proyect as USPRO inner join proyectos as PRO on USPRO.proyecto_id=PRO.id inner join usuario as USER on USPRO.user_id=USER.id_usuario WHERE USPRO.user_id=:id";
         $query = $this->conexion->prepare($sql);
         $query->execute(array(":id" => $user));
         $this->datos = $query->fetchAll(); // retorna objetos o no
@@ -977,15 +1081,16 @@ class Usuario
             return $this->mensaje;
         }
     }
-    function add_cliente2($data, $proyect_id, $created_by)
+    function add_cliente2($data, $proyect_id, $origen_name, $created_by)
     {
         try {
-            $sql = "INSERT INTO cliente(nombres, apellidos, documento, correo, celular, telefono, Pais, createdBy, origen, campania, ciudad, proyet_id, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $sql = "INSERT INTO cliente(nombres, apellidos, documento, correo, celular, telefono, Pais, createdBy, origen, campania, ciudad, proyet_id, fecha_creation, hora_creation, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             $stmt = $this->conexion->prepare($sql);
 
             if ($stmt === false) {
                 throw new Exception("Error en la preparación de la consulta: " . implode(", ", $this->conexion->errorInfo()));
             }
+            $inserted_ids = array(); // Array para almacenar los IDs insertados
 
             foreach ($data as $cliente) {
                 $values = array(
@@ -997,20 +1102,23 @@ class Usuario
                     $cliente->telefono,
                     $cliente->Pais,
                     $created_by,
-                    $cliente->origen,
+                    $origen_name,
                     $cliente->campaña,
                     $cliente->ciudad,
                     $proyect_id,
+                    $cliente->fecha,
+                    $cliente->hora,
                     "NO CONTACTADO"
                 );
 
                 if (!$stmt->execute($values)) {
                     throw new Exception("Error al insertar cliente: " . implode(", ", $stmt->errorInfo()));
                 }
+                // Recuperar el ID insertado y almacenarlo en el array
+                $inserted_ids[] = $this->conexion->lastInsertId();
             }
-
-            $response = array("message" => "Se insertaron correctamente los clientes");
-            $this->mensaje = $response;
+            $this->mensaje = array("ids_clientes" => $inserted_ids, "message" => "Se insertaron correctamente los clientes");
+            return $this->mensaje;
         } catch (Exception $error) {
             $response = array("error" => $error->getMessage());
             $this->mensaje = $response;
@@ -1028,9 +1136,9 @@ class Usuario
         $dato = $resultado;
         try {
             # code...
-            $sql = "INSERT INTO cliente(nombres, apellidos, documento, correo, celular, telefono, Pais, createdBy, origen, campania, ciudad, proyet_id, status) VALUES(:nombres, :apellidos, :documento, :correo, :celular, :telefono, :Pais, :createdBy, :origen, :campania, :ciudad, :proyet_id, :status)";
+            $sql = "INSERT INTO cliente(nombres, apellidos, documento, correo, celular, telefono, Pais, createdBy, origen, campania, ciudad, proyet_id, fecha_creation, hora_creation, status) VALUES(:nombres, :apellidos, :documento, :correo, :celular, :telefono, :Pais, :createdBy, :origen, :campania, :ciudad, :proyet_id, :fecha, :hora, :status)";
             $query = $this->conexion->prepare($sql);
-            $query->execute(array(":nombres" => $dato["nombre"], ":apellidos" => $dato["apellido"], ":documento" => $dato["documento"], ":correo" => $dato["correo"], ":celular" => $dato["celular"], ":telefono" => $dato["telefono"], ":Pais" => $dato["Pais"], ":origen" => $dato["origen"], ":campania" => $dato["campaña"], ":ciudad" => $dato["ciudad"], ":proyet_id" => $proyect_id, ":createdBy" => $created_by, ":status" => "NO CONTACTADO"));
+            $query->execute(array(":nombres" => $dato["nombre"], ":apellidos" => $dato["apellido"], ":documento" => $dato["documento"], ":correo" => $dato["correo"], ":celular" => $dato["celular"], ":telefono" => $dato["telefono"], ":Pais" => $dato["Pais"], ":origen" => $dato["origen"], ":campania" => $dato["campaña"], ":ciudad" => $dato["ciudad"], ":proyet_id" => $proyect_id, ":fecha" => $dato["fecha"], ":hora" => $dato["hora"], ":createdBy" => $created_by, ":status" => "NO CONTACTADO"));
             // Obtener el ID del cliente insertado
             $cliente_id = $this->conexion->lastInsertId();
             // Devolver el ID del cliente como respuesta
@@ -1304,21 +1412,46 @@ class Usuario
         $this->mensaje = "add-etiquetas-lead";
         return $this->mensaje;
     }
-    function add_user_cliente($id_cliente, $asesor)
+    function add_user_cliente($data, $asesor, $fecha, $hora)
     {
         try {
             # code...
-            $sql = "INSERT INTO user_cliente(user_id, cliente_id) VALUES (:id_usuario, :id_cliente)";
+            $sql = "INSERT INTO user_cliente(user_id, cliente_id, fecha_asigned, hora_asigned) VALUES (?,?,?,?)";
             $query = $this->conexion->prepare($sql);
-            $query->execute(array(":id_usuario" => $asesor, ':id_cliente' => $id_cliente));
+            foreach ($data as $cliente) {
+                $values = array(
+                    $asesor,
+                    $cliente,
+                    $fecha,
+                    $hora
+                );
+
+                if (!$query->execute($values)) {
+                    throw new Exception("Error al asignar cliente: " . implode(", ", $query->errorInfo()));
+                }
+            }
             $this->mensaje = "add-user-cliente";
             return $this->mensaje;
         } catch (\Throwable $error) {
-            $this->mensaje = "no-add-proyectos" . $error;
+            $this->mensaje = "no-asigned-clientes" . $error;
             return $this->mensaje;
         }
     }
     function delete_cliente_asesor($cliente, $asesor)
+    {
+        try {
+            # code...
+            $sql = "DELETE FROM user_cliente WHERE user_id=:id_usuario AND cliente_id=:id_cliente";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":id_usuario" => $asesor, ':id_cliente' => $cliente));
+            $this->mensaje = "delete-user-cliente";
+            return $this->mensaje;
+        } catch (\Throwable $error) {
+            $this->mensaje = "no-delete-user-cliente" . $error;
+            return $this->mensaje;
+        }
+    }
+    function unassign_my_asesor($cliente, $asesor)
     {
         try {
             # code...
@@ -1431,6 +1564,72 @@ class Usuario
             //throw $th;
         }
     }
+    function buscar_clientes_validar($user)
+    {
+        try {
+            $sql = "SELECT ic.id as id, CASE WHEN ic.cliente_id IS NULL THEN 'No asignado' ELSE CONCAT(u.nombre, ' ', u.apellido) END AS asignado_usuario, c.proyet_id as proyecto_id, ic.fecha_visita as fecha, ic.hora_visita as hora, ic.user_id, ic.tipo, ic.cliente_id, c.nombres, c.apellidos, c.correo, c.celular, u.nombre as nombre_asesor, u.apellido as apellido_asesor, p.nombreProyecto as nombre_proyecto FROM interaccion_cliente ic inner join cliente c on ic.cliente_id=c.id_cliente inner join usuario u on ic.user_id=u.id_usuario INNER JOIN user_proyect AS UP ON c.proyet_id = UP.proyecto_id INNER JOIN proyectos as p on c.proyet_id=p.id WHERE UP.user_id=:id_usuario AND ic.status='SEND_VALIDAR'
+            UNION ALL SELECT v.id as id, CASE WHEN v.cliente_id IS NULL THEN 'No asignado' ELSE CONCAT(u.nombre, ' ', u.apellido) END AS asignado_usuario, c.proyet_id as proyecto_id, v.fecha_venta as fecha, '00:00:00', v.user_id, 'VENTA', v.cliente_id, c.nombres, c.apellidos,  c.correo, c.celular, u.nombre as nombre_asesor, u.apellido as apellido_asesor, p.nombreProyecto as nombre_proyecto FROM ventas v inner join cliente c on v.cliente_id=c.id_cliente inner join usuario u on v.user_id=u.id_usuario INNER JOIN user_proyect AS UP ON c.proyet_id = UP.proyecto_id INNER JOIN proyectos as p on c.proyet_id=p.id WHERE UP.user_id=:id_usuario AND v.status='SEND_VALIDAR';";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":id_usuario" => $user));
+            $this->datos = $query->fetchAll(); // retorna objetos o no
+            if (!empty($this->datos)) {
+                return $this->datos;
+            } else {
+                $this->mensaje = "no-register-clientes";
+                return $this->mensaje;
+            }
+        } catch (\Throwable $error) {
+            $this->mensaje = "fatal_error" . $error;
+            return $this->mensaje;
+            //throw $th;
+        }
+    }
+    function buscar_group_clientes_fecha($fecha_inicio, $fecha_fin, $asesores)
+    {
+        try {
+            $idUsuarios = array_map(function ($asesor) {
+                return $asesor->id_usuario;
+            }, $asesores);
+            $sql = "SELECT c.nombres, c.apellidos, c.createdBy as usuario_id, c.proyet_id FROM cliente c WHERE 
+            c.createdBy IN (" . implode(',', $idUsuarios) . ")
+            AND c.fecha_creation BETWEEN :fecha_inicio AND :fecha_fin;";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":fecha_inicio" => $fecha_inicio, ":fecha_fin" => $fecha_fin));
+            $this->datos = $query->fetchAll(); // retorna objetos o no
+            if (!empty($this->datos)) {
+                return $this->datos;
+            } else {
+                $this->mensaje = "no-register-clientes";
+                return $this->mensaje;
+            }
+        } catch (\Throwable $error) {
+            $this->mensaje = "fatal_error" . $error;
+            return $this->mensaje;
+            //throw $th;
+        }
+    }
+    function buscar_group_asignados_fecha($adminuser, $fecha_inicio, $fecha_fin, $asesores)
+    {
+        try {
+            $idUsuarios = array_map(function ($asesor) {
+                return $asesor->id_usuario;
+            }, $asesores);
+            $sql = "SELECT c.nombres, c.apellidos, uc.user_id as usuario_id, c.proyet_id FROM user_cliente uc inner join cliente c on uc.cliente_id=c.id_cliente WHERE  uc.user_id IN (" . implode(',', $idUsuarios) . ") AND c.createdBy=:admin AND uc.fecha_asigned BETWEEN :fecha_inicio AND :fecha_fin;";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":fecha_inicio" => $fecha_inicio, ":fecha_fin" => $fecha_fin, ":admin" => $adminuser));
+            $this->datos = $query->fetchAll(); // retorna objetos o no
+            if (!empty($this->datos)) {
+                return $this->datos;
+            } else {
+                $this->mensaje = "no-register-clientes";
+                return $this->mensaje;
+            }
+        } catch (\Throwable $error) {
+            $this->mensaje = "fatal_error" . $error;
+            return $this->mensaje;
+            //throw $th;
+        }
+    }
     function completar_tarea($id_task)
     {
         try {
@@ -1440,6 +1639,54 @@ class Usuario
             $query = $this->conexion->prepare($sql);
             $query->execute(array(":status" => "COMPLETADO", ":id_task" => $id_task));
             $this->mensaje = "COMPLETADO";
+            return $this->mensaje;
+        } catch (\Throwable $th) {
+            //throw $th;
+            $this->mensaje = "fatal_error " . $th;
+            return $this->mensaje;
+        }
+    }
+    function validar_interaccion($id_task, $status)
+    {
+        try {
+            //code...
+            // ACTUALIZAR ESTADO DE LA RESERVA
+            $sql = "UPDATE interaccion_cliente SET status=:status WHERE id=:id_task";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":status" => $status, ":id_task" => $id_task));
+            $this->mensaje = $status;
+            return $this->mensaje;
+        } catch (\Throwable $th) {
+            //throw $th;
+            $this->mensaje = "fatal_error " . $th;
+            return $this->mensaje;
+        }
+    }
+    function validar_tarea($id_task)
+    {
+        try {
+            //code...
+            // ACTUALIZAR ESTADO DE LA RESERVA
+            $sql = "UPDATE interaccion_cliente SET status=:status WHERE id=:id_task";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":status" => "SEND_VALIDAR", ":id_task" => $id_task));
+            $this->mensaje = "SEND_VALIDAR";
+            return $this->mensaje;
+        } catch (\Throwable $th) {
+            //throw $th;
+            $this->mensaje = "fatal_error " . $th;
+            return $this->mensaje;
+        }
+    }
+    function validar_venta($id_task, $status)
+    {
+        try {
+            //code...
+            // ACTUALIZAR ESTADO DE LA RESERVA
+            $sql = "UPDATE ventas SET status=:status WHERE id=:id_task";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":status" => $status, ":id_task" => $id_task));
+            $this->mensaje = $status;
             return $this->mensaje;
         } catch (\Throwable $th) {
             //throw $th;
@@ -1464,6 +1711,26 @@ class Usuario
         }
     }
     // target user
+    function buscar_user_asesor($id_usuario)
+    {
+        try {
+            $sql = "SELECT id_usuario, nombre, apellido, correo, phone_number FROM usuario WHERE id_usuario=:id_usuario
+            ";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":id_usuario" => $id_usuario));
+            $this->datos = $query->fetchAll(); // retorna objetos o no
+            if (!empty($this->datos)) {
+                return $this->datos;
+            } else {
+                $this->mensaje = "no-register-target";
+                return $this->mensaje;
+            }
+        } catch (\Throwable $error) {
+            $this->mensaje = "fatal_error " + $error;
+            return $this->mensaje;
+            //throw $th;
+        }
+    }
     function buscar_user_target($id_usuario)
     {
         try {
@@ -1735,32 +2002,26 @@ class Usuario
     function buscar_clientes_by_asesor($id_usuario)
     {
         try {
-            $sql = "SELECT
+            $sql = "SELECT 
             c.*, c.createdBy as asigned,
             p.nombreProyecto AS nombre_proyecto,
             ic.id AS id_task,
             ic.status AS task_status,
             ic.fecha_visita,
             ic.hora_visita,
-            CONCAT('[', GROUP_CONCAT(CONCAT('{\"nombre\":\"', et.nombre, '\"}') SEPARATOR ', '), ']') AS etiquetas
-            FROM
-            usuario u
-        JOIN user_cliente uc ON u.id_usuario = uc.user_id
-        JOIN cliente c ON uc.cliente_id = c.id_cliente
-        LEFT JOIN proyectos p ON c.proyet_id = p.id
-        LEFT JOIN interaccion_cliente ic ON ic.cliente_id = c.id_cliente AND ic.status = 'PENDIENTE'
-        LEFT JOIN (
-            SELECT ec.cliente_id, GROUP_CONCAT(et.nombre SEPARATOR ', ') AS nombre
-            FROM etiqueta_cliente ec
-            JOIN etiqueta et ON ec.etiqueta_id = et.id AND et.user_id = :id_usuario
-            GROUP BY ec.cliente_id
-        ) et ON c.id_cliente = et.cliente_id
-        WHERE
-            u.id_usuario = :id_usuario
-            AND u.usuarioRol = 3 AND c.archived=0
-        GROUP BY c.id_cliente, p.nombreProyecto, ic.id, ic.status, ic.fecha_visita, ic.hora_visita;
-        
-     
+            CONCAT('[', GROUP_CONCAT(CONCAT('{\"nombre\":\"', e.nombre, '\"}') ORDER BY e.id SEPARATOR ', '), ']') AS etiquetas
+            FROM cliente c
+            INNER JOIN proyectos p ON c.proyet_id = p.id
+            INNER JOIN user_proyect up ON p.id = up.proyecto_id
+            INNER JOIN usuario u ON up.user_id = u.id_usuario
+            LEFT JOIN user_cliente uc on c.id_cliente=uc.cliente_id
+            LEFT JOIN etiqueta_cliente ec ON c.id_cliente= ec.cliente_id
+            LEFT JOIN etiqueta e ON ec.etiqueta_id = e.id
+            LEFT JOIN interaccion_cliente ic ON ic.cliente_id = c.id_cliente
+            WHERE 
+                uc.user_id = :id_usuario
+            GROUP BY 
+            c.id_cliente;
             ";
             $query = $this->conexion->prepare($sql);
             $query->execute(array(":id_usuario" => $id_usuario));

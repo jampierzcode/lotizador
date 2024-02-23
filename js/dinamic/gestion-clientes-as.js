@@ -5,13 +5,13 @@ $(document).ready(function () {
   var templateMsg;
   var idCliente;
   var proyectosList = [];
-  var clientesLastStatus;
+  var typefilter;
   var clientesFilter;
   var dataTable = $("#usuariosList").DataTable({
     // scrollY: "160px",
     // scrollY: "500px",
     // ordering: false,
-    // stateSave: true,
+    stateSave: false,
     lengthMenu: [5, 10, 25, 50],
     language: {
       lengthMenu: "Mostrar _MENU_ registros por página",
@@ -41,11 +41,20 @@ $(document).ready(function () {
     //     aTargets: ["nosort"],
     //   },
     // ],
+    aoColumnDefs: [
+      { bSortable: false, aTargets: [0] }, // 0 es el índice de la primera columna, ajusta según tus necesidades
+    ],
+    aaSorting: [],
 
     columns: [
       // { data: "id" },
 
-      { data: "created_cliente" },
+      {
+        data: null,
+        render: (data) => {
+          return `${data.fecha_creacion} ${data.hora_creacion}`;
+        },
+      },
       {
         data: null,
         render: (data) => {
@@ -70,27 +79,32 @@ $(document).ready(function () {
         data: null,
         render: function (data) {
           let template = "";
-          template += `<div class="flex flex-col gap-2 ">`;
+          template += `<div class="flex items-center gap-2 ">`;
           if (data.etiquetas === null) {
-            template += `<p>Sin etiquetas</p>`;
+            template += `<p class="text-sm">Sin etiquetas</p>`;
           } else {
             // Convertir la cadena a un array
             const etiquetas = JSON.parse(data.etiquetas);
             const etiquetasArray = etiquetas[0].nombre.split(",");
             etiquetasArray.forEach((e) => {
               template += `<div class="p-2 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400" role="alert">
-              <span class="font-medium whitespace-nowrap">${e}</span> </div>`;
+              <span class="font-medium whitespace-nowrap text-sm">${e}</span> </div>`;
             });
           }
-          template += `</div>`;
           template += `
           <button id="verEtiquetasCliente" keyCliente=${data.id} type="button" class="focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm p-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900"><ion-icon name="eye"></ion-icon></button>
           `;
+          template += `</div>`;
           return template;
         },
       },
       // { data: "correo" },
-      // { data: "celular" },
+      {
+        data: null,
+        render: function (data, type, row) {
+          return `<p class="text-[14px] font-bold">${data.celular}</p>`;
+        },
+      },
       // { data: "telefono" },
       // { data: "origen" },
       // { data: "ciudad" },
@@ -101,6 +115,67 @@ $(document).ready(function () {
           template_status += imprimirStatus(data?.status); // Cambiar de const a let
 
           if (data.task_status === "PENDIENTE") {
+            const fechaVisita = dayjs(
+              data.fecha_visita + " " + data.hora_visita
+            );
+            const ahora = dayjs();
+            const diferencia = fechaVisita.diff(ahora, "minute", true); // Diferencia en minutos
+            var dias = Math.floor(diferencia / (24 * 60));
+            var horas = Math.floor((diferencia % (24 * 60)) / 60);
+            var minutos = Math.floor(diferencia % 60);
+            let tiempoRestante = "";
+
+            // Ajuste para considerar 0 cuando estamos en el mismo día y hora
+            if (
+              diferencia > 0 ||
+              (diferencia === 0 && fechaVisita.isAfter(ahora))
+            ) {
+              if (dias > 1) {
+                tiempoRestante += `${dias} día${dias > 1 ? "s" : ""}`;
+              }
+
+              if (horas > 1 || (dias === 0 && minutos === 0)) {
+                tiempoRestante += `${
+                  tiempoRestante.length > 0 ? ", " : ""
+                }${horas} hora${horas > 1 ? "s" : ""}`;
+              }
+
+              if (minutos > 0 || (dias === 0 && horas === 0)) {
+                tiempoRestante += `${
+                  tiempoRestante.length > 0 ? ", " : ""
+                }${minutos} minuto${minutos > 1 ? "s" : ""}`;
+              }
+
+              template_status +=
+                tiempoRestante.length > 0
+                  ? `<div class="px-4 py-2 bg-green-100 border-green-500 text-green-500 font-bold text-xs rounded">Faltan ${tiempoRestante}</div>`
+                  : `<div class="px-4 py-2 bg-green-100 border-green-500 text-green-500 font-bold text-xs rounded">La visita está programada para ahora</div>`;
+            } else {
+              dias = dias * -1;
+              horas = horas * -1;
+              minutos = minutos * -1;
+              if (dias > 1) {
+                tiempoRestante += `${dias - 1} día${dias > 2 ? "s" : ""}`;
+              }
+
+              if (horas > 1 || (dias === 0 && minutos === 0)) {
+                tiempoRestante += `${tiempoRestante.length > 0 ? ", " : ""}${
+                  horas - 1
+                } hora${horas > 2 ? "s" : ""}`;
+              }
+
+              if (minutos > 0 || (dias === 0 && horas === 0)) {
+                tiempoRestante += `${
+                  tiempoRestante.length > 0 ? ", " : ""
+                }${minutos} minuto${minutos > 1 ? "s" : ""}`;
+              }
+
+              template_status +=
+                tiempoRestante.length > 0
+                  ? `<div class="px-4 py-2 bg-red-100 border-red-500 text-red-500 font-bold text-xs rounded">Retrasado por ${tiempoRestante}</div>`
+                  : ""; // No mostrar nada si no hay retraso
+            }
+
             template_status += `<span>${
               data.fecha_visita + " Hora: " + data.hora_visita
             }</span>`;
@@ -123,64 +198,79 @@ $(document).ready(function () {
                 `;
             }
           } else {
-            switch (data.status) {
-              case "NO CONTACTADO":
-                template_status += `
-            <div class="flex-actions">
-            <button target="_blank" keyTask="${data.id_task}" statusClient="${data.status}" keyClient="${data?.id}" id="contactarSeguimiento" class="btnJsvm default mt-2">Contactar</button>
-          </div>
-            `;
-                break;
-              case "REPROGRAMACION CONTACTO":
-                template_status += `COMPLETADO`;
-                template_status += `
-                <div class="flex-actions">
-                <button target="_blank" statusClient="${data.status}" keyClient="${data?.id}" id="registerSeguimiento" class="btnJsvm info mt-2">Registrar Evento</button>
-              </div>
-                `;
-                break;
-              case "REPROGRAMACION VISITA":
-                template_status += `COMPLETADO`;
-                template_status += `
-                <div class="flex-actions">
-                <button target="_blank" statusClient="${data.status}" keyClient="${data?.id}" id="registerSeguimiento" class="btnJsvm info mt-2">Registrar Evento</button>
-              </div>
-                `;
-                break;
-              case "VISITA":
-                template_status += `COMPLETADO`;
-                template_status += `
-                <div class="flex-actions">
-                <button target="_blank" statusClient="${data.status}" keyClient="${data?.id}" id="registerSeguimiento" class="btnJsvm info mt-2">Registrar Evento</button>
-              </div>
-                `;
-                break;
+            if (data.task_status === "COMPLETADO") {
+              switch (data.status) {
+                case "ASISTIO":
+                  template_status += `COMPLETADO`;
+                  template_status += `
+                  <div class="flex-actions">
+                  <button target="_blank" id_task="${data?.id_task}" id="sendValidar" class="bg-yellow-400 text-black rounded px-3 py-2 mt-2 font-bold">Validar</button>
+                </div>
+                  `;
+                  break;
+                case "REPROGRAMACION VISITA":
+                  template_status += `COMPLETADO`;
+                  template_status += `
+                  <div class="flex-actions">
+                  <button target="_blank" id_task="${data?.id_task}" id="sendValidar" class="bg-yellow-400 text-black rounded px-3 py-2 mt-2 font-bold">Validar</button>
+                </div>
+                  `;
+                  break;
+                case "SEPARACION":
+                  template_status += `COMPLETADO`;
+                  template_status += `
+                  <div class="flex-actions">
+                  <button target="_blank" id_task="${data?.id_task}" id="sendValidar" class="bg-yellow-400 text-black rounded px-3 py-2 mt-2 font-bold">Validar</button>
+                </div>
+                  `;
+                  break;
+                case "VISITA":
+                  template_status += `COMPLETADO`;
+                  template_status += `
+                  <div class="flex-actions">
+                  <button target="_blank" id_task="${data?.id_task}" id="sendValidar" class="bg-yellow-400 text-black rounded px-3 py-2 mt-2 font-bold">Validar</button>
+                </div>
+                  `;
+                  break;
+                case "VENTA":
+                  template_status += `COMPLETADO`;
+                  template_status += `
+                  <div class="flex-actions">
+                  <button target="_blank" id_task="${data?.id_task}" id="sendValidar" class="bg-yellow-400 text-black rounded px-3 py-2 mt-2 font-bold">Validar</button>
+                </div>
+                  `;
+                  break;
 
-              default:
-                template_status += `
-                <div class="flex-actions">
-                <button target="_blank" statusClient="${data.status}" keyClient="${data?.id}" id="registerSeguimiento" class="btnJsvm info mt-2">Registrar Evento</button>
-              </div>
-                `;
-                break;
+                default:
+                  template_status += `COMPLETADO`;
+                  template_status += `
+                    <div class="flex-actions">
+                    <button target="_blank" statusClient="${data.status}" keyClient="${data?.id}" id="registerSeguimiento" class="btnJsvm info mt-2">Registrar Evento</button>
+                  </div>
+                    `;
+                  break;
+              }
+            } else {
+              switch (data.status) {
+                case "NO CONTACTADO":
+                  template_status += `
+              <div class="flex-actions">
+              <button target="_blank" keyTask="${data.id_task}" statusClient="${data.status}" keyClient="${data?.id}" id="contactarSeguimiento" class="btnJsvm default mt-2">Contactar</button>
+            </div>
+              `;
+                  break;
+
+                default:
+                  template_status += `
+                  <div class="flex-actions">
+                  <button target="_blank" statusClient="${data.status}" keyClient="${data?.id}" id="registerSeguimiento" class="btnJsvm info mt-2">Registrar Evento</button>
+                </div>
+                  `;
+                  break;
+              }
             }
-
-            //   if (data.status == "NO CONTACTADO") {
-            //     template_status += `
-            //   <div class="flex-actions">
-            //   <button target="_blank" keyTask="${data.id_task}" statusClient="${data.status}" keyClient="${data?.id}" id="contactarSeguimiento" class="btnJsvm default mt-2">Contactar</button>
-            // </div>
-            //   `;
-            //   } else {
-            //     template_status += `COMPLETADO`;
-
-            //     template_status += `
-            //       <div class="flex-actions">
-            //       <button target="_blank" statusClient="${data.status}" keyClient="${data?.id}" id="registerSeguimiento" class="btnJsvm info mt-2">Registrar Evento</button>
-            //     </div>
-            //       `;
-            //   }
           }
+
           template_status += `</div>`;
 
           return template_status;
@@ -191,6 +281,8 @@ $(document).ready(function () {
         render: function (data) {
           return `<button id="open-plantilla" keyClient="${data.id}" class="p-2 rounded-md flex whitespace-nowrap text-sm bg-green-500 text-white">
               Enviar msg
+            </button> <button id="open-proforma" keyProyecto="${data.proyecto_id}" keyClient="${data.id}" class="p-2 rounded-md flex whitespace-nowrap text-sm bg-gray-500 text-white">
+              Enviar proforma
             </button>`;
         },
       },
@@ -202,14 +294,476 @@ $(document).ready(function () {
               <button target="_blank" keyClient="${data?.id}" id="editClient" class="btnJsvm normal"><ion-icon name="create-sharp"></ion-icon></button>
               <button target="_blank" keyClient="${data?.id}" id="removeClient" class="btnJsvm danger"><ion-icon name="trash"></ion-icon></button>
               <button target="_blank" keyClient="${data?.id}" id="historialCliente" class="btnJsvm normal">Historial</button>
-              
-              
               </div>
-    
               `;
         },
       },
     ],
+  });
+  async function send_validar(id_task) {
+    let funcion = "validar_tarea";
+    return new Promise((resolve, reject) => {
+      $.post(
+        "../../controlador/UsuarioController.php",
+        { funcion, id_task },
+        async (response) => {
+          console.log(response);
+          if (response.trim() === "SEND_VALIDAR") {
+            resolve("SEND_VALIDAR");
+          } else {
+            reject("ERROR");
+          }
+        }
+      );
+    });
+  }
+  $(document).on("click", "#sendValidar", async function () {
+    console.log("click");
+    let id_task = $(this).attr("id_task");
+    const validar = await send_validar(id_task);
+    if (validar === "SEND_VALIDAR") {
+      alert("Se envio actividad a VALIDACION");
+    } else {
+      alert("Hubo un error contacta al aministrador");
+    }
+    await buscar_clientes();
+    animarProgress();
+  });
+
+  var cartItems = [];
+  function llenarproforma() {
+    template = "";
+    var total = 0;
+    cartItems.forEach((item) => {
+      const subtotal = item.quantity * item.price;
+
+      template += `
+    <tr>
+      <td>${item.description}</td>
+      <td>${item.currency} ${Math.round((item.price * 100) / 100).toFixed(
+        2
+      )}</td>
+      <td>${item.quantity}</td>
+      <td class="text-end">${item.currency} ${Math.round(
+        (subtotal * 100) / 100
+      ).toFixed(2)}</td>
+    </tr>
+    `;
+      total = total + subtotal;
+    });
+    $("#fecha-proforma").html(dayjs().format("DD/MM/YYYY"));
+    $("#carrito-proforma").html(template);
+    $("#total-proforma").html(`${Math.round((total * 100) / 100).toFixed(2)}`);
+  }
+  function renderCart() {
+    const cartTable = $("#cart-items");
+    cartTable.empty();
+    if (cartItems.length > 0) {
+      cartItems.forEach((item, index) => {
+        const subtotal = item.quantity * item.price;
+        const row = `
+              <tr>
+                  <td class="border text-[14px] px-4 py-2">${index + 1}</td>
+                  <td class="border text-[14px] px-4 py-2">${
+                    item.description
+                  }</td>
+                  <td class="border text-[14px] px-4 py-2">${item.quantity}</td>
+                  <td class="border text-[14px] px-4 py-2">${
+                    item.currency
+                  } ${Math.round((item.price * 100) / 100).toFixed(2)}</td>
+                  <td class="border text-[14px] px-4 py-2">${
+                    item.currency
+                  } ${Math.round((subtotal * 100) / 100).toFixed(2)}</td>
+                  <td class="border text-[14px] px-4 py-2">
+                      <button class="text-blue-500 hover:text-blue-700 mr-2" id="editItem" index-table="${index}"><ion-icon name="create"></ion-icon></button>
+                      <button class="text-red-500 hover:text-red-700" id="deleteItem" index-table="${index}"><ion-icon name="trash"></ion-icon></button>
+                  </td>
+              </tr>
+          `;
+        cartTable.append(row);
+      });
+      llenarproforma();
+    } else {
+      cartTable.html("");
+    }
+  }
+
+  // Función para agregar un elemento al carrito
+  function addItem(description, quantity, price, currency) {
+    cartItems.push({ description, quantity, price, currency });
+    renderCart();
+  }
+
+  // Función para editar un elemento del carrito
+  function editItem(index) {
+    const row = $("#cart-items tr").eq(index); // Sumamos 1 para omitir la fila de encabezado
+    const item = cartItems[index];
+
+    // Convertir los campos en inputs editables
+    row.find("td").each(function (i) {
+      if (i > 0 && i < 4) {
+        // Excluir el primer y último campo
+        let fieldValue = $(this).text();
+        if (i === 3) {
+          // Campo de Precio
+          // const currency = item.currency === "dolar" ? "$" : "S/";
+          fieldValue = `<select class="currency-select">
+                                  <option value="$" ${
+                                    item.currency === "$" ? "selected" : ""
+                                  }>$</option>
+                                  <option value="S/" ${
+                                    item.currency === "S/" ? "selected" : ""
+                                  }>S/</option>
+                              </select>
+                              <input type="number" class="price-input" value="${
+                                item.price
+                              }">`;
+        } else {
+          fieldValue = `<input type="text" class="editable-field" value="${fieldValue}">`;
+        }
+        $(this).html(fieldValue);
+      }
+    });
+
+    // Agregar botón de guardar
+    const saveButton = $(
+      `<button class="text-green-500 hover:text-green-700" index-table="${index}" id="saveItemChanges"><ion-icon name="save"></ion-icon></button>`
+    );
+    row.find("td:last-child").html(saveButton);
+  }
+  function saveItemChanges(index) {
+    const row = $("#cart-items tr").eq(index);
+    const item = cartItems[index];
+
+    // Obtener los nuevos valores de los inputs editables
+    const description = row.find(".editable-field").eq(0).val();
+    const quantity = parseInt(row.find(".editable-field").eq(1).val());
+    const currency = row.find(".currency-select").val();
+    const price = parseFloat(row.find(".price-input").val());
+
+    // Actualizar el objeto del carrito con los nuevos valores
+    item.description = description;
+    item.quantity = quantity;
+    item.currency = currency;
+    item.price = price;
+
+    // Renderizar el carrito nuevamente
+    renderCart();
+  }
+
+  // Función para eliminar un elemento del carrito
+  function deleteItem(index) {
+    cartItems.splice(index, 1);
+    renderCart();
+  }
+  $("#cart-proforma").on("click", function () {
+    let description = $("#description-proforma").val();
+    let tipo_moneda = $("#tipomoneda").val();
+    let precio = $("#precio-proforma").val();
+    addItem(description, 1, precio, tipo_moneda);
+  });
+  $(document).on("click", "#editItem", function () {
+    let index = $(this).attr("index-table");
+    editItem(index);
+  });
+  $(document).on("click", "#deleteItem", function () {
+    let index = $(this).attr("index-table");
+    deleteItem(index);
+  });
+  $(document).on("click", "#saveItemChanges", function () {
+    let index = $(this).attr("index-table");
+    saveItemChanges(index);
+  });
+  // $("#description-proforma, #tipomoneda, #precio-proforma").on(
+  //   "change keyup",
+  //   llenarproforma
+  // );
+  // ---------------FINANCIAMIENTO---------------------
+  function llenar_financiamiento() {
+    let inicial = $("#monto_inicial_fn").val();
+    let numero_cuotas = $("#numero_cuotas_fn").val();
+    let monto_cuotas = $("#monto_cuotas_fn").val();
+    let currency = $("#tipomoneda").val();
+    $("#inicial_fn_pr").html(
+      `${currency}${Math.round((inicial * 100) / 100).toFixed(2)}`
+    );
+    $("#ncuotas_fn_pr").html(numero_cuotas);
+    $("#montocuotas_fn_pr").html(
+      `${currency}${Math.round((monto_cuotas * 100) / 100).toFixed(2)}`
+    );
+  }
+  $("#financiamiento_check").on("click", function () {
+    // let actived = $(this).prop("checked");
+    $("#container-financiamento").toggleClass("hidden");
+    $("#proforma_financiamiento").toggleClass("hidden");
+  });
+  $("#monto_inicial_fn, #numero_cuotas_fn, #monto_cuotas_fn").on(
+    "change keyup",
+    llenar_financiamiento
+  );
+
+  $("#generar-proforma .close-modal").on("click", function () {
+    cartItems = [];
+    renderCart();
+    $("#description-proforma").val("");
+    $("#precio-proforma").val("");
+    $("#generar-proforma .form-create").removeClass("modal-show");
+    setTimeout(() => {
+      $("#generar-proforma").addClass("md-hidden");
+    }, 300);
+  });
+
+  var map1;
+  function waitForMapLoad() {
+    return new Promise((resolve, reject) => {
+      map1.on("load", () => {
+        resolve();
+      });
+    });
+  }
+  $("#generar-proforma-pdf").on("click", function () {
+    if (cartItems.length > 0) {
+      var mapContainer = document.querySelector("#map1");
+      var options = {
+        filename: "proformanew.pdf",
+        margin: 0.25,
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: "in", format: "A4", orientation: "portrait" },
+      };
+      var contenidoPDF = document.createElement("div");
+      // Clonar el contenido de proforma-print y agregar el clon al PDF
+      $("#proforma-print").clone().appendTo(contenidoPDF);
+      // Capturar el mapa con HTML2Canvas
+      domtoimage.toPng(mapContainer).then(function (dataUrl) {
+        // Convertir el lienzo en una imagen
+        // var imgData = canvas.toDataURL("image/jpeg");
+        // Crear un elemento de imagen y establecer su fuente como la imagen capturada
+        var img = new Image();
+        img.src = dataUrl;
+        // Agregar la imagen al contenidoPDF
+        var divimg = document.createElement("div");
+        divimg.classList.add("px-[70px]");
+        divimg.classList.add("w-full");
+        img.classList.add("w-full");
+        divimg.appendChild(img);
+        contenidoPDF.appendChild(divimg);
+        // Generar y guardar el PDF
+        html2pdf().set(options).from(contenidoPDF).save();
+      });
+    } else {
+      alert("Debe llenar todos los campos");
+    }
+  });
+  // $("#generar-proforma-pdf").on("click", function () {
+  //   if (cartItems.length > 0) {
+  //     var mapContainer = document.querySelector("#map1");
+  //     var options = {
+  //       filename: "proformanew.pdf",
+  //       margin: [0.5, 0.5, 0.5, 0.5], // Margen de 0.5 pulgadas en todos los lados
+  //       image: { type: "jpeg", quality: 0.98 },
+  //       html2canvas: { scale: 2 },
+  //       jsPDF: { unit: "in", format: "A4", orientation: "portrait" },
+  //     };
+  //     var contenidoPDF = document.createElement("div");
+  //     // Clonar el contenido de proforma-print y agregar el clon al PDF
+  //     $("#proforma-print").clone().appendTo(contenidoPDF);
+  //     // Generar y guardar el PDF
+  //     html2pdf()
+  //       .set(options)
+  //       .from(contenidoPDF)
+  //       .toPdf()
+  //       .get("pdf")
+  //       .then(function (pdf) {
+  //         // Agregar la imagen al contenidoPDF
+  //         var divimg = document.createElement("div");
+  //         divimg.classList.add("px-[70px]");
+  //         divimg.classList.add("w-full");
+  //         img.classList.add("w-full");
+  //         // Agregar una nueva página al PDF
+  //         pdf.addPage();
+  //         // Capturar el mapa con HTML2Canvas en la nueva página
+  //         domtoimage.toPng(mapContainer).then(function (dataUrl) {
+  //           // Convertir la URL en una imagen
+  //           var img = new Image();
+  //           img.src = dataUrl;
+  //           // Agregar la imagen al PDF
+  //           pdf.addImage(img, "JPEG", 0.5, 0.5, 7, 5); // Ajusta las coordenadas y el tamaño de acuerdo a tus necesidades
+  //           // Guardar el PDF
+  //           pdf.save();
+  //         });
+  //       });
+  //   } else {
+  //     alert("Debe llenar todos los campos");
+  //   }
+  // });
+
+  function pintarmapa(proformaproyecto) {
+    if (!map1) {
+      // Inicializar Leaflet.draw y configurar los controles de dibujo
+      map1 = L.map("map1", {
+        crs: L.CRS.Simple,
+        minZoom: -4,
+        maxZoom: 2,
+        zoom: 0.1,
+      });
+      var drawnItems = new L.FeatureGroup();
+      map1.addLayer(drawnItems);
+      var drawControl = new L.Control.Draw({
+        edit: {
+          featureGroup: drawnItems,
+        },
+      });
+      map1.addControl(drawControl);
+    } else {
+      // Eliminar todas las capas existentes del mapa
+      map1.eachLayer(function (layer) {
+        map1.removeLayer(layer);
+      });
+      // Agregar de nuevo el control de dibujo y la capa de dibujo
+      var drawnItems = new L.FeatureGroup();
+      map1.addLayer(drawnItems);
+    }
+    map1.on("draw:created", function (e) {
+      var layer = e.layer;
+      drawnItems.addLayer(layer);
+    });
+
+    var img = new Image();
+    var imageUrl = "../../" + proformaproyecto.img_lotizador;
+    img.src = imageUrl;
+
+    img.onload = function () {
+      var imageWidth = this.width;
+      var imageHeight = this.height;
+
+      var imageBounds = [
+        [0, 0],
+        [imageHeight, imageWidth],
+      ];
+
+      var imageOverlay = L.imageOverlay(imageUrl, imageBounds);
+      imageOverlay.addTo(map1);
+      map1.fitBounds(imageBounds); // Ajustar los límites del mapa a la imagen
+      setInterval(() => {
+        $("#loading_lotizador").addClass("hidden");
+      }, 2000);
+    };
+  }
+  function buscar_amenidades(proformaproyecto) {
+    let funcion = "buscar_amenidades";
+    $.post(
+      "../../controlador/UsuarioController.php",
+      {
+        funcion,
+        id: proformaproyecto.id,
+      },
+      (response) => {
+        if (response.trim() !== "no-register-amenidades") {
+          let amenidades = JSON.parse(response);
+          let template = "";
+          amenidades.forEach((amenidad) => {
+            template += `
+          <div class="w-full mt-6">
+            <img src="../../imagenes/amenidades/${amenidad.icono}.png" class="w-[40%] mx-auto" alt="">
+            <p class="text-sm text-center">${amenidad.nombre}</p>
+          </div>  
+          `;
+          });
+          $("#list-amenidades-proforma").html(template);
+          $(".view-amenidades").removeClass("hidden");
+        } else {
+          $(".view-amenidades").addClass("hidden");
+        }
+      }
+    );
+  }
+  async function buscar_me_target() {
+    let funcion = "buscar_user_target";
+    return new Promise((resolve, reject) => {
+      $.post(
+        "../../controlador/UsuarioController.php",
+        { funcion },
+        (response) => {
+          if (response.trim() === "no-register-target") {
+            resolve(response);
+          } else {
+            let targeta = JSON.parse(response);
+            resolve(targeta[0]);
+          }
+        }
+      );
+    });
+  }
+  async function buscar_user_asesor() {
+    let funcion = "buscar_user_asesor";
+    return new Promise((resolve, reject) => {
+      $.post(
+        "../../controlador/UsuarioController.php",
+        { funcion },
+        (response) => {
+          if (response.trim() === "no-register-target") {
+            resolve(response);
+          } else {
+            let targeta = JSON.parse(response);
+            resolve(targeta[0]);
+          }
+        }
+      );
+    });
+  }
+  async function buscar_user_target_socials() {
+    let funcion = "buscar_user_target_socials";
+    return new Promise((resolve, reject) => {
+      $.post(
+        "../../controlador/UsuarioController.php",
+        { funcion },
+        (response) => {
+          if (response.trim() === "no-register-socials") {
+            resolve(response);
+          } else {
+            let targeta = JSON.parse(response);
+            resolve(targeta);
+          }
+        }
+      );
+    });
+  }
+
+  $(document).on("click", "#open-proforma", async function () {
+    const targeta = await buscar_me_target();
+    const meuser = await buscar_user_asesor();
+    let template_asesor = "";
+    template_asesor += `
+    <div class="w-full flex flex-col items-end">
+    <img class="w-16 h-16 border border-gray-200 rounded-full" src="../../${targeta.picture_perfil}" alt="">
+    
+    <li class='text-bold'>Asesor</li>
+    <li class='text-bold text-end'>${meuser?.nombre} ${meuser?.apellido}</li>
+    <li class='text-end'>${meuser?.phone_number}</li>
+    <li class='text-end'>${meuser?.correo}</li>
+    </div>
+    `;
+    $("#datos-asesor").html(template_asesor);
+    let cliente = $(this).attr("keyClient");
+    let proyectokey = $(this).attr("keyProyecto");
+    let proformaproyecto = proyectosList.find((p) => p.id === proyectokey);
+    pintarmapa(proformaproyecto);
+    buscar_amenidades(proformaproyecto);
+    let clienteproforma = clientesList.find((c) => c.id === cliente);
+    $("#logoproyecto-proforma").attr("src", "");
+    $("#logoproyecto-proforma").attr("src", `../../${proformaproyecto.logo}`);
+    $("#name-proyecto-proforma").html(proformaproyecto.nombreProyecto);
+    $("#name-cliente-proforma").html(
+      `${clienteproforma.nombres} ${clienteproforma?.apellidos || ""}`
+    );
+    $("#contact-cliente-proforma").html(`${clienteproforma.celular}`);
+    $("#generar-proforma").removeClass("md-hidden");
+    setTimeout(() => {
+      $("#generar-proforma .form-create").addClass("modal-show");
+    }, 300);
+    // link generaar
+    // $("");
   });
   var dataTableEtiquetas = $("#etiquetasList").DataTable({
     // scrollY: "160px",
@@ -290,6 +844,43 @@ $(document).ready(function () {
       },
     ],
   });
+  // analisis modal
+  $("#analysis-leads").on("click", function () {
+    $("#rendimiento-asesor").removeClass("md-hidden");
+
+    setTimeout(() => {
+      $("#rendimiento-asesor .form-create").addClass("modal-show");
+    }, 300);
+    // modal rendimiento
+    let fecha_start_month = dayjs().startOf("month");
+    let fecha_fin_month = dayjs().endOf("month");
+    $("#filter_date_analisis").val("this-month");
+
+    $("#fecha_analisis_start").val(fecha_start_month.format("YYYY-MM-DD"));
+    $("#fecha_analisis_end").val(fecha_fin_month.format("YYYY-MM-DD"));
+    analisis_rendimiento(
+      fecha_start_month.format("YYYY-MM-DD"),
+      fecha_fin_month.format("YYYY-MM-DD"),
+      "Todos"
+    );
+  });
+  $("#rendimiento-asesor .close-modal").on("click", function () {
+    $("#rendimiento-asesor .form-create").removeClass("modal-show");
+    setTimeout(() => {
+      $("#rendimiento-asesor").addClass("md-hidden");
+    }, 300);
+  });
+
+  // fin de analisis modal
+  revisarLogin();
+  function revisarLogin() {
+    const authInfo = JSON.parse(localStorage.getItem("authInfo"));
+    if (authInfo !== "" && authInfo !== undefined && authInfo !== null) {
+      $("#registercalendar").attr("checked", true);
+    } else {
+      $("#registercalendar").attr("checked", false);
+    }
+  }
   buscar_registros_status();
   function buscar_registros_status() {
     let funcion = "buscar_historial_status";
@@ -297,9 +888,9 @@ $(document).ready(function () {
       "../../controlador/UsuarioController.php",
       { funcion },
       (response) => {
-        // console.log(response);
         if (response.trim() !== "no-data") {
           const clientes = JSON.parse(response);
+
           const clientesAgroup = obtenerUltimoEstadoPorCliente(clientes);
           clientesLastStatus = clientesAgroup;
         }
@@ -386,11 +977,10 @@ $(document).ready(function () {
     );
   }
   $("#listPlantillas").change(function () {
-    console.log("change");
     let id_msg = $(this).val();
     if (id_msg !== "0") {
       const msg = plantillasList.find((e) => e.id === id_msg);
-      console.log(msg);
+
       $("#message-modal-plantilla").val(msg.mensaje);
       let saltoMsg = $("#message-modal-plantilla").val();
 
@@ -411,7 +1001,6 @@ $(document).ready(function () {
   });
   $("#message-modal-plantilla").on("keyup", function () {
     let value = $(this).val();
-    console.log(value);
     const mensajeFormateado = encodeURIComponent(value.replace(/\n/g, "\n"));
     $("#link-w-send").attr(
       "href",
@@ -422,23 +1011,33 @@ $(document).ready(function () {
   $(document).on("click", "#open-plantilla", function () {
     let id = $(this).attr("keyClient");
     const cliente = clientesList.find((e) => e.id === id);
-    console.log(cliente);
     templateMsg = cliente.celular;
     $("#send-modal-event").removeClass("md-hidden");
+    let message = $("#message-modal-plantilla").val();
+    $("#link-w-send").attr(
+      "href",
+      `https://api.whatsapp.com/send?phone=${templateMsg}&text=${message}`
+    );
     setTimeout(() => {
       $("#send-modal-event .form-create").addClass("modal-show");
-    }, 10);
+    }, 300);
   });
   $("#send-modal-event .close-modal").click(function () {
     setTimeout(() => {
       $("#send-modal-event .form-create").removeClass("modal-show");
-    }, 10);
+    }, 300);
     $("#send-modal-event").addClass("md-hidden");
   });
   // mis leads
   $("#meusers-filtros").click(function () {
     const meclientes = clientesList.filter((e) => e.asignedUser === "si");
-    console.log(meclientes);
+
+    clientesFilter = meclientes;
+    dataTable.clear().rows.add(meclientes).draw();
+  });
+  $("#asignedusers-filtros").click(function () {
+    const meclientes = clientesList.filter((e) => e.asignedUser === "no");
+
     clientesFilter = meclientes;
     dataTable.clear().rows.add(meclientes).draw();
   });
@@ -446,7 +1045,7 @@ $(document).ready(function () {
   // exportar leads
   function exportar_leads() {
     let clientes = clientesFilter;
-    console.log(clientes);
+
     if (clientes !== "" && clientes.length > 0 && clientes !== undefined) {
       for (let index = 0; index < clientes.length; index++) {
         delete clientes[index].id;
@@ -488,21 +1087,40 @@ $(document).ready(function () {
     });
   }
 
-  $(document).on("click", "#asistenciaNot, #asistenciaYes", async function () {
+  $(document).on("click", "#asistenciaYes", async function () {
     let observacion = "";
     let cliente = $(this).attr("keyClient");
     let task = $(this).attr("keyTask");
     let status = $(this).attr("statusClient");
-    // console.log(status, task, cliente);
     let confirmado = confirm("Esta seguro de esta eleccion");
     if (confirmado) {
-      // console.log("yes");
       await seguimiento_cliente(observacion, cliente, status);
-      await completarTask(task, cliente, status);
+      // await completarTask(task, cliente, status);
+      await register_visita_agenda(task, cliente, status);
+
+      const validar = await send_validar(task);
+      if (validar === "SEND_VALIDAR") {
+        alert("Se envio actividad a VALIDACION");
+      } else {
+        alert("Hubo un error contacta al aministrador");
+      }
+      await buscar_clientes();
+      await encontrar_ventas();
+      animarProgress();
+    }
+  });
+  $(document).on("click", "#asistenciaNot", async function () {
+    let observacion = "";
+    let cliente = $(this).attr("keyClient");
+    let task = $(this).attr("keyTask");
+    let status = $(this).attr("statusClient");
+    let confirmado = confirm("Esta seguro de esta eleccion");
+    if (confirmado) {
+      await seguimiento_cliente(observacion, cliente, status);
+      // await completarTask(task, cliente, status);
+      await completarTask(task);
       await register_visita_agenda(task, cliente, status);
       await encontrar_ventas();
-    } else {
-      console.log("rechazo");
     }
   });
   async function completarTask(id_task) {
@@ -513,7 +1131,6 @@ $(document).ready(function () {
           "../../controlador/UsuarioController.php",
           { funcion, id_task },
           async (response) => {
-            console.log(response);
             if (response.trim() == "COMPLETADO") {
               alert("Tarea completada satisfactoriamente");
               await buscar_clientes();
@@ -550,17 +1167,14 @@ $(document).ready(function () {
       const endOfMonth = dayjs().endOf("month");
       dayjs().locale("es");
       const mesActual = dayjs().format("MMMM");
-      // console.log(mesActual);
       $("#mesNow").html(mesActual);
       const fecha_inicio = startOfMonth.format("YYYY-MM-DD"); // Primer día del mes en formato YYYY-MM-DD
       const fecha_fin = endOfMonth.format("YYYY-MM-DD");
-      // console.log(fecha_inicio, fecha_fin);
       let funcion = "buscar_resumen_eficiencia_usuario";
       $.post(
         "../../controlador/UsuarioController.php",
         { funcion, fecha_inicio, fecha_fin },
         (response) => {
-          console.log(response);
           let visitas_concretadas;
           let separaciones;
           let ventas;
@@ -582,6 +1196,492 @@ $(document).ready(function () {
       );
     });
   }
+
+  async function analisis_rendimiento(fecha_inicio, fecha_fin, proyecto) {
+    return new Promise((resolve, reject) => {
+      var dom = document.getElementById("resumen-vsv");
+      var rvsv = echarts.init(dom, null, {
+        renderer: "canvas",
+        useDirtyRect: false,
+      });
+      var option;
+      if (proyecto === "Todos") {
+        let funcion = "buscar_resumen_eficiencia_usuario";
+        $.post(
+          "../../controlador/UsuarioController.php",
+          { funcion, fecha_inicio, fecha_fin },
+          (response) => {
+            let visitas_concretadas;
+            let visitas_no_concretadas;
+            let separaciones;
+            let ventas;
+            if (response.trim() === "no-register") {
+              visitas = 0;
+              visitas_no_concretadas = 0;
+              separaciones = 0;
+              ventas = 0;
+            } else {
+              let resumen = JSON.parse(response);
+              visitas_concretadas = resumen[0].visitas_concretadas;
+              visitas_no_concretadas = resumen[0].visitas_no_concretadas;
+              separaciones = resumen[0].separaciones;
+              ventas = resumen[0].ventas;
+            }
+            $("#ventas_analisis").html(ventas);
+            $("#separaciones_analisis").html(separaciones);
+            $("#visitas_analisis").html(visitas_concretadas);
+            $("#no_visitas_analisis").html(visitas_no_concretadas);
+
+            option = {
+              tooltip: {
+                trigger: "item",
+              },
+              legend: {
+                top: "5%",
+                left: "center",
+              },
+              series: [
+                {
+                  name: "Eficiencia",
+                  type: "pie",
+                  radius: ["40%", "70%"],
+                  avoidLabelOverlap: false,
+                  itemStyle: {
+                    borderRadius: 10,
+                    borderColor: "#fff",
+                    borderWidth: 2,
+                  },
+                  label: {
+                    show: false,
+                    position: "center",
+                  },
+                  emphasis: {
+                    label: {
+                      show: true,
+                      fontSize: 14,
+                      fontWeight: "bold",
+                    },
+                  },
+                  labelLine: {
+                    show: false,
+                  },
+                  data: [
+                    {
+                      value: visitas_concretadas,
+                      name: "VISITAS CONCRETADAS",
+                    },
+                    {
+                      value: visitas_no_concretadas,
+                      name: "VISITAS NO CONCRETADAS",
+                    },
+                    { value: separaciones, name: "SEPARACIONES" },
+                    { value: ventas, name: "VENTAS" },
+                  ],
+                  color: [
+                    "#5208DD",
+                    "#0A9597",
+                    "#0A3397",
+                    "#4A40E2",
+                    "#5BB8E0",
+                  ],
+                },
+              ],
+            };
+
+            if (option && typeof option === "object") {
+              rvsv.setOption(option);
+            }
+
+            window.addEventListener("resize", rvsv.resize);
+            resolve();
+          }
+        );
+      } else {
+        let funcion = "buscar_resumen_eficiencia_usuario_proyecto";
+
+        $.post(
+          "../../controlador/UsuarioController.php",
+          { funcion, fecha_inicio, fecha_fin, proyecto },
+          (response) => {
+            let visitas_concretadas;
+            let visitas_no_concretadas;
+            let separaciones;
+            let ventas;
+            if (response.trim() === "no-register") {
+              visitas_concretadas = 0;
+              visitas_no_concretadas = 0;
+              separaciones = 0;
+              ventas = 0;
+            } else {
+              let resumen = JSON.parse(response);
+              visitas_concretadas = resumen[0].visitas_concretadas;
+              visitas_no_concretadas = resumen[0].visitas_no_concretadas;
+              separaciones = resumen[0].separaciones;
+              ventas = resumen[0].ventas;
+            }
+            $("#ventas_analisis").html(ventas);
+            $("#separaciones_analisis").html(separaciones);
+            $("#visitas_analisis").html(visitas_concretadas);
+            $("#no_visitas_analisis").html(visitas_no_concretadas);
+            option = {
+              tooltip: {
+                trigger: "item",
+              },
+              legend: {
+                top: "5%",
+                left: "center",
+              },
+              series: [
+                {
+                  name: "Eficiencia",
+                  type: "pie",
+                  radius: ["40%", "70%"],
+                  avoidLabelOverlap: false,
+                  itemStyle: {
+                    borderRadius: 10,
+                    borderColor: "#fff",
+                    borderWidth: 2,
+                  },
+                  label: {
+                    show: false,
+                    position: "center",
+                  },
+                  emphasis: {
+                    label: {
+                      show: true,
+                      fontSize: 14,
+                      fontWeight: "bold",
+                    },
+                  },
+                  labelLine: {
+                    show: false,
+                  },
+                  data: [
+                    {
+                      value: visitas_concretadas,
+                      name: "VISITAS CONCRETADAS",
+                    },
+                    {
+                      value: visitas_no_concretadas,
+                      name: "VISITAS NO CONCRETADAS",
+                    },
+                    { value: separaciones, name: "SEPARACIONES" },
+                    { value: ventas, name: "VENTAS" },
+                  ],
+                  color: [
+                    "#5208DD",
+                    "#0A9597",
+                    "#0A3397",
+                    "#4A40E2",
+                    "#5BB8E0",
+                  ],
+                },
+              ],
+            };
+
+            if (option && typeof option === "object") {
+              rvsv.setOption(option);
+            }
+
+            window.addEventListener("resize", rvsv.resize);
+            resolve();
+          }
+        );
+      }
+      encontrar_clientes_rendimiento(fecha_inicio, fecha_fin, proyecto);
+    });
+  }
+  async function encontrar_clientes_rendimiento(
+    fecha_inicio,
+    fecha_fin,
+    proyecto
+  ) {
+    return new Promise((resolve, reject) => {
+      let funcion = "buscar_clientes_rendimiento";
+      $.post(
+        "../../controlador/UsuarioController.php",
+        { funcion, fecha_inicio, fecha_fin },
+        (response) => {
+          let visitas_concretadas;
+          let visitas_no_concretadas;
+          let separaciones;
+          let ventas;
+          // templates
+          let template_separaciones = "";
+          let template_ventas = "";
+          let template_visitas_concretadas = "";
+          let template_visitas_no_concretadas = "";
+
+          if (response.trim() === "no-register") {
+            $("#table-visitas-concretadas tbody").html(
+              template_visitas_concretadas
+            );
+            $("#table-visitas-no-concretadas tbody").html(
+              template_visitas_no_concretadas
+            );
+            $("#table-separaciones tbody").html(template_separaciones);
+            $("#table-ventas tbody").html(template_ventas);
+          } else {
+            let data = JSON.parse(response);
+            let template_separaciones = "";
+            let template_ventas = "";
+            let template_visitas_concretadas = "";
+            let template_visitas_no_concretadas = "";
+            if (proyecto === "Todos") {
+              visitas_concretadas = data.filter(
+                (c) =>
+                  (c.tipo == "VISITA" || c.tipo == "REPROGRAMACION VISITA") &&
+                  c.asistencia == "ASISTIO"
+              );
+              visitas_concretadas.length > 0 &&
+                visitas_concretadas.forEach((s) => {
+                  template_visitas_concretadas += `
+              <tr>
+              <td class="px-6 py-4 whitespace-nowrap">
+              ${s.nombres} ${s.apellidos}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+              ${s.fecha_registro}
+              </td>
+              <td class="font-bold px-6 py-4 whitespace-nowrap">
+                  ${s.proyecto}
+              </td>
+              <td class="font-bold px-6 py-4 whitespace-nowrap">
+                  ${s.status}
+              </td>
+              </tr>
+              `;
+                });
+              visitas_no_concretadas = data.filter(
+                (c) =>
+                  (c.tipo == "VISITA" || c.tipo == "REPROGRAMACION VISITA") &&
+                  c.asistencia == "NO ASISTIO"
+              );
+              visitas_no_concretadas.length > 0 &&
+                visitas_no_concretadas.forEach((s) => {
+                  template_visitas_no_concretadas += `
+              <tr>
+              <td class="px-6 py-4 whitespace-nowrap">
+              ${s.nombres} ${s.apellidos}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+              ${s.fecha_registro}
+              </td>
+              <td class="font-bold px-6 py-4 whitespace-nowrap">
+                  ${s.proyecto}
+              </td>
+              <td class="font-bold px-6 py-4 whitespace-nowrap">
+                  ${s.status}
+              </td>
+              </tr>
+              `;
+                });
+              separaciones = data.filter((c) => c.tipo == "SEPARACION");
+              separaciones.length > 0 &&
+                separaciones.forEach((s) => {
+                  template_separaciones += `
+              <tr>
+              <td class="px-6 py-4 whitespace-nowrap">
+              ${s.nombres} ${s.apellidos}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+              ${s.fecha_registro}
+              </td>
+              <td class="font-bold px-6 py-4 whitespace-nowrap">
+                  ${s.proyecto}
+              </td>
+              <td class="font-bold px-6 py-4 whitespace-nowrap">
+                  ${s.status}
+              </td>
+              </tr>
+              `;
+                });
+              ventas = data.filter((c) => c.tipo == "VENTA");
+              ventas.length > 0 &&
+                ventas.forEach((s) => {
+                  template_ventas += `
+              <tr>
+              <td class="px-6 py-4 whitespace-nowrap">
+              ${s.nombres} ${s.apellidos}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+              ${s.fecha_registro}
+              </td>
+              <td class="font-bold px-6 py-4 whitespace-nowrap">
+                  ${s.proyecto}
+              </td>
+              <td class="font-bold px-6 py-4 whitespace-nowrap">
+                  ${s.status}
+              </td>
+              </tr>
+              `;
+                });
+            } else {
+              visitas_concretadas = data.filter(
+                (c) =>
+                  (c.tipo == "VISITA" || c.tipo == "REPROGRAMACION VISITA") &&
+                  c.asistencia == "ASISTIO" &&
+                  c.proyet_id == proyecto
+              );
+              visitas_concretadas.length > 0 &&
+                visitas_concretadas.forEach((s) => {
+                  template_visitas_concretadas += `
+              <tr>
+              <td class="px-6 py-4 whitespace-nowrap">
+              ${s.nombres} ${s.apellidos}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+              ${s.fecha_registro}
+              </td>
+              <td class="font-bold px-6 py-4 whitespace-nowrap">
+                  ${s.proyecto}
+              </td>
+              <td class="font-bold px-6 py-4 whitespace-nowrap">
+                  ${s.status}
+              </td>
+              </tr>
+              `;
+                });
+              visitas_no_concretadas = data.filter(
+                (c) =>
+                  (c.tipo == "VISITA" || c.tipo == "REPROGRAMACION VISITA") &&
+                  c.asistencia == "NO ASISTIO" &&
+                  c.proyet_id == proyecto
+              );
+              visitas_no_concretadas.length > 0 &&
+                visitas_no_concretadas.forEach((s) => {
+                  template_visitas_no_concretadas += `
+              <tr>
+              <td class="px-6 py-4 whitespace-nowrap">
+              ${s.nombres} ${s.apellidos}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+              ${s.fecha_registro}
+              </td>
+              <td class="font-bold px-6 py-4 whitespace-nowrap">
+                  ${s.proyecto}
+              </td>
+              <td class="font-bold px-6 py-4 whitespace-nowrap">
+                  ${s.status}
+              </td>
+              </tr>
+              `;
+                });
+              separaciones = data.filter(
+                (c) => c.tipo == "SEPARACION" && c.proyet_id == proyecto
+              );
+              separaciones.length > 0 &&
+                separaciones.forEach((s) => {
+                  template_separaciones += `
+              <tr>
+              <td class="px-6 py-4 whitespace-nowrap">
+              ${s.nombres} ${s.apellidos}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+              ${s.fecha_registro}
+              </td>
+              <td class="font-bold px-6 py-4 whitespace-nowrap">
+                  ${s.proyecto}
+              </td>
+              <td class="font-bold px-6 py-4 whitespace-nowrap">
+                  ${s.status}
+              </td>
+              </tr>
+              `;
+                });
+              ventas = data.filter(
+                (c) => c.tipo == "VENTA" && c.proyet_id == proyecto
+              );
+              ventas.length > 0 &&
+                ventas.forEach((s) => {
+                  template_ventas += `
+              <tr>
+              <td class="px-6 py-4 whitespace-nowrap">
+              ${s.nombres} ${s.apellidos}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+              ${s.fecha_registro}
+              </td>
+              <td class="font-bold px-6 py-4 whitespace-nowrap">
+                  ${s.proyecto}
+              </td>
+              <td class="font-bold px-6 py-4 whitespace-nowrap">
+                  ${s.status}
+              </td>
+              </tr>
+              `;
+                });
+            }
+            $("#table-visitas-concretadas tbody").html(
+              template_visitas_concretadas
+            );
+            $("#table-visitas-no-concretadas tbody").html(
+              template_visitas_no_concretadas
+            );
+            $("#table-separaciones tbody").html(template_separaciones);
+            $("#table-ventas tbody").html(template_ventas);
+            //   visitas_concretadas = resumen[0].visitas_concretadas;
+            //   visitas_no_concretadas = resumen[0].visitas_no_concretadas;
+            //   separaciones = resumen[0].separaciones;
+            //   ventas = resumen[0].ventas;
+          }
+          // $("#ventas_analisis").html(ventas);
+          // $("#separaciones_analisis").html(separaciones);
+          // $("#visitas_analisis").html(visitas_concretadas);
+          // $("#no_visitas_analisis").html(visitas_no_concretadas);
+
+          resolve();
+        }
+      );
+    });
+  }
+  $("#fecha_analisis_start, #fecha_analisis_end, #proyectos_analisis").on(
+    "change",
+    async function () {
+      let fecha_inicio = $("#fecha_analisis_start").val();
+      let fecha_fin = $("#fecha_analisis_end").val();
+      let proyecto = $("#proyectos_analisis").val();
+      await analisis_rendimiento(fecha_inicio, fecha_fin, proyecto);
+    }
+  );
+  $("#filter_date_analisis").on("change", async function (e) {
+    let valor = e.target.value;
+    let actualdia;
+    let proyecto = $("#proyectos_analisis").val();
+    let fecha_inicio;
+    let fecha_fin;
+    let fecha_start;
+    switch (valor) {
+      case "this-month":
+        fecha_inicio = dayjs().startOf("month").format("YYYY-MM-DD");
+        fecha_fin = dayjs().endOf("month").format("YYYY-MM-DD");
+        $("#fecha_analisis_end").val(fecha_fin);
+        $("#fecha_analisis_start").val(fecha_inicio);
+        break;
+      case "last-month":
+        actualdia = dayjs();
+        fecha_fin = actualdia.format("YYYY-MM-DD");
+        $("#fecha_analisis_end").val(fecha_fin);
+        fecha_start = actualdia.subtract(1, "month");
+        fecha_inicio = fecha_start.format("YYYY-MM-DD");
+        $("#fecha_analisis_start").val(fecha_inicio);
+
+        break;
+      case "last-week":
+        actualdia = dayjs();
+        fecha_fin = actualdia.format("YYYY-MM-DD");
+        $("#fecha_analisis_end").val(fecha_fin);
+        fecha_start = actualdia.subtract(7, "days");
+        fecha_inicio = fecha_start.format("YYYY-MM-DD");
+        $("#fecha_analisis_start").val(fecha_inicio);
+
+      default:
+        break;
+    }
+    await analisis_rendimiento(fecha_inicio, fecha_fin, proyecto);
+  });
+
+  // fon modal rendimiento
   function animarProgress() {
     let funcion = "buscar_visitas_programadas";
     $.post(
@@ -621,6 +1721,7 @@ $(document).ready(function () {
     proyectosList = proyectos;
 
     llenarFiltros();
+    llenarFiltrosRendimiento();
   }
 
   // Llamar a la función de animación
@@ -638,11 +1739,13 @@ $(document).ready(function () {
         "../../controlador/UsuarioController.php",
         { funcion },
         (response) => {
+          console.log(response);
           $("#spin-load").html("");
           if (response.trim() === "no-register-clientes") {
             dataTable.clear().draw();
           } else {
             const clientes = JSON.parse(response);
+            console.log(clientes);
             clientesList = clientes;
             clientesList.sort(compareDatesDesc);
 
@@ -684,16 +1787,14 @@ $(document).ready(function () {
         "../../controlador/UsuarioController.php",
         { funcion, cliente },
         (response) => {
-          console.log(response);
           if (response.trim() === "no-data") {
             alert("no hay registro alguno, porfavor cree uno");
             resolve({ msg: "no hay registro alguno" });
           } else {
             const historial = JSON.parse(response);
-            console.log(historial);
+
             const sortedData = historial.sort(compareDates);
-            console.log(historial);
-            console.log(sortedData);
+
             let template = "";
             sortedData.forEach((history) => {
               template += `
@@ -725,12 +1826,10 @@ $(document).ready(function () {
     });
   }
   // INTERACCION CON CLIENTES
-  $("#menu-pendientes").click();
 
   // SHOW MODAL registrar seguimiento
   $(document).on("click", "#contactarSeguimiento", async function () {
     let id_cliente = $(this).attr("keyClient");
-    console.log(id_cliente);
 
     let observacion = "Cliente contactado";
     let status = "CONTACTADO";
@@ -795,6 +1894,7 @@ $(document).ready(function () {
     }
     return template;
   }
+  // $("#table-visitas-concretadas")
 
   $("#modal-lead").click(() => {
     $("#crear-lead").removeClass("md-hidden");
@@ -809,8 +1909,6 @@ $(document).ready(function () {
     $("#crear-lead #proyecto-lead").html(template);
   });
   $(document).on("click", "#editClient", function () {
-    // console.log(e);
-    // console.log("hola");
     let template = "";
     template += `<option value="0">Seleccione un proyecto</option>`;
     proyectosList.forEach((proyecto) => {
@@ -826,7 +1924,17 @@ $(document).ready(function () {
     const clienteResult = clientesList.filter(
       (elemento) => elemento.id === id_cliente
     );
-    console.log(id_cliente, clienteResult);
+    if (clienteResult[0].asignedUser === "si") {
+      $("#asignedcliente_user").html("Es tu lead");
+      $("#editar-lead #proyecto-lead").removeAttr("disabled");
+      $("#detalle_lead_asignado").html("");
+    } else {
+      $("#asignedcliente_user").html("Es un lead asignado");
+      $("#editar-lead #proyecto-lead").attr("disabled", "disabled");
+      $("#detalle_lead_asignado").html(
+        "No puedes hacer modificaciones porque es un lead asignado"
+      );
+    }
 
     $("#editar-lead #nombre-lead").val(clienteResult[0].nombres);
     $("#editar-lead #apellido-lead").val(clienteResult[0].apellidos);
@@ -845,25 +1953,39 @@ $(document).ready(function () {
   function llenarFiltros() {
     let template = "";
     template += `<option selected value="Todos">Todos</option>`;
-    // console.log(proyectosList);
+
     proyectosList.forEach((proyecto) => {
       template += `<option value="${proyecto.nombreProyecto}">${proyecto.nombreProyecto}</option>`;
     });
     $("#filter-proyecto").html(template);
   }
+  function llenarFiltrosRendimiento() {
+    let template = "";
+    template += `<option selected value="Todos">Todos</option>`;
+
+    proyectosList.forEach((proyecto) => {
+      template += `<option value="${proyecto.id}">${proyecto.nombreProyecto}</option>`;
+    });
+    $("#proyectos_analisis").html(template);
+  }
   function filtrarProyectos() {
     const nombreProyecto = $("#filter-proyecto").val();
     const nombreCliente = $("#cliente-search").val().toLowerCase();
     const nombreEtiqueta = $("#filter-etiqueta").val();
-    // console.log(nombreProyecto, nombreCliente, nombreEtiqueta);
+    let status = $("#filter-status").val();
+    let fecha_inicio = dayjs($("#fecha-inicio-status").val() + " 23:59:00");
+    let fecha_fin = dayjs($("#fecha-fin-status").val() + " 23:59:00");
 
     const clientes = clientesList.filter((cliente) => {
       let etiquetasList;
       let etiquetas = JSON.parse(cliente.etiquetas);
+
+      let fecha_registro = cliente.fecha_creacion;
+
       if (etiquetas === null) {
         etiquetasList = [];
       } else {
-        etiquetasList = etiquetas[0].nombre.split(",");
+        etiquetasList = etiquetas[0].nombre.split(", ");
       }
       let count = 0;
       etiquetasList.forEach((etiqueta) => {
@@ -871,6 +1993,7 @@ $(document).ready(function () {
           count = count + 1;
         }
       });
+
       if (count === 0 && nombreEtiqueta !== "Todos") {
         return false;
       }
@@ -880,15 +2003,48 @@ $(document).ready(function () {
       ) {
         return false;
       }
+
+      if (status !== "Todas" && status !== cliente.status) {
+        return false;
+      }
       if (
         nombreCliente !== "" &&
         !contienenombreCliente(cliente, nombreCliente)
       ) {
         return false;
       }
+      if (
+        fecha_inicio.format("YYYY/MM/DD") !== "Invalid Date" &&
+        fecha_fin.format("YYYY/MM/DD") !== "Invalid Date"
+      ) {
+        if (
+          !dayjs(fecha_registro, "YYYY/MM/DD").isSame(fecha_fin) ||
+          !dayjs(fecha_registro, "YYYY/MM/DD").isSame(fecha_inicio)
+        ) {
+          if (
+            dayjs(fecha_registro, "YYYY/MM/DD").isAfter(fecha_fin) ||
+            dayjs(fecha_registro, "YYYY/MM/DD").isBefore(fecha_inicio)
+          ) {
+            return false;
+          }
+        }
+      }
       return true;
     });
-    clientesFilter = clientes;
+    let newClientes = clientes.sort((a, b) => {
+      var fechaA = new Date(a.fecha_creacion + " " + a.hora_creacion);
+      var fechaB = new Date(b.fecha_creacion + " " + b.hora_creacion);
+
+      // Compara las fechas
+      if (fechaA < fechaB) {
+        return 1;
+      } else if (fechaA > fechaB) {
+        return -1;
+      } else {
+        return 0; // Las fechas son iguales
+      }
+    });
+    clientesFilter = newClientes;
     var estadoActual = {
       page: dataTable.page(), // Página actual
       scrollLeft: $("#usuariosList").parent().scrollLeft(), // Posición de scroll horizontal
@@ -904,16 +2060,13 @@ $(document).ready(function () {
     // Restaurar el número de página previo
     var pageInfo = dataTable.page.info();
     var totalPaginas = pageInfo.pages;
-    // console.log(totalPaginas);
     if (estadoActual.page < totalPaginas) {
-      // console.log(estadoActual.page);
       dataTable.page(estadoActual.page);
     } else {
       dataTable.clear().draw();
 
       // Agregar las nuevas filas
       dataTable.rows.add(clientes).draw();
-      console.log(totalPaginas - 1);
       dataTable.page(totalPaginas - 1);
     }
 
@@ -921,26 +2074,19 @@ $(document).ready(function () {
     $("#usuariosList").parent().scrollLeft(estadoActual.scrollLeft);
     $("body").parent().scrollTop(estadoActual.bodyScroll);
   }
-  function filtrarPendientes() {
+  function filtrarCreacion() {
     let fecha_inicio = dayjs($("#fecha-inicio-status").val() + " 23:59:00");
     let fecha_fin = dayjs($("#fecha-fin-status").val() + " 23:59:00");
     let status = $("#filter-status").val();
-    console.log(fecha_inicio, fecha_fin, status);
-    // if (
-    //   fecha_inicio.format("YYYY/MM/DD") !== "Invalid Date" &&
-    //   fecha_fin.format("YYYY/MM/DD") !== "Invalid Date"
-    // ) {
-    const clientes = clientesLastStatus.filter((cliente) => {
-      // const fechaRegistro = dayjs(`${cliente.fechaRegistro}`);
-      console.log(cliente);
-      // console.log(cliente);
-      // if (
-      //   nombreProyecto !== "Todos" &&
-      //   cliente.nombre_proyecto !== nombreProyecto
-      // ) {
-      //   console.log(cliente.nombre_proyecto);
-      //   return false;
-      // }
+    let nombreProyecto = $("#filter-proyecto").val();
+    const clientes = clientesList.filter((cliente) => {
+      let fecha_registro = cliente.created_cliente.split(" ")[0];
+      if (
+        nombreProyecto !== "Todos" &&
+        cliente.nombre_proyecto !== nombreProyecto
+      ) {
+        return false;
+      }
       if (status !== "Todas" && status !== cliente.status) {
         return false;
       }
@@ -948,21 +2094,13 @@ $(document).ready(function () {
         fecha_inicio.format("YYYY/MM/DD") !== "Invalid Date" &&
         fecha_fin.format("YYYY/MM/DD") !== "Invalid Date"
       ) {
-        console.log(dayjs(cliente.fechaRegistro, "YYYY/MM/DD"));
-        console.log(
-          dayjs(cliente.fechaRegistro, "YYYY/MM/DD").isAfter(fecha_fin)
-        );
-        console.log(
-          dayjs(cliente.fechaRegistro, "YYYY/MM/DD").isBefore(fecha_inicio)
-        );
-
         if (
-          !dayjs(cliente.fechaRegistro, "YYYY/MM/DD").isSame(fecha_fin) ||
-          !dayjs(cliente.fechaRegistro, "YYYY/MM/DD").isSame(fecha_inicio)
+          !dayjs(fecha_registro, "YYYY/MM/DD").isSame(fecha_fin) ||
+          !dayjs(fecha_registro, "YYYY/MM/DD").isSame(fecha_inicio)
         ) {
           if (
-            dayjs(cliente.fechaRegistro, "YYYY/MM/DD").isAfter(fecha_fin) ||
-            dayjs(cliente.fechaRegistro, "YYYY/MM/DD").isBefore(fecha_inicio)
+            dayjs(fecha_registro, "YYYY/MM/DD").isAfter(fecha_fin) ||
+            dayjs(fecha_registro, "YYYY/MM/DD").isBefore(fecha_inicio)
           ) {
             return false;
           }
@@ -971,17 +2109,9 @@ $(document).ready(function () {
 
       return true;
     });
-    const clientesNuevos = [];
-    clientes.map((cliente, index) => {
-      const result = clientesList.find((c) => c.id === cliente.cliente_id);
-      clientesNuevos.push(result);
-    });
-    clientesFilter = clientesNuevos;
+    clientesFilter = clientes;
 
-    console.log(clientesNuevos);
-
-    dataTable.clear().rows.add(clientesNuevos).draw();
-    // }
+    dataTable.clear().rows.add(clientesFilter).draw();
   }
 
   // Función auxiliar para verificar si el nombre y apellido coinciden con el filtro
@@ -997,7 +2127,16 @@ $(document).ready(function () {
 
   // filtro de pendientes
   $("#menu-pendientes").click(function () {
-    const clientes = clientesList.filter((e) => e.task_status === "PENDIENTE");
+    typefilter = "PENDIENTE";
+    const clientes = clientesList
+      .filter((e) => e.task_status === "PENDIENTE") // Filtra por task_status igual a "PENDIENTE"
+      .sort((a, b) => {
+        // Ordena por fecha_visita y luego por hora_visita
+        const fechaA = new Date(a.fecha_visita + " " + a.hora_visita);
+        const fechaB = new Date(b.fecha_visita + " " + b.hora_visita);
+
+        return fechaA - fechaB;
+      });
     dataTable.clear().rows.add(clientes).draw();
   });
 
@@ -1009,7 +2148,8 @@ $(document).ready(function () {
     $("#fecha-inicio-status").val(null);
     $("#fecha-fin-status").val(null);
     $("#filter-status").val("Todas");
-    dataTable.clear().rows.add(clientesList).draw();
+    // dataTable.clear().rows.add(clientesList).draw();
+    filtrarProyectos();
   });
 
   $("#fecha-inicio-status").on("change", function () {
@@ -1023,7 +2163,7 @@ $(document).ready(function () {
   });
   $("#fecha-inicio-status, #fecha-fin-status, #filter-status").on(
     "change",
-    filtrarPendientes
+    filtrarProyectos
   );
 
   // filtro de etiquetas
@@ -1057,16 +2197,13 @@ $(document).ready(function () {
       campaña: campania,
       ciudad: ciudad,
     };
-    console.log(result);
     if (proyecto_id !== "0") {
       let funcion = "edit_cliente";
       $.post(
         "../../controlador/UsuarioController.php",
         { funcion, result, proyecto_id, cliente: idCliente },
         async (response) => {
-          console.log(response);
           const data = JSON.parse(response);
-          console.log(data);
 
           if (data.hasOwnProperty("error")) {
             // Si la respuesta contiene un mensaje de error, muestra el mensaje
@@ -1099,12 +2236,10 @@ $(document).ready(function () {
     let id_cliente = $(this).attr("keyClient");
     idCliente = id_cliente;
     let status = $(this).attr("statusClient");
-    console.log(status);
     let template_status = imprimirStatus(status);
     const result = clientesList.filter(
       (elemento) => elemento.id === id_cliente
     );
-    console.log(result);
     $("#img-now-status").attr("src", "../../img/avatar_default.jpg");
     $("#name-now-status").html(result[0].nombres + " " + result[0].apellidos);
     $("#contact-now-status").html(result[0].celular);
@@ -1126,7 +2261,6 @@ $(document).ready(function () {
         "../../controlador/UsuarioController.php",
         { funcion, id_cliente },
         async (response) => {
-          console.log(response);
           if (response.trim() === "archived-user-cliente") {
             alert("Se archivo correctamente");
             await buscar_clientes();
@@ -1141,25 +2275,21 @@ $(document).ready(function () {
     // seguimiento_cliente(observacion, id_cliente, status);
   });
   $("#status-evento").on("change", function (e) {
-    console.log(e);
     let tipo = e.target.value;
-    console.log(tipo);
     if (
       tipo === "VISITA" ||
       tipo === "REPROGRAMACION CONTACTO" ||
-      tipo === "REPROGRAMACION VISITA" ||
-      tipo === "SEPARACION"
+      tipo === "REPROGRAMACION VISITA"
     ) {
       $("#fecha_visita").removeClass("hidden");
       $("#addcalendar").removeClass("hidden");
     } else {
+      $("#addcalendar").addClass("hidden");
       $("#fecha_visita").addClass("hidden");
     }
   });
 
   async function verificarAuthorizeCalendar() {
-    console.log(gapiInited);
-
     handleAuthClick();
   }
   $("#registercalendar").on("change", function (e) {
@@ -1175,7 +2305,6 @@ $(document).ready(function () {
         "../../controlador/UsuarioController.php",
         { funcion, fecha, hora, cliente, tipo, pendiente },
         (response) => {
-          console.log(response);
           if (response.trim() === "add-register-visita") {
             alert("Se registro" + tipo + " correctamente");
             animarProgress();
@@ -1195,7 +2324,6 @@ $(document).ready(function () {
         "../../controlador/UsuarioController.php",
         { funcion, fecha, cliente },
         (response) => {
-          console.log(response);
           if (response.trim() === "add-register-venta") {
             alert("Se registro correctamente la venta");
             resolve();
@@ -1209,9 +2337,10 @@ $(document).ready(function () {
   }
   $("#registerFormEvento").submit(async (e) => {
     e.preventDefault();
+    $("#register_event_btn").prop("disabled", true);
+
     let status = $("#status-evento").val();
     let observaciones = $("#observaciones-evento").val();
-    console.log(status, observaciones);
 
     if (status !== "0") {
       if (
@@ -1224,23 +2353,37 @@ $(document).ready(function () {
         let fecha = $("#date-visita").val();
         let hora = $("#time-visita").val() + ":00";
 
-        if (fecha && hora) {
-          const result = clientesList.filter(
-            (elemento) => elemento.id === idCliente
+        const result = clientesList.filter(
+          (elemento) => elemento.id === idCliente
+        );
+        let cliente = result[0].nombres + " " + result[0].apellidos;
+        let summary = `${status} - Cliente:${cliente} ${result[0].celular}`;
+        let description = `${observaciones} `;
+        if (status === "SEPARACION") {
+          let fecha_s = dayjs().format("YYYY-MM-DD");
+          let hora_s = dayjs().format("HH:mm:ss");
+          await registerVisita(
+            fecha_s,
+            hora_s,
+            idCliente,
+            status,
+            "SEND_VALIDAR"
           );
-          let cliente = result[0].nombres + " " + result[0].apellidos;
-          let description = `Nuevo evento:${status} - Cliente:${cliente} - Observaciones: ${observaciones} `;
-
-          await registerVisita(fecha, hora, idCliente, status, pendiente);
-          createCustomEvent(description, fecha, hora);
-
-          $("#date-visita").val(null);
-          $("#time-visita").val(null);
         } else {
-          return;
+          if (fecha && hora) {
+            await registerVisita(fecha, hora, idCliente, status, pendiente);
+            if ($("#registercalendar").prop("checked") === true) {
+              createCustomEvent(summary, description, fecha, hora);
+              $("#addcalendar").addClass("hidden");
+            }
+            $("#date-visita").val(null);
+            $("#time-visita").val(null);
+          } else {
+            // showToast();
+            return;
+          }
         }
       } else if (status === "VENTA") {
-        console.log("VENTA");
         let fecha = dayjs().format("YYYY-MM-DD");
         await register_venta(fecha, idCliente);
       }
@@ -1252,6 +2395,7 @@ $(document).ready(function () {
       await buscarHistorial(funcion, idCliente);
       await encontrar_ventas();
 
+      $("#register_event_btn").prop("disabled", false);
       $("#status-evento").val("0");
       $("#observaciones-evento").val("");
       setTimeout(function () {
@@ -1266,6 +2410,9 @@ $(document).ready(function () {
   // registrar lead
   $("#registerLead").submit((e) => {
     e.preventDefault();
+    let fecha_now = dayjs().format("YYYY-MM-DD");
+    let hora_now = dayjs().format("HH:mm:ss");
+    // return 0;
     let nombre = $("#nombre-lead").val();
     let apellido = $("#apellido-lead").val();
     let documento = $("#documento-lead").val();
@@ -1288,17 +2435,17 @@ $(document).ready(function () {
       origen: origen,
       campaña: campania,
       ciudad: ciudad,
+      fecha: fecha_now,
+      hora: hora_now,
     };
-    console.log(result);
-    if (proyecto_id !== "0") {
+    if (proyecto_id !== "0" && origen !== "0") {
       let funcion = "add_cliente";
+      $("#registrar_lead_btn").prop("disabled", true);
       $.post(
         "../../controlador/UsuarioController.php",
         { funcion, result, proyecto_id },
         (response) => {
-          console.log(response);
           const data = JSON.parse(response);
-          console.log(data);
 
           if (data.hasOwnProperty("error")) {
             // Si la respuesta contiene un mensaje de error, muestra el mensaje
@@ -1307,11 +2454,18 @@ $(document).ready(function () {
             funcion = "add_user_cliente_asesor";
             alert("se subio correctamente el cliente");
             let id = data.id;
+
+            let fecha_now = dayjs().format("YYYY-MM-DD");
+            let hora_now = dayjs().format("HH:mm:ss");
             $.post(
               "../../controlador/UsuarioController.php",
-              { funcion, id },
+              {
+                funcion,
+                ids_clientes: JSON.stringify([id]),
+                fecha_now,
+                hora_now,
+              },
               async (response) => {
-                console.log(response);
                 if (response.trim() == "add-user-cliente") {
                   alert("Se asigno cliente al asesor");
                   $("#crear-lead .form-create").removeClass("modal-show");
@@ -1336,10 +2490,12 @@ $(document).ready(function () {
               }
             );
           }
+
+          $("#registrar_lead_btn").prop("disabled", false);
         }
       );
     } else {
-      alert("Debe seleccionar un proyecto");
+      alert("Debe seleccionar un proyecto y origen");
     }
   });
   const showToast = () => {
@@ -1370,17 +2526,10 @@ $(document).ready(function () {
       let funcion = "seguimiento_cliente";
       var fecha = dayjs().format("DD/MM/YYYY");
       var hora = dayjs().format("HH:mm:ss");
-
-      // Imprimir las variables en la consola
-      console.log("Fecha actual:", fecha);
-      console.log("Hora actual:", hora);
-      console.log(cliente);
-      // let hora =
       $.post(
         "../../controlador/UsuarioController.php",
         { funcion, cliente, observacion, status, fecha, hora },
         async (response) => {
-          // console.log(response);
           if (response.trim() == "add-register-contact") {
             await buscar_clientes();
             resolve();
@@ -1396,7 +2545,6 @@ $(document).ready(function () {
   // remover etiqueta de lead
   $(document).on("click", "#removeEtiqueta", function () {
     let id_etiqueta = $(this).attr("keyEtiqueta");
-    console.log(id_etiqueta);
     let funcion = "remove_etiqueta_lead";
     $.post(
       "../../controlador/UsuarioController.php",
@@ -1405,9 +2553,8 @@ $(document).ready(function () {
         if (response.trim() === "remove-asigned") {
           await buscar_clientes();
           const etiquetas = await buscar_etiquetas_cliente(idCliente);
-          console.log(etiquetas);
+
           let template;
-          // let template = `<option value="" selected></option>`;
           let etiquetasAsigned = [];
           etiquetas.forEach((etiqueta) => {
             let option = `<option value=${etiqueta.id}>${etiqueta.nombre}</option>`;
@@ -1427,7 +2574,6 @@ $(document).ready(function () {
         } else {
           alert("Ocurrio un error, contacta al administrador");
         }
-        console.log(response);
       }
     );
   });
@@ -1449,14 +2595,12 @@ $(document).ready(function () {
     e.preventDefault();
     let nombre = $("#nombre-etiqueta").val();
     if (nombre !== "") {
-      console.log(nombre);
       let funcion = "add_etiqueta";
       let fecha = dayjs().format("YYYY-MM-DD");
       $.post(
         "../../controlador/UsuarioController.php",
         { funcion, nombre, fecha },
         (response) => {
-          console.log(response);
           if (response.trim() === "add-etiqueta") {
             $("#nombre-etiqueta").val("");
             buscar_etiquetas();
@@ -1477,7 +2621,6 @@ $(document).ready(function () {
       "../../controlador/UsuarioController.php",
       { funcion },
       (response) => {
-        // console.log(response);
         if (response !== "") {
           const etiquetas = JSON.parse(response);
           let template = `<option value="Todos">Todos</option>`;
@@ -1498,7 +2641,6 @@ $(document).ready(function () {
         "../../controlador/UsuarioController.php",
         { funcion, id_cliente },
         (response) => {
-          console.log(response);
           if (response.trim() == "no-register") {
             resolve(null);
           } else {
@@ -1513,11 +2655,10 @@ $(document).ready(function () {
   }
   $(document).on("click", "#verEtiquetasCliente", async function () {
     let id_cliente = $(this).attr("keyCliente");
-    console.log(id_cliente);
     idCliente = id_cliente;
     try {
       const etiquetas = await buscar_etiquetas_cliente(id_cliente);
-      console.log(etiquetas);
+
       let template;
       // let template = `<option value="" selected></option>`;
       let etiquetasAsigned = [];
@@ -1554,7 +2695,6 @@ $(document).ready(function () {
     let funcion = "update_asigned_etiqueta";
     let etiquetas = $("#etiquetas-user").val();
     let fecha = dayjs().format("YYYY-MM-DD");
-    console.log(etiquetas);
     $.post(
       "../../controlador/UsuarioController.php",
       { funcion, etiquetas, cliente: idCliente, fecha },
@@ -1563,7 +2703,7 @@ $(document).ready(function () {
           alert("Se asigno correctamente");
           await buscar_clientes();
           const etiquetas = await buscar_etiquetas_cliente(idCliente);
-          console.log(etiquetas);
+
           let template;
           // let template = `<option value="" selected></option>`;
           let etiquetasAsigned = [];

@@ -235,6 +235,10 @@
   background: #e9e4ff;
   color: rgb(49 14 205);
 }
+.active-link {
+  background: #e9e4ff;
+  color: rgb(49 14 205);
+}
 .link-block > .left-link > a > p {
   margin: 0px !important;
   font-size: 12px;

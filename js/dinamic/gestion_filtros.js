@@ -1,5 +1,63 @@
 $(document).ready(function () {
   var asesoresArray;
+
+  buscar_asesores();
+
+  function buscar_asesores() {
+    let funcion = "buscar_usuarios_asesores";
+    $.post(
+      "../../controlador/UsuarioController.php",
+      { funcion },
+      (response) => {
+        console.log(response);
+        let template = "";
+        if (response.trim() === "no-users-asesor") {
+          template += "No data";
+        } else {
+          template += `
+          <li id="selectAsesor" keyAsesor= "Todos" class="py-3 px-4 sm:py-4 cursor-pointer hover:bg-gray-100">
+            <div class="flex items-center space-x-4">
+                <div class="flex-shrink-0">
+                    <img class="w-8 h-8 rounded-full" src="https://t3.ftcdn.net/jpg/02/99/06/22/360_F_299062215_VpZk4Ng8h5JpPWsBblyiVEWfAFwESfon.jpg" alt="Neil image">
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                        Comparar
+                        </p>
+                        <p class="text-sm text-gray-500 truncate dark:text-gray-400">
+                        Todos
+                    </p>
+                </div>
+            </div>
+        </li>
+          `;
+          const asesores = JSON.parse(response);
+          asesoresArray = asesores;
+          asesores.forEach((asesor) => {
+            template += `
+            <li id="selectAsesor" keyAsesor= "${asesor.id_usuario}" class="py-3 px-4 sm:py-4 cursor-pointer hover:bg-gray-100">
+            <div class="flex items-center space-x-4">
+                <div class="flex-shrink-0">
+                    <img class="w-8 h-8 rounded-full" src="../../img/avatar_default.jpg" alt="Neil image">
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                        ${asesor.nombre}
+                        </p>
+                        <p class="text-sm text-gray-500 truncate dark:text-gray-400">
+                        ${asesor.apellido}
+                    </p>
+                </div>
+            </div>
+        </li>
+            `;
+          });
+          $("#listAsesores").html(template);
+          semanaGrafico();
+        }
+      }
+    );
+  }
   $("#search_date_visitas").click(function () {
     let fecha_inicio = dayjs(
       $("#fecha-inicio-search").val(),
@@ -11,9 +69,35 @@ $(document).ready(function () {
     console.log(fecha_inicio, fecha_fin);
     if (fecha_inicio && fecha_fin) {
       pintar_grafico(fecha_inicio, fecha_fin);
-      resumen_vsv(fecha_inicio, fecha_fin);
+      leads_subidos(fecha_inicio, fecha_fin);
+      leads_asignados(fecha_inicio, fecha_fin);
     }
   });
+  buscar_proyectos();
+  async function buscar_proyectos() {
+    funcion = "buscar_proyectos_admin";
+    const response = await $.post("../../controlador/UsuarioController.php", {
+      funcion,
+    });
+    const proyectos = JSON.parse(response);
+    proyectosList = proyectos;
+    console.log(proyectosList);
+    let template = "";
+    template += `
+      <li id="select_proyecto" key_proyecto="Todos" class="px-4 py-3 hover:bg-blue-100 rounded duration-300 cursor-pointer"> <img src="" alt="">
+        <p class="text-sm">Todos Los proyectos</p>
+      </li>
+      `;
+    proyectos.forEach((p) => {
+      template += `
+      <li id="select_proyecto" key_proyecto="${p.id}" class="flex items-center gap-3 px-4 py-3 hover:bg-blue-100 rounded duration-300 cursor-pointer"> 
+        <img class="w-5 h-5 rounded-full" src="../../${p.logo}" alt="logo-${p.nombreProyecto}">
+        <p class="text-sm">${p.nombreProyecto}</p>
+      </li>
+      `;
+    });
+    $("#list-proyectos").html(template);
+  }
   $("#refresh_date_visitas").click(function () {
     semanaGrafico();
     $("#asesor-search").removeAttr("keyAsesor");
@@ -21,334 +105,523 @@ $(document).ready(function () {
   });
   function pintar_grafico(fecha_inicio, fecha_fin) {
     let usuario = $("#asesor-search").attr("keyAsesor");
+    let proyecto = $("#span-proyecto").attr("key_proyecto");
     console.log(usuario);
-    if (usuario === undefined || usuario === "") {
-      let funcion = "buscar_visitas_date";
+    if (usuario === "Todos") {
+      console.log(asesoresArray);
+      // let funcion = "buscar_resumen_eficiencia_group_asesor";
+      let funcion = "buscar_clientes_rendimiento_group_asesor";
+      let asesores = JSON.stringify({ asesores: asesoresArray });
+      console.log(asesores);
       $.post(
         "../../controlador/UsuarioController.php",
-        { funcion, fecha_inicio, fecha_fin },
+        {
+          funcion,
+          asesores,
+          fecha_inicio,
+          fecha_fin,
+        },
         (response) => {
-          console.log(response);
-          // Configurar el gráfico
-          var xAxisData = [];
-          // Inicializar el gráfico
-          var myChart = echarts.init(document.getElementById("visitas_graf"));
-
-          var seriesAsistioData = []; // Datos para la barra de ASISTIO
-          var seriesNoAsistioData = []; // Datos para la barra de NO ASISTIO
-
+          let template = "";
           if (response.trim() === "no-register") {
-            xAxisData.push("no data", "no data");
-            seriesAsistioData.push(0);
-            seriesNoAsistioData.push(0);
+            asesoresArray.forEach((usuario) => {
+              template += `
+              <div class="w-full max-w-[250px] p-2 bg-white border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
+                        <div class="mb-4">
+                            <h5 class="text-lg font-bold leading-none text-gray-900 dark:text-white">${
+                              usuario?.nombre
+                            }</h5>
+                            <p>${usuario?.apellido}</p>
+                        </div>
+                        <div class="flow-root">
+                            <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
+                                <li class="py-3 sm:py-4">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                                                VISITAS CONCRETADAS
+                                            </p>
+                                        </div>
+                                        <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                                        ${0}
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="py-3 sm:py-4">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                                                VISITAS NO CONCRETADAS
+                                            </p>
+                                        </div>
+                                        <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                                        ${0}
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="py-3 sm:py-4">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                                                SEPARACIONES
+                                            </p>
+                                        </div>
+                                        <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                                        ${0}
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="py-3 sm:py-4">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                                                VENTAS
+                                            </p>
+                                        </div>
+                                        <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                                            ${0}
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+
+                    </div>
+              `;
+            });
           } else {
-            var data = JSON.parse(response);
-            console.log(data);
-
-            // Obtener el rango de fechas de inicio y fin
-            var fechaInicio = fecha_inicio;
-            var fechaFin = fecha_fin;
-
-            var dateDiff = dayjs(fechaFin).diff(dayjs(fechaInicio), "day") + 1;
-            console.log(dateDiff);
-
-            if (dateDiff <= 7) {
-              // Si el rango es de 7 días o menos, mostrar día a día
-              var currentGroupStartDate = fechaInicio;
-              var currentGroupEndDate = fechaFin;
-              while (currentGroupEndDate >= currentGroupStartDate) {
-                var groupVisitsAsistio = 0;
-                var groupVisitsNoAsistio = 0;
-                data.forEach((item) => {
-                  var fechaVisita = item.fecha_visita;
-                  if (fechaVisita === currentGroupStartDate) {
-                    if (item.status === "ASISTIO") {
-                      groupVisitsAsistio += Number(item.cantidad_visitas);
-                    } else {
-                      groupVisitsNoAsistio += Number(item.cantidad_visitas);
-                    }
-                  }
-                });
-                xAxisData.push(
-                  getTimeLabel(currentGroupStartDate, currentGroupStartDate)
+            const usuarios = JSON.parse(response);
+            console.log(usuarios);
+            // let visitas_concretadas;
+            // let visitas_no_concretadas;
+            // let separaciones;
+            // let ventas;
+            if (proyecto === "Todos") {
+              asesoresArray.forEach((usuario) => {
+                let visitas_concretadas = usuarios.filter(
+                  (u) =>
+                    u.user_id === usuario.id_usuario &&
+                    u.asistencia === "ASISTIO" &&
+                    u.status === "VALIDADO"
                 );
-                seriesAsistioData.push(groupVisitsAsistio);
-                seriesNoAsistioData.push(groupVisitsNoAsistio);
-                currentGroupStartDate = dayjs(currentGroupStartDate)
-                  .add(1, "day")
-                  .format("YYYY-MM-DD");
-              }
-            } else if (dateDiff > 7 && dateDiff <= 30) {
-              // Si el rango es mayor a 7 días y menor o igual a 30 días, mostrar por semana
-              var currentGroupStartDate = fechaInicio;
-              var currentGroupEndDate = dayjs(fechaInicio)
-                .add(6, "day")
-                .format("YYYY-MM-DD");
-              while (currentGroupStartDate <= fechaFin) {
-                var groupVisitsAsistio = 0;
-                var groupVisitsNoAsistio = 0;
-                data.forEach((item) => {
-                  var fechaVisita = item.fecha_visita;
-                  if (
-                    fechaVisita >= currentGroupStartDate &&
-                    fechaVisita <= currentGroupEndDate
-                  ) {
-                    if (item.status === "ASISTIO") {
-                      groupVisitsAsistio += Number(item.cantidad_visitas);
-                    } else {
-                      groupVisitsNoAsistio += Number(item.cantidad_visitas);
-                    }
-                  }
-                });
-                xAxisData.push(
-                  getTimeLabel(currentGroupStartDate, currentGroupEndDate)
+                let visitas_no_concretadas = usuarios.filter(
+                  (u) =>
+                    u.user_id === usuario.id_usuario &&
+                    u.asistencia === "NO ASISTIO"
                 );
-                seriesAsistioData.push(groupVisitsAsistio);
-                seriesNoAsistioData.push(groupVisitsNoAsistio);
-                currentGroupStartDate = dayjs(currentGroupEndDate)
-                  .add(1, "day")
-                  .format("YYYY-MM-DD");
-                currentGroupEndDate = dayjs(currentGroupStartDate)
-                  .add(6, "day")
-                  .format("YYYY-MM-DD");
-              }
+                let separaciones = usuarios.filter(
+                  (u) =>
+                    u.user_id === usuario.id_usuario &&
+                    u.tipo === "SEPARACION" &&
+                    u.status === "VALIDADO"
+                );
+                let ventas = usuarios.filter(
+                  (u) =>
+                    u.user_id === usuario.id_usuario &&
+                    u.tipo === "VENTA" &&
+                    u.status === "VALIDADO"
+                );
+                template += `
+              <div class="w-full max-w-[250px] p-2 bg-white border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
+                        <div class="mb-4">
+                            <h5 class="text-lg font-bold leading-none text-gray-900 dark:text-white">${usuario?.nombre}</h5>
+                            <p>${usuario?.apellido}</p>
+
+                        </div>
+                        <div class="flow-root">
+                            <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
+                                <li class="py-3 sm:py-4">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                                                VISITAS CONCRETADAS
+                                            </p>
+
+                                        </div>
+                                        <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                                        ${visitas_concretadas.length}
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="py-3 sm:py-4">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                                                VISITAS NO CONCRETADAS
+                                            </p>
+
+                                        </div>
+                                        <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                                        ${visitas_no_concretadas.length}
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="py-3 sm:py-4">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                                                SEPARACIONES
+                                            </p>
+
+                                        </div>
+                                        <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                                        ${separaciones.length}
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="py-3 sm:py-4">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                                                VENTAS
+                                            </p>
+
+                                        </div>
+                                        <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                                            ${ventas.length}
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+
+                    </div>
+              `;
+              });
             } else {
-              // Si el rango es mayor a 30 días, mostrar por mes
-              var currentGroupStartDate = fechaInicio;
-              var currentGroupEndDate = dayjs(fechaInicio)
-                .add(30, "day")
-                .format("YYYY-MM-DD");
-              console.log(currentGroupStartDate, currentGroupEndDate);
-              while (currentGroupStartDate <= fechaFin) {
-                var groupVisitsAsistio = 0;
-                var groupVisitsNoAsistio = 0;
-                data.forEach((item) => {
-                  var fechaVisita = item.fecha_visita;
-                  if (
-                    fechaVisita >= currentGroupStartDate &&
-                    fechaVisita <= currentGroupEndDate
-                  ) {
-                    if (item.status === "ASISTIO") {
-                      groupVisitsAsistio += Number(item.cantidad_visitas);
-                    } else {
-                      groupVisitsNoAsistio += Number(item.cantidad_visitas);
-                    }
-                  }
-                });
-                xAxisData.push(
-                  getTimeLabel(currentGroupStartDate, currentGroupEndDate)
+              asesoresArray.forEach((usuario) => {
+                let visitas_concretadas = usuarios.filter(
+                  (u) =>
+                    u.user_id === usuario.id_usuario &&
+                    u.asistencia === "ASISTIO" &&
+                    u.proyet_id === proyecto &&
+                    u.status === "VALIDADO"
                 );
-                seriesAsistioData.push(groupVisitsAsistio);
-                seriesNoAsistioData.push(groupVisitsNoAsistio);
-                currentGroupStartDate = dayjs(currentGroupEndDate)
-                  .add(1, "day")
-                  .format("YYYY-MM-DD");
-                currentGroupEndDate = dayjs(currentGroupStartDate)
-                  .add(30, "day")
-                  .format("YYYY-MM-DD");
-              }
+                let visitas_no_concretadas = usuarios.filter(
+                  (u) =>
+                    u.user_id === usuario.id_usuario &&
+                    u.asistencia === "NO ASISTIO" &&
+                    u.proyet_id === proyecto
+                );
+                let separaciones = usuarios.filter(
+                  (u) =>
+                    u.user_id === usuario.id_usuario &&
+                    u.tipo === "SEPARACION" &&
+                    u.proyet_id === proyecto &&
+                    u.status === "VALIDADO"
+                );
+                let ventas = usuarios.filter(
+                  (u) =>
+                    u.user_id === usuario.id_usuario &&
+                    u.tipo === "VENTA" &&
+                    u.proyet_id === proyecto &&
+                    u.status === "VALIDADO"
+                );
+                template += `
+              <div class="w-full max-w-[250px] p-2 bg-white border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
+                        <div class="mb-4">
+                            <h5 class="text-lg font-bold leading-none text-gray-900 dark:text-white">${usuario?.nombre}</h5>
+                            <p>${usuario?.apellido}</p>
+
+                        </div>
+                        <div class="flow-root">
+                            <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
+                                <li class="py-3 sm:py-4">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                                                VISITAS CONCRETADAS
+                                            </p>
+
+                                        </div>
+                                        <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                                        ${visitas_concretadas.length}
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="py-3 sm:py-4">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                                                VISITAS NO CONCRETADAS
+                                            </p>
+
+                                        </div>
+                                        <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                                        ${visitas_no_concretadas.length}
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="py-3 sm:py-4">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                                                SEPARACIONES
+                                            </p>
+
+                                        </div>
+                                        <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                                        ${separaciones.length}
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="py-3 sm:py-4">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                                                VENTAS
+                                            </p>
+
+                                        </div>
+                                        <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                                            ${ventas.length}
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+
+                    </div>
+              `;
+              });
             }
           }
-
-          // Configurar opciones del gráfico
-          var option = {
-            // title: {
-            //   text: "Visitas ASISTIO y NO ASISTIO",
-            // },
-            tooltip: {},
-            xAxis: {
-              type: "category",
-              data: xAxisData,
-            },
-            yAxis: {
-              type: "value",
-            },
-            legend: {
-              data: ["ASISTIO", "NO ASISTIO"],
-            },
-            series: [
-              {
-                name: "ASISTIO",
-                type: "bar",
-                data: seriesAsistioData,
-              },
-              {
-                name: "NO ASISTIO",
-                type: "bar",
-                data: seriesNoAsistioData,
-              },
-            ],
-            color: ["#5208DD", "#0A9597", "#0A3397", "#4A40E2", "#5BB8E0"],
-          };
-
-          // Establecer las opciones y mostrar el gráfico
-          myChart.setOption(option);
+          $("#allAsesoresResumen").html(template);
+          $("#estadistics-box").addClass("hidden");
         }
       );
     } else {
-      let funcion = "buscar_visitas_date_asesor";
+      let funcion = "buscar_clientes_rendimiento_by_asesor";
       $.post(
         "../../controlador/UsuarioController.php",
         { funcion, fecha_inicio, fecha_fin, usuario },
         (response) => {
-          console.log(response);
-          // Configurar el gráfico
-          var xAxisData = [];
-          // Inicializar el gráfico
-          var myChart = echarts.init(document.getElementById("visitas_graf"));
-
-          var seriesAsistioData = []; // Datos para la barra de ASISTIO
-          var seriesNoAsistioData = []; // Datos para la barra de NO ASISTIO
+          let template = "";
+          let datos = asesoresArray.find((a) => a.id_usuario === usuario);
 
           if (response.trim() === "no-register") {
-            xAxisData.push("no data", "no data");
-            seriesAsistioData.push(0);
-            seriesNoAsistioData.push(0);
+            console.log("no -register");
+            template += `
+            <div class="w-full max-w-[250px] p-2 bg-white border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
+                      <div class="mb-4">
+                          <h5 class="text-lg font-bold leading-none text-gray-900 dark:text-white">${
+                            datos?.nombre
+                          }</h5>
+                          <p>${datos?.apellido}</p>
+                      </div>
+                      <div class="flow-root">
+                          <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
+                              <li class="py-3 sm:py-4">
+                                  <div class="flex items-center space-x-4">
+                                      <div class="flex-1 min-w-0">
+                                          <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                                              VISITAS CONCRETADAS
+                                          </p>
+                                      </div>
+                                      <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                                      ${0}
+                                      </div>
+                                  </div>
+                              </li>
+                              <li class="py-3 sm:py-4">
+                                  <div class="flex items-center space-x-4">
+                                      <div class="flex-1 min-w-0">
+                                          <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                                              VISITAS NO CONCRETADAS
+                                          </p>
+                                      </div>
+                                      <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                                      ${0}
+                                      </div>
+                                  </div>
+                              </li>
+                              <li class="py-3 sm:py-4">
+                                  <div class="flex items-center space-x-4">
+                                      <div class="flex-1 min-w-0">
+                                          <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                                              SEPARACIONES
+                                          </p>
+                                      </div>
+                                      <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                                      ${0}
+                                      </div>
+                                  </div>
+                              </li>
+                              <li class="py-3 sm:py-4">
+                                  <div class="flex items-center space-x-4">
+                                      <div class="flex-1 min-w-0">
+                                          <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                                              VENTAS
+                                          </p>
+                                      </div>
+                                      <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                                          ${0}
+                                      </div>
+                                  </div>
+                              </li>
+                          </ul>
+                      </div>
+
+                  </div>
+            `;
           } else {
-            var data = JSON.parse(response);
-            console.log(data);
-
-            // Obtener el rango de fechas de inicio y fin
-            var fechaInicio = fecha_inicio;
-            var fechaFin = fecha_fin;
-
-            var dateDiff = dayjs(fechaFin).diff(dayjs(fechaInicio), "day") + 1;
-            console.log(dateDiff);
-
-            if (dateDiff <= 7) {
-              // Si el rango es de 7 días o menos, mostrar día a día
-              var currentGroupStartDate = fechaInicio;
-              var currentGroupEndDate = fechaFin;
-              while (currentGroupEndDate >= currentGroupStartDate) {
-                var groupVisitsAsistio = 0;
-                var groupVisitsNoAsistio = 0;
-                data.forEach((item) => {
-                  var fechaVisita = item.fecha_visita;
-                  if (fechaVisita === currentGroupStartDate) {
-                    if (item.status === "ASISTIO") {
-                      groupVisitsAsistio += Number(item.cantidad_visitas);
-                    } else {
-                      groupVisitsNoAsistio += Number(item.cantidad_visitas);
-                    }
-                  }
-                });
-                xAxisData.push(
-                  getTimeLabel(currentGroupStartDate, currentGroupStartDate)
-                );
-                seriesAsistioData.push(groupVisitsAsistio);
-                seriesNoAsistioData.push(groupVisitsNoAsistio);
-                currentGroupStartDate = dayjs(currentGroupStartDate)
-                  .add(1, "day")
-                  .format("YYYY-MM-DD");
-              }
-            } else if (dateDiff > 7 && dateDiff <= 30) {
-              // Si el rango es mayor a 7 días y menor o igual a 30 días, mostrar por semana
-              var currentGroupStartDate = fechaInicio;
-              var currentGroupEndDate = dayjs(fechaInicio)
-                .add(6, "day")
-                .format("YYYY-MM-DD");
-              while (currentGroupStartDate <= fechaFin) {
-                var groupVisitsAsistio = 0;
-                var groupVisitsNoAsistio = 0;
-                data.forEach((item) => {
-                  var fechaVisita = item.fecha_visita;
-                  if (
-                    fechaVisita >= currentGroupStartDate &&
-                    fechaVisita <= currentGroupEndDate
-                  ) {
-                    if (item.status === "ASISTIO") {
-                      groupVisitsAsistio += Number(item.cantidad_visitas);
-                    } else {
-                      groupVisitsNoAsistio += Number(item.cantidad_visitas);
-                    }
-                  }
-                });
-                xAxisData.push(
-                  getTimeLabel(currentGroupStartDate, currentGroupEndDate)
-                );
-                seriesAsistioData.push(groupVisitsAsistio);
-                seriesNoAsistioData.push(groupVisitsNoAsistio);
-                currentGroupStartDate = dayjs(currentGroupEndDate)
-                  .add(1, "day")
-                  .format("YYYY-MM-DD");
-                currentGroupEndDate = dayjs(currentGroupStartDate)
-                  .add(6, "day")
-                  .format("YYYY-MM-DD");
-              }
+            const usuarios = JSON.parse(response);
+            console.log(usuarios);
+            if (proyecto !== "Todos") {
+              let visitas_concretadas = usuarios.filter(
+                (u) => u.asistencia === "ASISTIO" && u.proyet_id === proyecto
+              );
+              let visitas_no_concretadas = usuarios.filter(
+                (u) => u.asistencia === "NO ASISTIO" && u.proyet_id === proyecto
+              );
+              let separaciones = usuarios.filter(
+                (u) => u.tipo === "SEPARACION" && u.proyet_id === proyecto
+              );
+              let ventas = usuarios.filter(
+                (u) => u.tipo === "VENTA" && u.proyet_id === proyecto
+              );
+              template += `
+                <div class="w-full max-w-[250px] p-2 bg-white border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
+                          <div class="mb-4">
+                              <h5 class="text-lg font-bold leading-none text-gray-900 dark:text-white">${datos?.nombre}</h5>
+                              <p>${datos?.apellido}</p>
+                          </div>
+                          <div class="flow-root">
+                              <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
+                                  <li class="py-3 sm:py-4">
+                                      <div class="flex items-center space-x-4">
+                                          <div class="flex-1 min-w-0">
+                                              <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                                                  VISITAS CONCRETADAS
+                                              </p>
+                                          </div>
+                                          <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                                          ${visitas_concretadas.length}
+                                          </div>
+                                      </div>
+                                  </li>
+                                  <li class="py-3 sm:py-4">
+                                      <div class="flex items-center space-x-4">
+                                          <div class="flex-1 min-w-0">
+                                              <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                                                  VISITAS NO CONCRETADAS
+                                              </p>
+                                          </div>
+                                          <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                                          ${visitas_no_concretadas.length}
+                                          </div>
+                                      </div>
+                                  </li>
+                                  <li class="py-3 sm:py-4">
+                                      <div class="flex items-center space-x-4">
+                                          <div class="flex-1 min-w-0">
+                                              <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                                                  SEPARACIONES
+                                              </p>
+                                          </div>
+                                          <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                                          ${separaciones.length}
+                                          </div>
+                                      </div>
+                                  </li>
+                                  <li class="py-3 sm:py-4">
+                                      <div class="flex items-center space-x-4">
+                                          <div class="flex-1 min-w-0">
+                                              <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                                                  VENTAS
+                                              </p>
+                                          </div>
+                                          <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                                              ${ventas.length}
+                                          </div>
+                                      </div>
+                                  </li>
+                              </ul>
+                          </div>
+    
+                      </div>
+                `;
             } else {
-              // Si el rango es mayor a 30 días, mostrar por mes
-              var currentGroupStartDate = fechaInicio;
-              var currentGroupEndDate = dayjs(fechaInicio)
-                .add(30, "day")
-                .format("YYYY-MM-DD");
-              console.log(currentGroupStartDate, currentGroupEndDate);
-              while (currentGroupStartDate <= fechaFin) {
-                var groupVisitsAsistio = 0;
-                var groupVisitsNoAsistio = 0;
-                data.forEach((item) => {
-                  var fechaVisita = item.fecha_visita;
-                  if (
-                    fechaVisita >= currentGroupStartDate &&
-                    fechaVisita <= currentGroupEndDate
-                  ) {
-                    if (item.status === "ASISTIO") {
-                      groupVisitsAsistio += Number(item.cantidad_visitas);
-                    } else {
-                      groupVisitsNoAsistio += Number(item.cantidad_visitas);
-                    }
-                  }
-                });
-                xAxisData.push(
-                  getTimeLabel(currentGroupStartDate, currentGroupEndDate)
-                );
-                seriesAsistioData.push(groupVisitsAsistio);
-                seriesNoAsistioData.push(groupVisitsNoAsistio);
-                currentGroupStartDate = dayjs(currentGroupEndDate)
-                  .add(1, "day")
-                  .format("YYYY-MM-DD");
-                currentGroupEndDate = dayjs(currentGroupStartDate)
-                  .add(30, "day")
-                  .format("YYYY-MM-DD");
-              }
+              let visitas_concretadas = usuarios.filter(
+                (u) => u.asistencia === "ASISTIO"
+              );
+              let visitas_no_concretadas = usuarios.filter(
+                (u) => u.asistencia === "NO ASISTIO"
+              );
+              let separaciones = usuarios.filter(
+                (u) => u.tipo === "SEPARACION"
+              );
+              let ventas = usuarios.filter((u) => u.tipo === "VENTA");
+              template += `
+                <div class="w-full max-w-[250px] p-2 bg-white border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
+                          <div class="mb-4">
+                              <h5 class="text-lg font-bold leading-none text-gray-900 dark:text-white">${datos?.nombre}</h5>
+                              <p>${datos?.apellido}</p>
+                          </div>
+                          <div class="flow-root">
+                              <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
+                                  <li class="py-3 sm:py-4">
+                                      <div class="flex items-center space-x-4">
+                                          <div class="flex-1 min-w-0">
+                                              <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                                                  VISITAS CONCRETADAS
+                                              </p>
+                                          </div>
+                                          <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                                          ${visitas_concretadas.length}
+                                          </div>
+                                      </div>
+                                  </li>
+                                  <li class="py-3 sm:py-4">
+                                      <div class="flex items-center space-x-4">
+                                          <div class="flex-1 min-w-0">
+                                              <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                                                  VISITAS NO CONCRETADAS
+                                              </p>
+                                          </div>
+                                          <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                                          ${visitas_no_concretadas.length}
+                                          </div>
+                                      </div>
+                                  </li>
+                                  <li class="py-3 sm:py-4">
+                                      <div class="flex items-center space-x-4">
+                                          <div class="flex-1 min-w-0">
+                                              <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                                                  SEPARACIONES
+                                              </p>
+                                          </div>
+                                          <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                                          ${separaciones.length}
+                                          </div>
+                                      </div>
+                                  </li>
+                                  <li class="py-3 sm:py-4">
+                                      <div class="flex items-center space-x-4">
+                                          <div class="flex-1 min-w-0">
+                                              <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                                                  VENTAS
+                                              </p>
+                                          </div>
+                                          <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                                              ${ventas.length}
+                                          </div>
+                                      </div>
+                                  </li>
+                              </ul>
+                          </div>
+    
+                      </div>
+                `;
             }
           }
+          $("#allAsesoresResumen").html(template);
 
-          // Configurar opciones del gráfico
-          var option = {
-            // title: {
-            //   text: "Visitas ASISTIO y NO ASISTIO",
-            // },
-            tooltip: {},
-            xAxis: {
-              type: "category",
-              data: xAxisData,
-            },
-            yAxis: {
-              type: "value",
-            },
-            legend: {
-              data: ["ASISTIO", "NO ASISTIO"],
-            },
-            series: [
-              {
-                name: "ASISTIO",
-                type: "bar",
-                data: seriesAsistioData,
-              },
-              {
-                name: "NO ASISTIO",
-                type: "bar",
-                data: seriesNoAsistioData,
-              },
-            ],
-            color: ["#5208DD", "#0A9597", "#0A3397", "#4A40E2", "#5BB8E0"],
-          };
-
-          // Establecer las opciones y mostrar el gráfico
-          myChart.setOption(option);
+          $("#estadistics-box").addClass("hidden");
         }
       );
     }
+    // }
   }
   function getTimeLabel(startDate, endDate) {
     console.log(startDate, endDate);
@@ -384,7 +657,6 @@ $(document).ready(function () {
     console.log(dayjs(date).endOf("week"));
     return dayjs(date).endOf("week").add(1, "day").format("YYYY-MM-DD");
   }
-  semanaGrafico();
   function semanaGrafico() {
     var fechaActual = dayjs().format("YYYY-MM-DD");
 
@@ -397,172 +669,276 @@ $(document).ready(function () {
     $("#fecha-fin-search").val(fechaFinSemana);
 
     pintar_grafico(fechaInicioSemana, fechaFinSemana);
-    resumen_vsv(fechaInicioSemana, fechaFinSemana);
+    leads_subidos(fechaInicioSemana, fechaFinSemana);
+    leads_asignados(fechaInicioSemana, fechaFinSemana);
+
     console.log(
       "Fecha de inicio de la semana actual (lunes):",
       fechaInicioSemana
     );
     console.log("Fecha de fin de la semana actual (domingo):", fechaFinSemana);
   }
-  function resumen_vsv(fecha_inicio, fecha_fin) {
-    var dom = document.getElementById("resumen-vsv");
-    var rvsv = echarts.init(dom, null, {
-      renderer: "canvas",
-      useDirtyRect: false,
-    });
-    let usuario = $("#asesor-search").attr("keyAsesor");
-    console.log(usuario);
-    if (usuario === undefined || usuario === "") {
-      let funcion = "buscar_resumen_eficiencia";
-      $.post(
-        "../../controlador/UsuarioController.php",
-        { funcion, fecha_inicio, fecha_fin },
-        (response) => {
-          console.log(response);
-          let resumen = JSON.parse(response);
-          let visitas =
-            resumen[0].visitas_concretadas === null
-              ? 0
-              : resumen[0].visitas_concretadas;
-          let separaciones = resumen[0].separaciones;
-          let ventas = resumen[0].ventas;
-          console.log(resumen);
-          $("#resumen-visitas").html(visitas);
-          $("#resumen-separaciones").html(separaciones);
-          $("#resumen-ventas").html(ventas);
-          // var app = {};
-
-          var option;
-
-          option = {
-            tooltip: {
-              trigger: "item",
-            },
-            legend: {
-              top: "5%",
-              left: "center",
-            },
-            series: [
-              {
-                name: "Eficiencia",
-                type: "pie",
-                radius: ["40%", "70%"],
-                avoidLabelOverlap: false,
-                itemStyle: {
-                  borderRadius: 10,
-                  borderColor: "#fff",
-                  borderWidth: 2,
-                },
-                label: {
-                  show: false,
-                  position: "center",
-                },
-                emphasis: {
-                  label: {
-                    show: true,
-                    fontSize: 14,
-                    fontWeight: "bold",
-                  },
-                },
-                labelLine: {
-                  show: false,
-                },
-                data: [
-                  {
-                    value: visitas,
-                    name: "VISITAS CONCRETADAS",
-                  },
-                  { value: separaciones, name: "SEPARACIONES" },
-                  { value: ventas, name: "VENTAS" },
-                ],
-                color: ["#5208DD", "#0A9597", "#0A3397", "#4A40E2", "#5BB8E0"],
-              },
-            ],
-          };
-
-          if (option && typeof option === "object") {
-            rvsv.setOption(option);
-          }
-
-          window.addEventListener("resize", rvsv.resize);
-        }
-      );
+  $(".icon-filter").on("click", function () {
+    $(".icon-filter").toggleClass("rotate-180");
+    $("#menu-filtros-box").toggleClass("invisible");
+    $("#menu-filtros-box").toggleClass("h-auto");
+    $("#menu-filtros-box").toggleClass("py-3");
+  });
+  $("#proyecto-active").on("click", function () {
+    $(".icon-proyecto-down").toggleClass("rotate-180");
+    $("#list-proyectos").toggleClass("invisible");
+  });
+  $(document).on("click", "#list-proyectos li", function (e) {
+    let idProyecto = $(this).attr("key_proyecto");
+    console.log(idProyecto);
+    if (idProyecto !== "Todos") {
+      let data = proyectosList.find((p) => p.id === idProyecto);
+      $("#span-proyecto").text(data.nombreProyecto);
+      $("#span-proyecto").attr("key_proyecto", idProyecto);
     } else {
-      let funcion = "buscar_resumen_eficiencia_asesor";
-      $.post(
-        "../../controlador/UsuarioController.php",
-        { funcion, fecha_inicio, fecha_fin, usuario },
-        (response) => {
-          console.log(response);
-          let resumen = JSON.parse(response);
-          let visitas =
-            resumen[0].visitas_concretadas === null
-              ? 0
-              : resumen[0].visitas_concretadas;
-          let separaciones = resumen[0].separaciones;
-          let ventas = resumen[0].ventas;
-          console.log(resumen);
-          $("#resumen-visitas").html(visitas);
-          $("#resumen-separaciones").html(separaciones);
-          $("#resumen-ventas").html(ventas);
-          // var app = {};
-
-          var option;
-
-          option = {
-            tooltip: {
-              trigger: "item",
-            },
-            legend: {
-              top: "5%",
-              left: "center",
-            },
-            series: [
-              {
-                name: "Eficiencia",
-                type: "pie",
-                radius: ["40%", "70%"],
-                avoidLabelOverlap: false,
-                itemStyle: {
-                  borderRadius: 10,
-                  borderColor: "#fff",
-                  borderWidth: 2,
-                },
-                label: {
-                  show: false,
-                  position: "center",
-                },
-                emphasis: {
-                  label: {
-                    show: true,
-                    fontSize: 14,
-                    fontWeight: "bold",
-                  },
-                },
-                labelLine: {
-                  show: false,
-                },
-                data: [
-                  {
-                    value: visitas,
-                    name: "VISITAS CONCRETADAS",
-                  },
-                  { value: separaciones, name: "SEPARACIONES" },
-                  { value: ventas, name: "VENTAS" },
-                ],
-                color: ["#5208DD", "#0A9597", "#0A3397", "#4A40E2", "#5BB8E0"],
-              },
-            ],
-          };
-
-          if (option && typeof option === "object") {
-            rvsv.setOption(option);
-          }
-
-          window.addEventListener("resize", rvsv.resize);
-        }
-      );
+      $("#span-proyecto").text("Todos");
+      $("#span-proyecto").attr("key_proyecto", "Todos");
     }
+    $("#list-proyectos").addClass("invisible");
+    $(".icon-proyecto-down").removeClass("rotate-180");
+  });
+  $("#filter_static").on("change", function (e) {
+    const valor = e.target.value;
+    let actualdia;
+    let fecha_inicio;
+    switch (valor) {
+      case "last-month":
+        actualdia = dayjs();
+        $("#fecha-fin-search").val(actualdia.format("YYYY-MM-DD"));
+        fecha_inicio = actualdia.subtract(1, "month");
+        $("#fecha-inicio-search").val(fecha_inicio.format("YYYY-MM-DD"));
+
+        break;
+      case "last-week":
+        actualdia = dayjs();
+        $("#fecha-fin-search").val(actualdia.format("YYYY-MM-DD"));
+        fecha_inicio = actualdia.subtract(7, "days");
+        $("#fecha-inicio-search").val(fecha_inicio.format("YYYY-MM-DD"));
+        break;
+
+      default:
+        break;
+    }
+  });
+  function leads_subidos(fecha_inicio, fecha_fin) {
+    // let usuario = $("#asesor-search").attr("keyAsesor");
+    // console.log(usuario);
+    let asesores = JSON.stringify({ asesores: asesoresArray });
+    let funcion = "buscar_group_clientes_fecha";
+    $.post(
+      "../../controlador/UsuarioController.php",
+      { funcion, fecha_inicio, fecha_fin, asesores },
+      (response) => {
+        var lead_subidos = document.getElementById("leads-subidos");
+        var myChartSubidos = echarts.init(lead_subidos);
+        var option;
+
+        // Configura colores para las series
+        var coloresSeries = [
+          "#5470C6",
+          "#91CC75",
+          "#EE6666",
+          "#EE9966",
+          "#73C0DE",
+          "#3BA272",
+          "#FC8452",
+          "#9A60B4",
+          "#FAD860",
+          "#F3A43B",
+        ];
+        let data = [];
+        if (response.trim() === "no-register-clientes") {
+          asesoresArray.forEach((asesor) => {
+            let newData = {
+              nombre: asesor.nombre + " " + asesor.apellido,
+              valor: 0,
+            };
+            data.push(newData);
+          });
+        } else {
+          var clientes = JSON.parse(response);
+          asesoresArray.forEach((asesor) => {
+            const dataclientes = clientes.filter(
+              (c) => c.usuario_id === asesor.id_usuario
+            );
+            console.log(dataclientes);
+            let newData = {
+              nombre: asesor.nombre + " " + asesor.apellido,
+              valor: dataclientes.length,
+            };
+            data.push(newData);
+          });
+        }
+
+        // Configura los datos para el gráfico de barras
+        var nombresAsesores = data.map(function (item) {
+          return item.nombre;
+        });
+        // var valoresAsesores = data.map(function (item) {
+        //   return item.valor;
+        // });
+
+        // Opciones del gráfico
+        option = {
+          tooltip: {
+            trigger: "axis",
+            axisPointer: {
+              type: "shadow",
+            },
+          },
+          legend: {
+            data: nombresAsesores,
+          },
+          grid: {
+            left: "3%",
+            right: "4%",
+            bottom: "3%",
+            containLabel: true,
+          },
+          xAxis: {
+            type: "category",
+            // Deja el eje X vacío porque no necesitamos etiquetas en este caso
+            data: [],
+          },
+          yAxis: {
+            type: "value",
+          },
+          series: data.map(function (asesor, index) {
+            return {
+              name: asesor.nombre,
+              type: "bar",
+              data: [{ value: asesor.valor, name: asesor.nombre }],
+              itemStyle: {
+                // Configura colores para cada serie
+                color: coloresSeries[index],
+              },
+              label: {
+                show: true,
+                position: "top",
+                formatter: function (params) {
+                  return params.value + " leads";
+                },
+              },
+            };
+          }),
+        };
+
+        option && myChartSubidos.setOption(option);
+      }
+    );
+  }
+  function leads_asignados(fecha_inicio, fecha_fin) {
+    // let usuario = $("#asesor-search").attr("keyAsesor");
+    // console.log(usuario);
+    let asesores = JSON.stringify({ asesores: asesoresArray });
+    let funcion = "buscar_group_asignados_fecha";
+    $.post(
+      "../../controlador/UsuarioController.php",
+      { funcion, fecha_inicio, fecha_fin, asesores },
+      (response) => {
+        var lead_no_subidos = document.getElementById("leads-no-subidos");
+
+        var myChartNoSubidos = echarts.init(lead_no_subidos);
+        var option;
+
+        // Configura colores para las series
+        var coloresSeries = [
+          "#5470C6",
+          "#91CC75",
+          "#EE6666",
+          "#EE9966",
+          "#73C0DE",
+          "#3BA272",
+          "#FC8452",
+          "#9A60B4",
+          "#FAD860",
+          "#F3A43B",
+        ];
+        let data = [];
+        if (response.trim() === "no-register-clientes") {
+          asesoresArray.forEach((asesor) => {
+            let newData = {
+              nombre: asesor.nombre + " " + asesor.apellido,
+              valor: 0,
+            };
+            data.push(newData);
+          });
+        } else {
+          var clientes = JSON.parse(response);
+          asesoresArray.forEach((asesor) => {
+            const dataclientes = clientes.filter(
+              (c) => c.usuario_id === asesor.id_usuario
+            );
+            console.log(dataclientes);
+            let newData = {
+              nombre: asesor.nombre + " " + asesor.apellido,
+              valor: dataclientes.length,
+            };
+            data.push(newData);
+          });
+        }
+
+        // Configura los datos para el gráfico de barras
+        var nombresAsesores = data.map(function (item) {
+          return item.nombre;
+        });
+        // var valoresAsesores = data.map(function (item) {
+        //   return item.valor;
+        // });
+
+        // Opciones del gráfico
+        option = {
+          tooltip: {
+            trigger: "axis",
+            axisPointer: {
+              type: "shadow",
+            },
+          },
+          legend: {
+            data: nombresAsesores,
+          },
+          grid: {
+            left: "3%",
+            right: "4%",
+            bottom: "3%",
+            containLabel: true,
+          },
+          xAxis: {
+            type: "category",
+            // Deja el eje X vacío porque no necesitamos etiquetas en este caso
+            data: [],
+          },
+          yAxis: {
+            type: "value",
+          },
+          series: data.map(function (asesor, index) {
+            return {
+              name: asesor.nombre,
+              type: "bar",
+              data: [{ value: asesor.valor, name: asesor.nombre }],
+              itemStyle: {
+                // Configura colores para cada serie
+                color: coloresSeries[index],
+              },
+              label: {
+                show: true,
+                position: "top",
+                formatter: function (params) {
+                  return params.value + " leads";
+                },
+              },
+            };
+          }),
+        };
+
+        option && myChartNoSubidos.setOption(option);
+      }
+    );
   }
   $("#asesor-search").click(function () {
     $("#listUsuarios").toggleClass("hidden");
@@ -573,48 +949,19 @@ $(document).ready(function () {
       $("#icon-drop-asesor").attr("name", "chevron-up");
     }
   });
-  buscar_asesores();
-  function buscar_asesores() {
-    let funcion = "buscar_usuarios_asesores";
-    $.post(
-      "../../controlador/UsuarioController.php",
-      { funcion },
-      (response) => {
-        console.log(response);
-        let template = "";
-        if (response.trim() === "no-users-asesor") {
-          template += "No data";
-        } else {
-          const asesores = JSON.parse(response);
-          asesoresArray = asesores;
-          asesores.forEach((asesor) => {
-            template += `
-            <li id="selectAsesor" keyAsesor= "${asesor.id_usuario}" class="py-3 px-4 sm:py-4 cursor-pointer hover:bg-gray-100">
-            <div class="flex items-center space-x-4">
-                <div class="flex-shrink-0">
-                    <img class="w-8 h-8 rounded-full" src="../../img/avatar_default.jpg" alt="Neil image">
-                </div>
-                <div class="flex-1 min-w-0">
-                    <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                        ${asesor.nombre}
-                        </p>
-                        <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                        ${asesor.apellido}
-                    </p>
-                </div>
-            </div>
-        </li>
-            `;
-          });
-          $("#listAsesores").html(template);
-        }
-      }
-    );
-  }
   $(document).on("click", "#selectAsesor", function () {
     let id_usuario = $(this).attr("keyASesor");
     console.log(id_usuario);
-    let asesor = asesoresArray.filter((e) => e.id_usuario === id_usuario);
+    if (id_usuario === "Todos") {
+      $("#asesor-search span").html("Comparar Todos");
+      $("#asesor-search").attr("keyAsesor", id_usuario);
+    } else {
+      let asesor = asesoresArray.filter((e) => e.id_usuario === id_usuario);
+
+      $("#asesor-search span").html(
+        asesor[0].nombre + " " + asesor[0].apellido
+      );
+    }
     $("#listUsuarios").addClass("hidden");
     if ($("#listUsuarios").hasClass("hidden")) {
       console.log("entro");
@@ -623,12 +970,26 @@ $(document).ready(function () {
       $("#icon-drop-asesor").attr("name", "chevron-up");
     }
     $("#asesor-search").attr("keyAsesor", id_usuario);
-    $("#asesor-search span").html(asesor[0].nombre + " " + asesor[0].apellido);
   });
   $("#search-asesor-input").on("keyup search", function () {
     let name = $(this).val().toLowerCase();
     let template = "";
-    console.log(name);
+    template += `
+          <li id="selectAsesor" keyAsesor= "Todos" class="py-3 px-4 sm:py-4 cursor-pointer hover:bg-gray-100">
+            <div class="flex items-center space-x-4">
+                <div class="flex-shrink-0">
+                    <img class="w-8 h-8 rounded-full" src="https://t3.ftcdn.net/jpg/02/99/06/22/360_F_299062215_VpZk4Ng8h5JpPWsBblyiVEWfAFwESfon.jpg" alt="Neil image">
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                        Comparar
+                        </p>
+                        <p class="text-sm text-gray-500 truncate dark:text-gray-400">
+                        Todos
+                    </p>
+                </div>
+            </div>
+        </li>`;
     if (name === "") {
       asesoresArray.forEach((asesor) => {
         template += `
@@ -651,13 +1012,14 @@ $(document).ready(function () {
 
       $("#listAsesores").html(template);
     } else {
+      console.log(asesoresArray);
       let asesores = asesoresArray.filter((persona) => {
-        // console.log(persona);
         const nombreCompleto = `${persona.nombre} ${persona.apellido}`;
         // console.log(nombreCompleto.toLowerCase().includes(name));
         return nombreCompleto.toLowerCase().includes(name);
       });
       console.log(asesores);
+
       if (asesores.length > 0) {
         asesores.forEach((asesor) => {
           template += `

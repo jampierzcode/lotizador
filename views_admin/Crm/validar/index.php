@@ -41,7 +41,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
         ?>
         <div class="container-dashboard">
             <span class="route">
-                > Home > CRM </span>
+                > Home > CRM > Validar </span>
 
             <div class="confirm-popup md-hidden">
                 <div class="form-confirm">

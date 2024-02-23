@@ -1,10 +1,11 @@
-$(document).ready(function () {
+$(document).ready(async function () {
   const urlParams = new URLSearchParams(window.location.search);
   var user = urlParams.get("user");
   var proyect = urlParams.get("proyect");
   var dataUser;
   var dataContatUser;
   var multimedia = [];
+  var proyectoActive;
   var iconsSocials = [
     {
       title: "email",
@@ -148,6 +149,41 @@ $(document).ready(function () {
 
   if (user && proyect) {
     console.log("entro");
+
+    await buscarProyecto();
+    function buscarProyecto() {
+      return new Promise((resolve, reject) => {
+        let funcion = "buscar_proyectos_id";
+        $.post(
+          "../controlador/TargetController.php",
+          { funcion, proyecto: proyect },
+          (response) => {
+            const proyecto = JSON.parse(response);
+            proyectoActive = proyecto;
+            console.log(proyecto);
+            let nameProyecto = proyecto[0].nombreproyecto;
+            let descriptionProyecto = proyecto[0].description;
+            let logo = proyecto[0].logo;
+            let video = proyecto[0].video_url;
+            // video url
+            if (video !== "" && video !== null) {
+              let codigovideo = obtenerCodigoVideo(video);
+              let videosrc = construirURLDeEmbed(codigovideo);
+              $("#urlvideoY").attr("src", videosrc);
+              $("#urlvideoY").removeClass("hidden");
+            }
+            $("#photo_proyect").attr("src", "../" + logo);
+            $("#nameProyecto").text(nameProyecto);
+            $("#descriptionProyecto").text(
+              descriptionProyecto !== null && descriptionProyecto !== "null"
+                ? descriptionProyecto
+                : ""
+            );
+            resolve();
+          }
+        );
+      });
+    }
     buscar_target();
     obtenerUsuario();
     function buscar_target() {
@@ -324,7 +360,14 @@ $(document).ready(function () {
           const svg = iconsSocials.find((e) =>
             e.title === red.social ? e.img : ""
           );
-          let url = red?.url ? red?.url : "#";
+          let url;
+          if (red.social === "whatsapp") {
+            let modificacion =
+              red?.url + `%20-${proyectoActive[0].nombreproyecto}-`;
+            url = red?.url ? modificacion : "#";
+          } else {
+            url = red?.url ? red?.url : "#";
+          }
           template += `
         <div class="md:w-[18%]" style="display: flex; justify-content: center; margin: 0px 9px 5px;">
           <a class="jss807" href="${url}" target="_blank" style="margin-bottom: 0px; width: 54.58px; height: 74px; box-shadow: none; border-radius: 0px;">
@@ -338,36 +381,6 @@ $(document).ready(function () {
         }
       });
       $("#links-container").html(template);
-    }
-    buscarProyecto();
-    function buscarProyecto() {
-      let funcion = "buscar_proyectos_id";
-      $.post(
-        "../controlador/TargetController.php",
-        { funcion, proyecto: proyect },
-        (response) => {
-          const proyecto = JSON.parse(response);
-          console.log(proyecto);
-          let nameProyecto = proyecto[0].nombreproyecto;
-          let descriptionProyecto = proyecto[0].description;
-          let logo = proyecto[0].logo;
-          let video = proyecto[0].video_url;
-          // video url
-          if (video !== "" && video !== null) {
-            let codigovideo = obtenerCodigoVideo(video);
-            let videosrc = construirURLDeEmbed(codigovideo);
-            $("#urlvideoY").attr("src", videosrc);
-            $("#urlvideoY").removeClass("hidden");
-          }
-          $("#photo_proyect").attr("src", "../" + logo);
-          $("#nameProyecto").text(nameProyecto);
-          $("#descriptionProyecto").text(
-            descriptionProyecto !== null && descriptionProyecto !== "null"
-              ? descriptionProyecto
-              : ""
-          );
-        }
-      );
     }
     function obtenerCodigoVideo(url) {
       const match = url.match(
