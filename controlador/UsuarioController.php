@@ -453,8 +453,8 @@ if ($_POST["funcion"] == "buscar_etiquetas_cliente") {
 }
 if ($_POST["funcion"] == "buscar_asesor_cliente") {
     $json = array();
-    $id_usuario = $_POST["id_cliente"];
-    $usuario->buscar_asesor_cliente($id_usuario);
+    $id_cliente = $_POST["id_cliente"];
+    $usuario->buscar_asesor_cliente($id_cliente);
     if ($usuario->mensaje) {
         echo $usuario->mensaje;
     }
@@ -1058,32 +1058,14 @@ if ($_POST["funcion"] == "buscar_pendientes") {
 }
 
 if ($_POST["funcion"] == "buscar_clientes") {
-    $json = array();
     $user = $_SESSION["id_usuario"];
     $usuario->buscar_clientes($user);
     if ($usuario->mensaje) {
         echo $usuario->mensaje;
     }
     if ($usuario->datos) {
-        foreach ($usuario->datos as $dato) {
-            $json[] = array(
-                'id' => $dato->id_cliente,
-                'nombres' => $dato->nombres,
-                'apellidos' => $dato->apellidos,
-                'correo' => $dato->correo,
-                'celular' => $dato->celular,
-                'telefono' => $dato->telefono,
-                'origen' => $dato->origen,
-                'ciudad' => $dato->ciudad,
-                'nombre_proyecto' => $dato->nombre_proyecto,
-                'fecha_creacion' => $dato->fecha_creation,
-                'hora_creacion' => $dato->hora_creation,
-                'proyecto_id' => $dato->proyet_id,
-                'asignado_usuario' => $dato->asignado_usuario,
-                'status' => $dato->status
-            );
-        }
-        $jsonstring = json_encode($json);
+
+        $jsonstring = json_encode($usuario->datos);
         echo $jsonstring;
     }
 }

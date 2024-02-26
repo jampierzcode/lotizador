@@ -567,7 +567,7 @@ class Usuario
             return $this->mensaje;
         }
     }
-    function buscar_asesor_cliente($id_usuario)
+    function buscar_asesor_cliente($id_cliente)
     {
         try {
             # code...
@@ -592,7 +592,7 @@ class Usuario
         
             ";
             $query = $this->conexion->prepare($sql);
-            $query->execute(array(":id" => $id_usuario, ":created_by_user_id" => $_SESSION["id_usuario"]));
+            $query->execute(array(":id" => $id_cliente, ":created_by_user_id" => $_SESSION["id_usuario"]));
             $this->datos = $query->fetchAll(); // retorna objetos o no
             if (!empty($this->datos)) {
                 return $this->datos;
@@ -1184,9 +1184,9 @@ class Usuario
     {
         try {
             # code...
-            $sql = "INSERT INTO ventas(cliente_id, user_id, fecha_venta) VALUES(:cliente, :usuario, :fecha)";
+            $sql = "INSERT INTO ventas(cliente_id, user_id, fecha_venta, status) VALUES(:cliente, :usuario, :fecha, :status)";
             $query = $this->conexion->prepare($sql);
-            $query->execute(array(":cliente" => $cliente, ":usuario" => $user, ":fecha" => $fecha));
+            $query->execute(array(":cliente" => $cliente, ":usuario" => $user, ":fecha" => $fecha, ":status" => "SEND_VALIDAR"));
 
             $this->mensaje = "add-register-venta";
             return $this->mensaje;
@@ -1534,7 +1534,10 @@ class Usuario
     {
         try {
             $sql = "SELECT
-            CLIENTE.*,
+            CLIENTE.*,ic.id AS id_task,
+            ic.status AS task_status,
+            ic.fecha_visita,
+            ic.hora_visita,
             CASE
                 WHEN UC.cliente_id IS NULL THEN 'No asignado'
                 ELSE CONCAT(USUARIO.nombre, ' ', USUARIO.apellido)
@@ -1546,6 +1549,7 @@ class Usuario
             LEFT JOIN user_cliente AS UC ON CLIENTE.id_cliente = UC.cliente_id
             LEFT JOIN usuario AS USUARIO ON UC.user_id = USUARIO.id_usuario
             LEFT JOIN proyectos AS PROYECTO ON CLIENTE.proyet_id = PROYECTO.id
+            LEFT JOIN interaccion_cliente ic ON ic.cliente_id = CLIENTE.id_cliente
         WHERE
             UP.user_id = :id_usuario; AND CLIENTE.archived=0
         ";
@@ -2019,7 +2023,7 @@ class Usuario
             LEFT JOIN etiqueta e ON ec.etiqueta_id = e.id
             LEFT JOIN interaccion_cliente ic ON ic.cliente_id = c.id_cliente
             WHERE 
-                uc.user_id = :id_usuario
+                uc.user_id = :id_usuario AND c.archived=0
             GROUP BY 
             c.id_cliente;
             ";

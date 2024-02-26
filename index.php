@@ -22,7 +22,7 @@ if (!empty($_SESSION["id_usuario"])) {
 } else {
 ?>
     <!DOCTYPE html>
-    <html lang="en">
+    <html lang="es">
 
     <head>
         <meta charset="UTF-8">
@@ -30,7 +30,10 @@ if (!empty($_SESSION["id_usuario"])) {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="css/main.css">
         <link rel="stylesheet" href="css/login.css">
-        <title>Login</title>
+        <!-- tailwin css -->
+        <script src="https://cdn.tailwindcss.com"></script>
+
+        <title>SIRE - Login</title>
     </head>
 
     <body>
@@ -38,24 +41,14 @@ if (!empty($_SESSION["id_usuario"])) {
             <div class="form-login">
 
                 <form action="./controlador/LoginController.php" method="post">
-                    <div class="header-form">
-                        <img style="width: 100%" src="./img/logo.png" alt="">
+                    <div class="mb-4">
+                        <h1 class="text-2xl font-bold text-center md:text-5xl">SIRE</h1>
+                        <p class="flex text-sm justify-center items-center gap-1">Sistema Informático Real State
+                        </p>
                         <!-- <img src="img/logo.jpg" alt="logo"> -->
                     </div>
                     <div class="body-form">
-                        <?php
 
-                        if (!empty($_SESSION["error"])) {
-                            $error = $_SESSION["error"];
-
-                        ?>
-                            <div id="toast">
-                                <p><?php echo $_SESSION["error"] ?></p>
-                            </div>
-                        <?php
-                            session_destroy();
-                        }
-                        ?>
                         <div class="group-date">
                             <ion-icon name="person-sharp"></ion-icon>
                             <input name="username" type="text" placeholder="Ingresa el usuario">
@@ -65,7 +58,26 @@ if (!empty($_SESSION["id_usuario"])) {
                             <input id="password_login" name="password" type="password" placeholder="Ingresa la contraseña">
                             <div class="view-password" key_actived="false"><ion-icon name="eye-off-outline"></ion-icon></div>
                         </div>
-                        <button class="btn-submit" type="submit">Iniciar Sesion</button>
+                        <button class="bg-[#310ecd] px-4 py-3 text-white rounded-md" type="submit">Iniciar Sesion</button>
+                        <?php
+
+                        if (!empty($_SESSION["error"])) {
+                            $error = $_SESSION["error"];
+
+                        ?>
+                            <div class="bg-red-100 text-red-600 border-2 border-red-600 rounded w-full text-center">
+                                <p><?php echo $_SESSION["error"] ?></p>
+                            </div>
+                        <?php
+                            session_destroy();
+                        }
+                        ?>
+                        <div class="mt-4">
+                            <p class="flex text-sm justify-center items-center gap-1">Sistema creado por
+                                <img style="width: 60px" src="./img/logo.png" alt="">
+                            </p>
+                            <!-- <img src="img/logo.jpg" alt="logo"> -->
+                        </div>
                     </div>
                 </form>
             </div>

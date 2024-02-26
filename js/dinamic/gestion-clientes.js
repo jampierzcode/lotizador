@@ -35,14 +35,14 @@ $(document).ready(function () {
     },
 
     columns: [
-      { data: "id" },
+      { data: "id_cliente" },
       // { data: "id" },
       { data: "nombres" },
       { data: "apellidos" },
       {
         data: null,
         render: (data) => {
-          return `${data.fecha_creacion} ${data.hora_creacion}`;
+          return `${data.fecha_creation} ${data.hora_creation}`;
         },
       },
       { data: "correo" },
@@ -59,10 +59,92 @@ $(document).ready(function () {
             : `${data.asignado_usuario}`;
         },
       },
+      // {
+      //   data: null,
+      //   render: function (data, type, row) {
+      //     let template_status = imprimirStatus(data?.status);
+      //     return template_status;
+      //   },
+      // },
       {
         data: null,
         render: function (data, type, row) {
-          let template_status = imprimirStatus(data?.status);
+          let template_status = `<div class="flex items-center gap-2">`;
+          template_status += imprimirStatus(data?.status); // Cambiar de const a let
+
+          if (data.task_status === "PENDIENTE") {
+            const fechaVisita = dayjs(
+              data.fecha_visita + " " + data.hora_visita
+            );
+            const ahora = dayjs();
+            const diferencia = fechaVisita.diff(ahora, "minute", true); // Diferencia en minutos
+            var dias = Math.floor(diferencia / (24 * 60));
+            var horas = Math.floor((diferencia % (24 * 60)) / 60);
+            var minutos = Math.floor(diferencia % 60);
+            let tiempoRestante = "";
+
+            // Ajuste para considerar 0 cuando estamos en el mismo día y hora
+            if (
+              diferencia > 0 ||
+              (diferencia === 0 && fechaVisita.isAfter(ahora))
+            ) {
+              if (dias > 1) {
+                tiempoRestante += `${dias} día${dias > 1 ? "s" : ""}`;
+              }
+
+              if (horas > 1 || (dias === 0 && minutos === 0)) {
+                tiempoRestante += `${
+                  tiempoRestante.length > 0 ? ", " : ""
+                }${horas} hora${horas > 1 ? "s" : ""}`;
+              }
+
+              if (minutos > 0 || (dias === 0 && horas === 0)) {
+                tiempoRestante += `${
+                  tiempoRestante.length > 0 ? ", " : ""
+                }${minutos} minuto${minutos > 1 ? "s" : ""}`;
+              }
+
+              template_status +=
+                tiempoRestante.length > 0
+                  ? `<div class="px-4 py-2 bg-green-100 border-green-500 text-green-500 font-bold text-xs rounded">Faltan ${tiempoRestante}</div>`
+                  : `<div class="px-4 py-2 bg-green-100 border-green-500 text-green-500 font-bold text-xs rounded">La visita está programada para ahora</div>`;
+            } else {
+              dias = dias * -1;
+              horas = horas * -1;
+              minutos = minutos * -1;
+              if (dias > 1) {
+                tiempoRestante += `${dias - 1} día${dias > 2 ? "s" : ""}`;
+              }
+
+              if (horas > 1 || (dias === 0 && minutos === 0)) {
+                tiempoRestante += `${tiempoRestante.length > 0 ? ", " : ""}${
+                  horas - 1
+                } hora${horas > 2 ? "s" : ""}`;
+              }
+
+              if (minutos > 0 || (dias === 0 && horas === 0)) {
+                tiempoRestante += `${
+                  tiempoRestante.length > 0 ? ", " : ""
+                }${minutos} minuto${minutos > 1 ? "s" : ""}`;
+              }
+
+              template_status +=
+                tiempoRestante.length > 0
+                  ? `<div class="px-4 py-2 bg-red-100 border-red-500 text-red-500 font-bold text-xs rounded">Retrasado por ${tiempoRestante}</div>`
+                  : ""; // No mostrar nada si no hay retraso
+            }
+
+            template_status += `<span>${
+              data.fecha_visita + " Hora: " + data.hora_visita
+            }</span>`;
+          } else {
+            if (data.task_status === "COMPLETADO") {
+              template_status += `COMPLETADO`;
+            }
+          }
+
+          template_status += `</div>`;
+
           return template_status;
         },
       },
@@ -71,10 +153,10 @@ $(document).ready(function () {
         render: function (data, type, row) {
           return `
           <div class="flex-actions">
-          <button target="_blank" keyClient="${data?.id}" id="asignedClient" class="btnJsvm default"><ion-icon name="add-circle-sharp"></ion-icon></button>
-          <button target="_blank" keyClient="${data?.id}" id="editClient" class="btnJsvm normal"><ion-icon name="create-sharp"></ion-icon></button>
+          <button target="_blank" keyClient="${data?.id_cliente}" id="asignedClient" class="btnJsvm default"><ion-icon name="add-circle-sharp"></ion-icon></button>
+          <button target="_blank" keyClient="${data?.id_cliente}" id="editClient" class="btnJsvm normal"><ion-icon name="create-sharp"></ion-icon></button>
            
-          <button target="_blank" keyClient="${data?.id}" id="historialCliente" class="btnJsvm normal">Historial</button>
+          <button target="_blank" keyClient="${data?.id_cliente}" id="historialCliente" class="btnJsvm normal">Historial</button>
            
           </div>
 
@@ -332,11 +414,11 @@ $(document).ready(function () {
     $("#editar-lead").removeClass("md-hidden");
     setTimeout(function () {
       $("#editar-lead .form-create").addClass("modal-show");
-    }, 10);
+    }, 300);
     const id_cliente = $(this).attr("keyClient");
     idCliente = id_cliente;
     const clienteResult = clientesList.filter(
-      (elemento) => elemento.id === id_cliente
+      (elemento) => elemento.id_cliente === id_cliente
     );
     console.log(id_cliente, clienteResult);
 
@@ -351,7 +433,13 @@ $(document).ready(function () {
     $("#editar-lead #campania-lead").val(clienteResult[0].campania);
     $("#editar-lead #email-lead").val(clienteResult[0].correo);
 
-    $("#editar-lead #proyecto-lead").val(clienteResult[0].proyecto_id);
+    $("#editar-lead #proyecto-lead").val(clienteResult[0].proyet_id);
+  });
+  $("#editar-lead .close-modal").on("click", function () {
+    $("#editar-lead .form-create").removeClass("modal-show");
+    setTimeout(function () {
+      $("#editar-lead").addClass("md-hidden");
+    }, 300);
   });
   $("#editar-lead #editLead").submit((e) => {
     e.preventDefault();
@@ -477,6 +565,7 @@ $(document).ready(function () {
           template += "<td>No hay registros</td>";
         } else {
           const clientes = JSON.parse(response);
+          console.log(clientes);
           clientesList = clientes;
           clientes.sort(compareDatesDesc);
           filtrarProyectos();
@@ -642,7 +731,7 @@ $(document).ready(function () {
     // console.log(rows_selected.length);
     let arrayClientes = [];
     $.each(rows_selected, function (key, clienteId) {
-      const cliente = clientesList.find((e) => e.id === clienteId);
+      const cliente = clientesList.find((e) => e.id_cliente === clienteId);
       arrayClientes.push(cliente);
       if (cliente.asignado_usuario !== "No asignado") {
         bolCount = bolCount + 1;
@@ -723,7 +812,7 @@ $(document).ready(function () {
         {
           funcion,
           asesor,
-          ids_clientes: JSON.stringify([cliente.id]),
+          ids_clientes: JSON.stringify([cliente.id_cliente]),
           fecha_now,
           hora_now,
         },
@@ -891,6 +980,7 @@ $(document).ready(function () {
     idCliente = id_cliente;
     try {
       const asesores = await buscar_asesores(id_cliente);
+      console.log(asesores);
       // let template;
       let template = `<option value="" selected></option>`;
       let asesoresAsigned = [];
@@ -910,9 +1000,12 @@ $(document).ready(function () {
         placeholder: "Selecciona un asesor",
         data: [],
       });
-
-      const result = clientesList.find((elemento) => elemento.id === idCliente);
-
+      console.log(clientesList);
+      console.log(id_cliente);
+      const result = clientesList.find(
+        (elemento) => elemento.id_cliente === id_cliente
+      );
+      console.log(result);
       $("#nombre_user").html(
         result.nombres +
           " " +
@@ -978,13 +1071,18 @@ $(document).ready(function () {
     $("#documento-modal").val("");
     $("#documento-modal").attr("disabled", "true");
     $("#nombres-modal").val("");
-    $(".modal-create").addClass("md-hidden");
+    $("#asigned_asesores .form-create").removeClass("modal-show");
+    setTimeout(() => {
+      $("#asigned_asesores").addClass("md-hidden");
+    }, 300);
   });
   // FIN DE MODAL multi ASIGNES
   $("#asigned_asesores_multiclient .form-create .close-modal").click(() => {
     $("#asesor-user-multi").val(null).trigger("change");
-
-    $(".modal-create").addClass("md-hidden");
+    $("#asigned_asesores_multiclient .form-create").removeClass("modal-show");
+    setTimeout(() => {
+      $("#asigned_asesores_multiclient").addClass("md-hidden");
+    }, 300);
   });
 
   // fin de presentation modal
