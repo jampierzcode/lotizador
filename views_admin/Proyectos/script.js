@@ -6,7 +6,7 @@ var amenidadesChange = [];
 var idProyecto;
 // Función para mostrar el modal de iconos
 $("#btnAgregarAmenidad").click(function () {
-  $("#modalIconos").show();
+  $("#modalIconos").removeClass("hidden");
 });
 // change setting logo y galery
 $(document).on("click", "#change_settings", function () {
@@ -25,8 +25,19 @@ $(".icono").click(function () {
 
 // Función para continuar al modal de nombre de amenidad
 $("#btnContinuarIconos").click(function () {
-  $("#modalIconos").hide();
-  $("#modalNombreAmenidad").show();
+  $("#modalIconos").addClass("hidden");
+  $("#modalNombreAmenidad").removeClass("hidden");
+});
+$("#btnCancelarIconos").click(function () {
+  $("#modalIconos").addClass("hidden");
+  reiniciarModalIconos();
+});
+$("#cancelarIconoEditado").click(function () {
+  $("#modalEditarIcono").addClass("hidden");
+});
+$("#btnRegresarIconoAmenidad").click(function () {
+  $("#modalNombreAmenidad").addClass("hidden");
+  $("#modalIconos").removeClass("hidden");
 });
 function verificarCambios() {
   console.log(amenidades, amenidadesChange);
@@ -60,7 +71,7 @@ $("#btnGuardarAmenidad").click(function () {
       "../../controlador/UsuarioController.php",
       { funcion, id: id_proyecto, amenidades: jsonData },
       (response) => {
-        alert("se creo correctamente la amenidad");
+        add_toast("success", "Se creo correctamente la amenidad");
         console.log(response);
         // Agregar la amenidad al array
         amenidadesChange.push(nuevaAmenidad);
@@ -69,7 +80,7 @@ $("#btnGuardarAmenidad").click(function () {
         buscar_amenidades();
 
         // Cerrar el modal de nombre de amenidad
-        $("#modalNombreAmenidad").hide();
+        $("#modalNombreAmenidad").addClass("hidden");
 
         // Reiniciar el modal de iconos y el input de nombre
         reiniciarModalIconos();
@@ -77,18 +88,18 @@ $("#btnGuardarAmenidad").click(function () {
       }
     );
   } else {
-    alert(
+    add_toast(
+      "warning",
       "Por favor, selecciona un ícono y proporciona un nombre para la amenidad."
     );
   }
 });
-
 // Función para mostrar amenidades en la interfaz
 function mostrarAmenidades() {
   var amenidadesList = $("#amenidadesList");
   amenidadesList.empty(); // Limpiar la lista antes de mostrar las amenidades
 
-  amenidades.forEach(function (amenidad, index) {
+  amenidadesChange.forEach(function (amenidad, index) {
     var listItem = $(`<li class="flex items-center gap-3">`).html(`
       <img
       class="w-[40px] icono-amenidad"
@@ -111,8 +122,8 @@ function mostrarAmenidades() {
   // Agregar evento de clic para el botón de eliminar
   $(".eliminar-btn").click(function () {
     var index = $(this).data("index");
+    console.log(index);
     eliminarAmenidad(index);
-    verificarCambios();
   });
 }
 function buscar_amenidades() {
@@ -124,6 +135,8 @@ function buscar_amenidades() {
       // console.log(response);
       if (response.trim() !== "no-register-amenidades") {
         amenidades = JSON.parse(response);
+        amenidadesChange = JSON.parse(response);
+        console.log(amenidades);
         mostrarAmenidades();
       } else {
         amenidades = [];
@@ -170,13 +183,29 @@ function editarAmenidad(index, nuevoNombre) {
 
 // Función para eliminar una amenidad del array
 function eliminarAmenidad(index) {
-  amenidadesChange.splice(index, 1);
-  mostrarAmenidades(); // Actualizar la lista en la interfaz
-  verificarCambios();
+  let amenidad_delete = amenidades[index];
+  console.log(amenidad_delete.id);
+  let funcion = "eliminar_amenidad";
+  $.post(
+    "../../controlador/UsuarioController.php",
+    { funcion, id: amenidad_delete.id },
+    (response) => {
+      if (response.trim() === "delete-amenidad") {
+        amenidadesChange.splice(index, 1);
+        console.log(amenidadesChange);
+        mostrarAmenidades();
+        add_toast("success", "La amenidad se elimino correctamente");
+      } else {
+        console.log(response);
+        add_toast("error", "Ocurrio un error al eliminar la amenidad");
+      }
+    }
+  );
 }
 
 // Función para reiniciar el modal de iconos
 function reiniciarModalIconos() {
+  $(".selected-icon").removeClass("border-[#38a169]");
   $(".icono").removeClass("selected-icon");
 }
 
@@ -212,12 +241,12 @@ $("#saveEditAmenidad").click(function () {
     { funcion, data: JSON.stringify(amenidadactive) },
     (response) => {
       if (response.trim() === "update-sucess") {
-        alert("se actualizo correctamente la amenidad");
+        add_toast("success", "Se actualizo correctamente la amenidad");
         amenidadactive = "";
         $("#editarAmenidad").addClass("hidden");
         buscar_amenidades();
       } else {
-        alert("Hubo un error, contacta al administrador");
+        add_toast("error", "Hubo un error, contacta al administrador");
       }
     }
   );
@@ -233,7 +262,7 @@ $("#nombreAmenidadEdit").on("change, keyup", function (e) {
 // Función para mostrar el modal de editar icono
 function mostrarModalEditarIcono(iconoActual) {
   // Mostrar el modal de editar icono
-  $("#modalEditarIcono").show();
+  $("#modalEditarIcono").removeClass("hidden");
 
   // Limpiar la selección actual
   $(".icono-editar").removeClass("selected-icon");
@@ -265,9 +294,9 @@ function mostrarModalEditarIcono(iconoActual) {
           "src",
           `../../imagenes/amenidades/${amenidadactive.icono}.png`
         );
-        $("#modalEditarIcono").hide();
+        $("#modalEditarIcono").addClass("hidden");
       } else {
-        alert("Por favor, selecciona un ícono.");
+        add_toast("warning", "Por favor, selecciona un ícono.");
       }
     });
 }

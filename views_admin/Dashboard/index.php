@@ -75,7 +75,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
             </span> -->
             <div class="grid gap-4 w-full">
 
-                <div style="z-index: 5000" class="sticky top-[-40px] bg-[#f5f7fb]">
+                <div class="md:z-[1000] top-0 md:sticky md:top-[-40px] bg-[#f5f7fb]">
                     <div class="relativew-full md:w-full flex items-center">
                         <!-- <div class="flex items-center max-w-max justify-between bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 p-4">
                             <h5 class="text-lg font-bold leading-none text-gray-900 dark:text-white">Filtros avanzados</h5>

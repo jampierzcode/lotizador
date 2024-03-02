@@ -13,6 +13,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="../../css/main.css">
+        <link rel="stylesheet" href="../../css/toast.css">
 
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
         <link rel="stylesheet" href="../../css/sidebar.css">
@@ -280,6 +281,9 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                                 </div>
                                 <h1 class="w-full text-sm font-bold my-8 text-gray-800">Plano lotizador</h1>
                             </div>
+                            <!-- <div id="text-lotizador" class="py-8">
+                                <h1 class="w-full text-sm font-bold my-8 text-gray-800">Plano lotizador</h1>
+                            </div> -->
                         </div>
                         <div id="mapacontainer" class="relative w-full h-[500px]">
                             <div id="loading_lotizador" style="z-index: 40000;" class="w-full gap-4 bg-blue-600 flex flex-col items-center justify-center absolute top-0 left-0 right-0 bottom-0 h-100" role="status">
@@ -1162,6 +1166,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css" integrity="sha512-YWzhKL2whUzgiheMoBFwW8CKV4qpHQAEuvilg9FAn5VJUDwKZZxkJNuGM4XkWuk94WCrrwslk8yWNGmY1EduTA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <script src="../../js/jquery.min.js"></script>
+    <script src="../../js/dinamic/toastmith.js"></script>
     <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
     <script src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/fixedcolumns/3.2.2/js/dataTables.fixedColumns.min.js"></script>

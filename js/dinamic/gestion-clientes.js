@@ -358,7 +358,7 @@ $(document).ready(function () {
       async (response) => {
         console.log(response);
         if (response.trim() === "remove-asigned") {
-          alert("se elimino correctamente al asesor");
+          add_toast("success", "se elimino correctamente al asesor");
           const asesores = await buscar_asesores(idCliente);
           // let template;
           let template = `<option value="" selected></option>`;
@@ -393,7 +393,7 @@ $(document).ready(function () {
           );
           buscar_clientes();
         } else {
-          alert("Hubo un error, contacta al administrador");
+          add_toast("error", "Hubo un error, contacta al administrador");
         }
       }
     );
@@ -479,9 +479,9 @@ $(document).ready(function () {
 
           if (data.hasOwnProperty("error")) {
             // Si la respuesta contiene un mensaje de error, muestra el mensaje
-            alert(data.error);
+            add_toast("error", data.error);
           } else {
-            alert("Se edito correctamente al cliente");
+            add_toast("success", "Se edito correctamente al cliente");
             setTimeout(function () {
               $("#editar-lead .form-create").removeClass("modal-show");
             }, 1000);
@@ -518,7 +518,7 @@ $(document).ready(function () {
       (response) => {
         console.log(response);
         if (response.trim() === "no-data") {
-          alert("no hay registro alguno, porfavor cree uno");
+          add_toast("warning", "no hay registro alguno, porfavor cree uno");
         } else {
           const historial = JSON.parse(response);
           console.log(historial);
@@ -585,12 +585,32 @@ $(document).ready(function () {
 
     llenarFiltros();
   }
+  // filtro de pendientes
+  $("#menu-pendientes").click(function () {
+    typefilter = "PENDIENTE";
+    const clientes = clientesList
+      .filter((e) => e.task_status === "PENDIENTE") // Filtra por task_status igual a "PENDIENTE"
+      .sort((a, b) => {
+        // Ordena por fecha_visita y luego por hora_visita
+        const fechaA = new Date(a.fecha_visita + " " + a.hora_visita);
+        const fechaB = new Date(b.fecha_visita + " " + b.hora_visita);
+
+        return fechaA - fechaB;
+      });
+    dataTable.clear().rows.add(clientes).draw();
+  });
 
   // Event listeners para los cambios en el select y el input
   $("#cliente-search, #filter-proyecto, #filter-selected").on(
     "change keyup",
     filtrarProyectos
   );
+  function animarProgress() {
+    const pendientes = clientesList.filter(
+      (c) => c.task_status === "PENDIENTE"
+    );
+    $("#menu-pendientes").html("Pendientes: " + pendientes.length);
+  }
   function filtrarProyectos() {
     console.log(clientesList);
     const selected = $("#filter-selected").val();
@@ -611,10 +631,7 @@ $(document).ready(function () {
         console.log(cliente.nombre_proyecto);
         return false;
       }
-      if (
-        nombreProyecto !== "Todos" &&
-        cliente.proyecto_id !== nombreProyecto
-      ) {
+      if (nombreProyecto !== "Todos" && cliente.proyet_id !== nombreProyecto) {
         console.log(cliente.nombre_proyecto);
         return false;
       }
@@ -668,11 +685,20 @@ $(document).ready(function () {
       console.log(totalPaginas - 1);
       dataTable.page(totalPaginas - 1);
     }
-
+    animarProgress();
     // Restaurar la posición de scroll horizontal
     $("#usuariosList").parent().scrollLeft(estadoActual.scrollLeft);
     $("body").parent().scrollTop(estadoActual.bodyScroll);
   }
+  // --------reset filters
+  $("#reset_filtros").click(function () {
+    $("#cliente-search").val("");
+    $("#filter-proyecto").val("Todos");
+    $("#filter-selected").val("Todos");
+    // dataTable.clear().rows.add(clientesList).draw();
+    filtrarProyectos();
+  });
+
   // Función auxiliar para verificar si el nombre y apellido coinciden con el filtro
   function contienenombreCliente(cliente, nombreCliente) {
     const nombreCompleto =
@@ -792,10 +818,13 @@ $(document).ready(function () {
           );
         }, 10);
       } else {
-        alert("aun no ha seleccionado ningun cliente");
+        add_toast("warning", "aun no ha seleccionado ningun cliente");
       }
     } else {
-      alert("Algunos clientes cuentan con asignacion, revisar selecciones");
+      add_toast(
+        "warning",
+        "Algunos clientes cuentan con asignacion, revisar selecciones"
+      );
     }
   });
   $("#asesor-asigned-multiclient").click(function () {
@@ -821,7 +850,7 @@ $(document).ready(function () {
         }
       );
     });
-    alert("Se asignaron todos los clientes");
+    add_toast("success", "Se asignaron todos los clientes");
     $("#asesor-user-multi").val(null).trigger("change");
 
     $(".modal-create").addClass("md-hidden");
@@ -925,9 +954,9 @@ $(document).ready(function () {
 
           if (data.hasOwnProperty("error")) {
             // Si la respuesta contiene un mensaje de error, muestra el mensaje
-            alert(data.error);
+            add_toast("error", data.error);
           } else {
-            alert("se subio correctamente el cliente");
+            add_toast("success", "se subio correctamente el cliente");
             let id = data.id;
             setTimeout(function () {
               $("#crear-lead .form-create").removeClass("modal-show");
@@ -949,7 +978,7 @@ $(document).ready(function () {
         }
       );
     } else {
-      alert("Debe seleccionar un proyecto");
+      add_toast("warning", "Debe seleccionar un proyecto");
     }
   });
 
@@ -1019,7 +1048,7 @@ $(document).ready(function () {
         $("#asigned_asesores .form-create").addClass("modal-show");
       }, 10);
     } catch (error) {
-      alert("No hay asesores registrados");
+      add_toast("warning", "No hay asesores registrados");
       console.log(error);
     }
   });
@@ -1045,14 +1074,14 @@ $(document).ready(function () {
       (response) => {
         console.log(response);
         if (response.trim() == "add-user-cliente") {
-          alert("Se asigno cliente al asesor");
+          add_toast("success", "Se asigno cliente al asesor");
           $("#asigned_asesores").addClass("md-hidden");
           setTimeout(function () {
             $("#asigned_asesores .form-create").removeClass("modal-show");
           }, 10);
           buscar_clientes();
         } else {
-          alert("No se asigno, contacta al administrador");
+          add_toast("error", "No se asigno, contacta al administrador");
         }
       }
     );

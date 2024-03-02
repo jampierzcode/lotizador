@@ -1166,6 +1166,20 @@ if ($_POST["funcion"] == "buscar_user_asesor") {
         echo $jsonstring;
     }
 }
+// business controller
+if ($_POST["funcion"] == "buscar_user_info_empresa") {
+    $json = array();
+    $usuario->buscar_user_info_empresa($_SESSION["id_usuario"]);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+
+        $jsonstring = json_encode($usuario->datos);
+        echo $jsonstring;
+    }
+}
+// targets controller
 if ($_POST["funcion"] == "buscar_user_target_socials") {
     $json = array();
     $usuario->buscar_user_target_socials($_SESSION["id_usuario"]);
@@ -1241,6 +1255,11 @@ if ($_POST["funcion"] == "update_amenidad") {
     $usuario->update_amenidad($amenidad);
     echo $usuario->mensaje;
 }
+if ($_POST["funcion"] == "eliminar_amenidad") {
+    $id = $_POST["id"];
+    $usuario->eliminar_amenidad($id);
+    echo $usuario->mensaje;
+}
 if ($_POST["funcion"] == "buscar_amenidades") {
     $id = $_POST["id"];
     $usuario->buscar_amenidades($id);
@@ -1285,6 +1304,12 @@ if ($_POST["funcion"] == "update_user_target") {
     $json = array();
     $data = json_decode($_POST["data"]);
     $usuario->update_user_target($data, $id_usuario);
+    echo $usuario->mensaje;
+}
+if ($_POST["funcion"] == "update_user_business") {
+    $json = array();
+    $data = json_decode($_POST["data"]);
+    $usuario->update_user_business($data, $id_usuario);
     echo $usuario->mensaje;
 }
 if ($_POST["funcion"] == "buscar_clientes_by_asesor") {

@@ -121,6 +121,7 @@ $(document).ready(function () {
             const ahora = dayjs();
             const diferencia = fechaVisita.diff(ahora, "minute", true); // Diferencia en minutos
             var dias = Math.floor(diferencia / (24 * 60));
+
             var horas = Math.floor((diferencia % (24 * 60)) / 60);
             var minutos = Math.floor(diferencia % 60);
             let tiempoRestante = "";
@@ -130,11 +131,11 @@ $(document).ready(function () {
               diferencia > 0 ||
               (diferencia === 0 && fechaVisita.isAfter(ahora))
             ) {
-              if (dias > 1) {
+              if (dias >= 1) {
                 tiempoRestante += `${dias} día${dias > 1 ? "s" : ""}`;
               }
 
-              if (horas > 1 || (dias === 0 && minutos === 0)) {
+              if (horas >= 1 || (dias === 0 && minutos === 0)) {
                 tiempoRestante += `${
                   tiempoRestante.length > 0 ? ", " : ""
                 }${horas} hora${horas > 1 ? "s" : ""}`;
@@ -154,11 +155,11 @@ $(document).ready(function () {
               dias = dias * -1;
               horas = horas * -1;
               minutos = minutos * -1;
-              if (dias > 1) {
+              if (dias >= 1) {
                 tiempoRestante += `${dias - 1} día${dias > 2 ? "s" : ""}`;
               }
 
-              if (horas > 1 || (dias === 0 && minutos === 0)) {
+              if (horas >= 1 || (dias === 0 && minutos === 0)) {
                 tiempoRestante += `${tiempoRestante.length > 0 ? ", " : ""}${
                   horas - 1
                 } hora${horas > 2 ? "s" : ""}`;
@@ -198,76 +199,30 @@ $(document).ready(function () {
                 `;
             }
           } else {
-            if (data.task_status === "COMPLETADO") {
-              switch (data.status) {
-                case "ASISTIO":
-                  template_status += `COMPLETADO`;
-                  template_status += `
-                  <div class="flex-actions">
-                  <button target="_blank" id_task="${data?.id_task}" id="sendValidar" class="bg-yellow-400 text-black rounded px-3 py-2 mt-2 font-bold">Validar</button>
-                </div>
-                  `;
-                  break;
-                case "REPROGRAMACION VISITA":
-                  template_status += `COMPLETADO`;
-                  template_status += `
-                  <div class="flex-actions">
-                  <button target="_blank" id_task="${data?.id_task}" id="sendValidar" class="bg-yellow-400 text-black rounded px-3 py-2 mt-2 font-bold">Validar</button>
-                </div>
-                  `;
-                  break;
-                case "SEPARACION":
-                  template_status += `COMPLETADO`;
-                  template_status += `
-                  <div class="flex-actions">
-                  <button target="_blank" id_task="${data?.id_task}" id="sendValidar" class="bg-yellow-400 text-black rounded px-3 py-2 mt-2 font-bold">Validar</button>
-                </div>
-                  `;
-                  break;
-                case "VISITA":
-                  template_status += `COMPLETADO`;
-                  template_status += `
-                  <div class="flex-actions">
-                  <button target="_blank" id_task="${data?.id_task}" id="sendValidar" class="bg-yellow-400 text-black rounded px-3 py-2 mt-2 font-bold">Validar</button>
-                </div>
-                  `;
-                  break;
-                case "VENTA":
-                  template_status += `COMPLETADO`;
-                  template_status += `
-                  <div class="flex-actions">
-                  <button target="_blank" id_task="${data?.id_task}" id="sendValidar" class="bg-yellow-400 text-black rounded px-3 py-2 mt-2 font-bold">Validar</button>
-                </div>
-                  `;
-                  break;
-
-                default:
-                  template_status += `COMPLETADO`;
-                  template_status += `
-                    <div class="flex-actions">
-                    <button target="_blank" statusClient="${data.status}" keyClient="${data?.id}" id="registerSeguimiento" class="btnJsvm info mt-2">Registrar Evento</button>
-                  </div>
-                    `;
-                  break;
-              }
-            } else {
-              switch (data.status) {
-                case "NO CONTACTADO":
-                  template_status += `
+            switch (data.status) {
+              case "NO CONTACTADO":
+                template_status += `
               <div class="flex-actions">
               <button target="_blank" keyTask="${data.id_task}" statusClient="${data.status}" keyClient="${data?.id}" id="contactarSeguimiento" class="btnJsvm default mt-2">Contactar</button>
             </div>
               `;
-                  break;
+                break;
+              case "REPROGRAMACION CONTACTO":
+                template_status += `COMPLETADO`;
+                template_status += `
+              <div class="flex-actions">
+              <button target="_blank" statusClient="${data.status}" keyClient="${data?.id}" id="registerSeguimiento" class="btnJsvm info mt-2">Registrar Evento</button>
+                </div>
+              `;
+                break;
 
-                default:
-                  template_status += `
+              default:
+                template_status += `
                   <div class="flex-actions">
                   <button target="_blank" statusClient="${data.status}" keyClient="${data?.id}" id="registerSeguimiento" class="btnJsvm info mt-2">Registrar Evento</button>
                 </div>
                   `;
-                  break;
-              }
+                break;
             }
           }
 
@@ -307,7 +262,6 @@ $(document).ready(function () {
         "../../controlador/UsuarioController.php",
         { funcion, id_task },
         async (response) => {
-          console.log(response);
           if (response.trim() === "SEND_VALIDAR") {
             resolve("SEND_VALIDAR");
           } else {
@@ -318,7 +272,6 @@ $(document).ready(function () {
     });
   }
   $(document).on("click", "#sendValidar", async function () {
-    console.log("click");
     let id_task = $(this).attr("id_task");
     const validar = await send_validar(id_task);
     if (validar === "SEND_VALIDAR") {
@@ -523,80 +476,80 @@ $(document).ready(function () {
   }
   $("#generar-proforma-pdf").on("click", function () {
     if (cartItems.length > 0) {
-      var mapContainer = document.querySelector("#map1");
+      var mapContainer = document.querySelector("#mapacontainer");
+      var texto_html = document.querySelector("#text-lotizador");
       var options = {
         filename: "proformanew.pdf",
-        margin: 0.25,
+        margin: 0.5,
         image: { type: "jpeg", quality: 0.98 },
         html2canvas: { scale: 2 },
         jsPDF: { unit: "in", format: "A4", orientation: "portrait" },
       };
       var contenidoPDF = document.createElement("div");
+
       // Clonar el contenido de proforma-print y agregar el clon al PDF
       $("#proforma-print").clone().appendTo(contenidoPDF);
-      // Capturar el mapa con HTML2Canvas
-      domtoimage.toPng(mapContainer).then(function (dataUrl) {
-        // Convertir el lienzo en una imagen
-        // var imgData = canvas.toDataURL("image/jpeg");
-        // Crear un elemento de imagen y establecer su fuente como la imagen capturada
-        var img = new Image();
-        img.src = dataUrl;
-        // Agregar la imagen al contenidoPDF
-        var divimg = document.createElement("div");
-        divimg.classList.add("px-[70px]");
-        divimg.classList.add("w-full");
-        img.classList.add("w-full");
-        divimg.appendChild(img);
-        contenidoPDF.appendChild(divimg);
-        // Generar y guardar el PDF
-        html2pdf().set(options).from(contenidoPDF).save();
-      });
+
+      // Generar y guardar el PDF
+      html2pdf()
+        .set(options)
+        .from(contenidoPDF)
+        .toPdf()
+        .get("pdf")
+        .then(function (pdf) {
+          // Capturar el mapa con HTML2Canvas
+          domtoimage.toPng(mapContainer).then(function (dataUrl) {
+            // Convertir el lienzo en una imagen
+            var img = new Image();
+            img.src = dataUrl;
+
+            // Calcular tamaño del mapa
+            var mapWidthInches = mapContainer.offsetWidth / 96; // 96 pixels per inch
+
+            var mapHeightInches = mapContainer.offsetHeight / 96;
+
+            var anchodocumento =
+              pdf.internal.pageSize.getWidth() - 2 * options.margin;
+            var restaImage = anchodocumento - mapWidthInches;
+
+            // Calcular espacio disponible en la página actual
+            var currentPageHeightInches =
+              pdf.internal.pageSize.getHeight - 2 * options.margin; // Subtracting margins
+            var remainingPageHeightInches = currentPageHeightInches - pdf.y;
+            // Verificar si el mapa cabe en la página actual
+            if (mapHeightInches <= remainingPageHeightInches) {
+              pdf.addHTML(texto_html);
+              // Agregar la imagen al PDF en la página actual
+              pdf.addImage(
+                img,
+                "JPEG",
+                options.margin,
+                pdf.y + options.margin,
+                anchodocumento,
+                mapHeightInches + restaImage
+              );
+            } else {
+              // Agregar nueva página al PDF
+              pdf.addPage();
+              // Agregar la imagen al PDF en la página siguiente
+              pdf.addImage(
+                img,
+                "JPEG",
+                options.margin,
+                options.margin,
+                anchodocumento,
+                mapHeightInches + restaImage
+              );
+            }
+
+            // Guardar el PDF
+            pdf.save();
+          });
+        });
     } else {
       alert("Debe llenar todos los campos");
     }
   });
-  // $("#generar-proforma-pdf").on("click", function () {
-  //   if (cartItems.length > 0) {
-  //     var mapContainer = document.querySelector("#map1");
-  //     var options = {
-  //       filename: "proformanew.pdf",
-  //       margin: [0.5, 0.5, 0.5, 0.5], // Margen de 0.5 pulgadas en todos los lados
-  //       image: { type: "jpeg", quality: 0.98 },
-  //       html2canvas: { scale: 2 },
-  //       jsPDF: { unit: "in", format: "A4", orientation: "portrait" },
-  //     };
-  //     var contenidoPDF = document.createElement("div");
-  //     // Clonar el contenido de proforma-print y agregar el clon al PDF
-  //     $("#proforma-print").clone().appendTo(contenidoPDF);
-  //     // Generar y guardar el PDF
-  //     html2pdf()
-  //       .set(options)
-  //       .from(contenidoPDF)
-  //       .toPdf()
-  //       .get("pdf")
-  //       .then(function (pdf) {
-  //         // Agregar la imagen al contenidoPDF
-  //         var divimg = document.createElement("div");
-  //         divimg.classList.add("px-[70px]");
-  //         divimg.classList.add("w-full");
-  //         img.classList.add("w-full");
-  //         // Agregar una nueva página al PDF
-  //         pdf.addPage();
-  //         // Capturar el mapa con HTML2Canvas en la nueva página
-  //         domtoimage.toPng(mapContainer).then(function (dataUrl) {
-  //           // Convertir la URL en una imagen
-  //           var img = new Image();
-  //           img.src = dataUrl;
-  //           // Agregar la imagen al PDF
-  //           pdf.addImage(img, "JPEG", 0.5, 0.5, 7, 5); // Ajusta las coordenadas y el tamaño de acuerdo a tus necesidades
-  //           // Guardar el PDF
-  //           pdf.save();
-  //         });
-  //       });
-  //   } else {
-  //     alert("Debe llenar todos los campos");
-  //   }
-  // });
 
   function pintarmapa(proformaproyecto) {
     if (!map1) {
@@ -1064,6 +1017,13 @@ $(document).ready(function () {
       // Agregar la hoja de trabajo al libro
       XLSX.utils.book_append_sheet(workbook, worksheet, "Hoja1");
       XLSX.writeFile(workbook, "Leads.xlsx", { compression: true });
+      add_toast("success", "Se exportaron correctamente los clientes");
+    } else {
+      add_toast("error", "No se pudo exportar los leads");
+      add_toast(
+        "warning",
+        "No puedes exportar leads que no existan o esten vacios"
+      );
     }
   }
   $("#export_leads").on("click", exportar_leads);
@@ -1077,8 +1037,9 @@ $(document).ready(function () {
         { funcion, task, cliente, status },
         (response) => {
           if (response.trim() === "register") {
-            alert("Se paso asistencia al cliente");
+            add_toast("success", "Se paso asistencia al cliente");
           } else {
+            add_toast("error", "Ocurrio un error, contacta a soporte");
             console.log(response);
           }
           resolve();
@@ -1100,9 +1061,9 @@ $(document).ready(function () {
 
       const validar = await send_validar(task);
       if (validar === "SEND_VALIDAR") {
-        alert("Se envio actividad a VALIDACION");
+        add_toast("success", "Se envio actividad a VALIDACION");
       } else {
-        alert("Hubo un error contacta al aministrador");
+        add_toast("error", "Hubo un error contacta al aministrador");
       }
       await buscar_clientes();
       await encontrar_ventas();
@@ -1132,11 +1093,12 @@ $(document).ready(function () {
           { funcion, id_task },
           async (response) => {
             if (response.trim() == "COMPLETADO") {
-              alert("Tarea completada satisfactoriamente");
+              add_toast("success", "Tarea completada satisfactoriamente");
               await buscar_clientes();
               animarProgress();
               resolve();
             } else {
+              add_toast("error", "Ocurrio un error, contacta a soporte");
               console.log(response);
 
               reject({
@@ -1683,32 +1645,36 @@ $(document).ready(function () {
 
   // fon modal rendimiento
   function animarProgress() {
-    let funcion = "buscar_visitas_programadas";
-    $.post(
-      "../../controlador/UsuarioController.php",
-      { funcion },
-      (response) => {
-        let count;
-        let pendientes;
-        let separaciones;
-        let ventas;
-        if (response === "") {
-          count = 0;
-          pendientes = 0;
-        } else {
-          const interaccion = JSON.parse(response);
-          const pendientesList = interaccion.filter(
-            (data) => data.status === "PENDIENTE"
-          );
-          pendientes = pendientesList.length;
-        }
-        let total = 10;
-        // var progressBar = document.querySelector(".progreessbar .barSize");
+    // let funcion = "buscar_visitas_programadas";
+    // $.post(
+    //   "../../controlador/UsuarioController.php",
+    //   { funcion },
+    //   (response) => {
+    //     let count;
+    //     let pendientes;
+    //     let separaciones;
+    //     let ventas;
+    //     if (response === "") {
+    //       count = 0;
+    //       pendientes = 0;
+    //     } else {
+    //       const interaccion = JSON.parse(response);
+    //       const pendientesList = interaccion.filter(
+    //         (data) => data.status === "PENDIENTE"
+    //       );
+    //       pendientes = pendientesList.length;
+    //     }
+    //     let total = 10;
+    //     // var progressBar = document.querySelector(".progreessbar .barSize");
 
-        // progressBar.style.width = `${(count / total) * 100}%`;
-        $("#menu-pendientes").html("Pendientes: " + pendientes);
-      }
+    //     // progressBar.style.width = `${(count / total) * 100}%`;
+    //     $("#menu-pendientes").html("Pendientes: " + pendientes);
+    //   }
+    // );
+    const pendientes = clientesList.filter(
+      (c) => c.task_status === "PENDIENTE"
     );
+    $("#menu-pendientes").html("Pendientes: " + pendientes.length);
   }
   // registrar lead indiidual
   buscar_proyectos();
@@ -1725,7 +1691,7 @@ $(document).ready(function () {
   }
 
   // Llamar a la función de animación
-  animarProgress();
+
   function compareDatesDesc(a, b) {
     return dayjs(b.created_cliente).diff(dayjs(a.created_cliente));
   }
@@ -1739,13 +1705,11 @@ $(document).ready(function () {
         "../../controlador/UsuarioController.php",
         { funcion },
         (response) => {
-          console.log(response);
           $("#spin-load").html("");
           if (response.trim() === "no-register-clientes") {
             dataTable.clear().draw();
           } else {
             const clientes = JSON.parse(response);
-            console.log(clientes);
             clientesList = clientes;
             clientesList.sort(compareDatesDesc);
 
@@ -2069,7 +2033,7 @@ $(document).ready(function () {
       dataTable.rows.add(clientes).draw();
       dataTable.page(totalPaginas - 1);
     }
-
+    animarProgress();
     // Restaurar la posición de scroll horizontal
     $("#usuariosList").parent().scrollLeft(estadoActual.scrollLeft);
     $("body").parent().scrollTop(estadoActual.bodyScroll);
@@ -2306,11 +2270,11 @@ $(document).ready(function () {
         { funcion, fecha, hora, cliente, tipo, pendiente },
         (response) => {
           if (response.trim() === "add-register-visita") {
-            alert("Se registro" + tipo + " correctamente");
+            add_toast("success", "Se registro" + tipo + " correctamente");
             animarProgress();
             resolve();
           } else {
-            alert("No se registro, contacta al administrador");
+            add_toast("error", "No se registro, contacta al administrador");
             reject({ err: "no se registro, contacta al adminitraor" });
           }
         }
@@ -2325,10 +2289,10 @@ $(document).ready(function () {
         { funcion, fecha, cliente },
         (response) => {
           if (response.trim() === "add-register-venta") {
-            alert("Se registro correctamente la venta");
+            add_toast("success", "Se registro correctamente la venta");
             resolve();
           } else {
-            alert("Hubo un error Contacta al administrador");
+            add_toast("error", "Hubo un error Contacta al administrador");
             reject({ err: response });
           }
         }
@@ -2403,7 +2367,10 @@ $(document).ready(function () {
       }, 1000);
       $("#crear-event").addClass("md-hidden");
     } else {
-      showToast();
+      // showToast();
+      add_toast("warning", "Debes seleccionar al menos un tipo");
+
+      $("#register_event_btn").prop("disabled", false);
     }
   });
 
@@ -2449,10 +2416,10 @@ $(document).ready(function () {
 
           if (data.hasOwnProperty("error")) {
             // Si la respuesta contiene un mensaje de error, muestra el mensaje
-            alert(data.error);
+            add_toast("error", data.error);
           } else {
             funcion = "add_user_cliente_asesor";
-            alert("se subio correctamente el cliente");
+            add_toast("success", "se subio correctamente el cliente");
             let id = data.id;
 
             let fecha_now = dayjs().format("YYYY-MM-DD");
@@ -2467,7 +2434,7 @@ $(document).ready(function () {
               },
               async (response) => {
                 if (response.trim() == "add-user-cliente") {
-                  alert("Se asigno cliente al asesor");
+                  add_toast("success", "Se asigno cliente al asesor");
                   $("#crear-lead .form-create").removeClass("modal-show");
                   setTimeout(function () {
                     $("#crear-lead").addClass("md-hidden");
@@ -2485,7 +2452,7 @@ $(document).ready(function () {
                   $("#email-lead").val("");
                   $("#proyecto-lead").val("");
                 } else {
-                  alert("No se asigno, contacta al administrador");
+                  add_toast("error", "No se asigno, contacta al administrador");
                 }
               }
             );
@@ -2495,7 +2462,7 @@ $(document).ready(function () {
         }
       );
     } else {
-      alert("Debe seleccionar un proyecto y origen");
+      add_toast("warning", "Debe seleccionar un proyecto y origen");
     }
   });
   const showToast = () => {
@@ -2531,10 +2498,11 @@ $(document).ready(function () {
         { funcion, cliente, observacion, status, fecha, hora },
         async (response) => {
           if (response.trim() == "add-register-contact") {
+            add_toast("success", "Se registro en el historial");
             await buscar_clientes();
             resolve();
           } else {
-            alert("Hubo un error contacta con el administrador");
+            add_toast("error", "Hubo un error contacta con el administrador");
             reject({ err: "Hubo un error contacta con el administrador" });
           }
         }
@@ -2604,14 +2572,14 @@ $(document).ready(function () {
           if (response.trim() === "add-etiqueta") {
             $("#nombre-etiqueta").val("");
             buscar_etiquetas();
-            alert("La etiqueta se creo correctamente");
+            add_toast("success", "La etiqueta se creo correctamente");
           } else {
-            alert("Hubo un error contacta con el administrador");
+            add_toast("error", "Hubo un error contacta con el administrador");
           }
         }
       );
     } else {
-      alert("El nombre de la etiqueta no puede estar vacio");
+      add_toast("warning", "El nombre de la etiqueta no puede estar vacio");
     }
   });
   buscar_etiquetas();

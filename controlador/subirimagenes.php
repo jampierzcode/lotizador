@@ -60,6 +60,69 @@ if (isset($_FILES['imagengallery'])) {
         echo $th;
     }
 }
+// imagenes de empresa business
+if (isset($_FILES['businesslogo'])) {
+    // Obtener la cantidad de imágenes recibidas
+    $totalImagenes = $_FILES['businesslogo']['name'];
+    $carpeta = $_POST["carpeta"];
+
+    crearCarpeta("../imagenes/" . $carpeta);
+    $protocolo = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
+    $dominio = $_SERVER['HTTP_HOST'];
+    // Recorrer cada imagen recibida
+    try {
+
+        $nombreImagen = uniqid() . '-' . $_FILES['businesslogo']['name'];
+        $tmpImagen = $_FILES['businesslogo']['tmp_name'];
+        $rutaDestino = "../imagenes/" . $carpeta . "/" . $nombreImagen;
+
+        $rutas = "imagenes/" . $carpeta . "/" . $nombreImagen;
+
+        // Mover la imagen a la carpeta de destino
+        move_uploaded_file($tmpImagen, $rutaDestino);
+
+        echo $rutas;
+    } catch (\Throwable $th) {
+        echo $th;
+    }
+}
+
+if (isset($_POST["funcion"]) && $_POST["funcion"] === "delete_image_business") {
+    $route =  "../" . $_POST["route"];
+    if (file_exists($route)) {
+        unlink($route);
+        echo "delete-sucess";
+        // if (unlink($route)) {
+        //     echo "delete-sucess";
+        // } else {
+        //     echo "error-delete";
+        // }
+    } else {
+        echo "no-existe";
+    }
+}
+if (isset($_POST["funcion"]) && $_POST["funcion"] === "update_image_business") {
+    $route =  "../" . $_POST["route"];
+    if (file_exists($route)) {
+        unlink($route);
+        $nombreImagen = uniqid() . '-' . $_FILES['businessimagenupdate']['name'];
+        $tmpImagen = $_FILES['businessimagenupdate']['tmp_name'];
+        $rutaDestino = "../imagenes/business/" . $nombreImagen;
+
+        $rutas = "imagenes/business/" . $nombreImagen;
+
+        // Mover la imagen a la carpeta de destino
+        move_uploaded_file($tmpImagen, $rutaDestino);
+
+        echo $rutas;
+    } else {
+        echo "no-existe";
+    }
+}
+
+
+
+// imagenes de targets socials
 if (isset($_FILES['targetimagen'])) {
     // Obtener la cantidad de imágenes recibidas
     $totalImagenes = $_FILES['targetimagen']['name'];

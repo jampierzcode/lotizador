@@ -13,6 +13,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="../../css/main.css">
+        <link rel="stylesheet" href="../../css/toast.css">
         <link rel="stylesheet" href="../../css/sidebar.css">
         <link rel="stylesheet" href="../../css/navdashboard.css">
         <link rel="stylesheet" href="../../css/container-dashboard.css">
@@ -472,7 +473,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
                     </div> -->
                 <!-- <form> -->
                 <!-- <form> -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
                     <div>
                         <label for="default-search" class="mb-2 text-sm font-medium text-gray-900  dark:text-white">Nombre</label>
                         <div class="relative">
@@ -522,6 +523,23 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
 
                             </div>
                         </div>
+                    </div>
+                    <div class="relative flex gap-2 items-end justify-start text-left">
+
+                        <button type="button" class="whitespace-nowrap inline-flex items-center w-full justify-center gap-x-1.5 rounded-md bg-red-600 px-3 py-2.5 text-sm font-semibold shadow-sm text-white" id="menu-pendientes" aria-expanded="false" aria-haspopup="true">
+
+                            Pendientes
+                        </button>
+                        <button type="button" class="whitespace-nowrap flex max-w-max items-center justify-center gap-x-1.5 rounded-md text-black px-3 py-2 text-[12px] font-semibold shadow-sm bg-yellow-500" id="reset_filtros" aria-expanded="false" aria-haspopup="true">
+
+                            <ion-icon name="refresh"></ion-icon>
+
+
+                            <p class="text-[12px] text-nowrap">Resetear</p>
+
+                        </button>
+
+
                     </div>
                     <!-- <div>
                             <label for="default-search" class="mb-2 text-sm font-medium text-gray-900  dark:text-white">Etiquetas</label>
@@ -647,6 +665,8 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css" integrity="sha512-YWzhKL2whUzgiheMoBFwW8CKV4qpHQAEuvilg9FAn5VJUDwKZZxkJNuGM4XkWuk94WCrrwslk8yWNGmY1EduTA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <script src="../../js/jquery.min.js"></script>
+    <script src="../../js/dinamic/toastmith.js"></script>
+
     <script src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/fixedcolumns/3.2.2/js/dataTables.fixedColumns.min.js"></script>
     <script type="text/javascript" src="//gyrocode.github.io/jquery-datatables-checkboxes/1.2.12/js/dataTables.checkboxes.min.js"></script>

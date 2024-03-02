@@ -74,6 +74,30 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
             <span class="route">
                 > Home > Target User
             </span>
+            <div id="generar-link" class="modal-create md-hidden">
+                <div class="form-create" style="max-width: 500px !important; width: 100%">
+                    <!-- <form id="form_producto_add"> -->
+                    <div class="close-modal">
+                        <ion-icon name="close-outline"></ion-icon>
+                    </div>
+                    <h1 class="font-bold">Generar link</h1>
+                    <div class="grid">
+                        <div class="group">
+                            <label for="numerp">Numero de celular</label>
+                            <input id="numero_link" class="px-3 py-2 rounded bg-gray-200 w-full" type="text" placeholder="Ingresa tu numero aqui ejm: +51999999999">
+                        </div>
+                        <div class="group">
+                            <label for="numerp">Ingresa tu mensaje</label>
+                            <textarea name="mensaje" id="mensaje_link" class="px-3 py-2 rounded bg-gray-200 w-full" cols="30" rows="10"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-4">
+                        <button id="generar-link-btn" class="px-4 flex items-center gap-2 rounded py-3 bg-violet-700 text-white text-sm font-bold"><ion-icon name="link-outline"></ion-icon> Generar link</button>
+                        <button id="cancelar-link-btn" class="border-2 border-gray-900 px-4 flex items-center gap-2 rounded py-3 bg-white text-gray-800 text-sm font-bold">Cancelar</button>
+                    </div>
+                </div>
+            </div>
             <div class="w-full">
 
                 <div class="flex flex-wrap md:flex-nowrap">
@@ -171,7 +195,6 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                     </div>
                 </div>
             </div>
-
             <!-- </div> -->
         </div>
         </div>

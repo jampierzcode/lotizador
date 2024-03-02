@@ -13,6 +13,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="../../css/main.css">
+        <link rel="stylesheet" href="../../css/toast.css">
         <link rel="stylesheet" href="../../css/sidebar.css">
         <link rel="stylesheet" href="../../css/navdashboard.css">
         <link rel="stylesheet" href="../../css/container-dashboard.css">
@@ -21,10 +22,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
         <link rel="icon" href="../../img/logo.jpg">
         <!-- data table CDN -->
         <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.css" />
-        <!-- bootsttrap -->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous">
-        </script>
+
         <!-- select 2 -->
         <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
         <!-- tailwin css -->
@@ -162,7 +160,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
             </div>
 
             <!-- Modal para seleccionar icono -->
-            <div id="modalIconos" class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 items-center justify-center z-[50000]">
+            <div id="modalIconos" class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[50000]">
                 <div class="bg-white max-w-[400px] mx-auto p-4 rounded shadow-lg">
                     <h2 class="text-xl mb-4">Selecciona un ícono</h2>
                     <div class="grid grid-cols-5 gap-4">
@@ -207,9 +205,14 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
                             <img class="w-full" src="../../imagenes/amenidades/colegio.png" alt="colegio" />
                         </button>
                     </div>
-                    <button id="btnContinuarIconos" class="mt-4 bg-green-500 text-white px-4 py-2 rounded">
-                        Continuar
-                    </button>
+                    <div class="flex gap-3">
+                        <button id="btnContinuarIconos" class="mt-4 bg-green-500 text-white px-4 py-2 rounded">
+                            Continuar
+                        </button>
+                        <button id="btnCancelarIconos" class="mt-4 bg-gray-200 text-gray-800 px-4 py-2 rounded">
+                            Cancelar
+                        </button>
+                    </div>
                 </div>
             </div>
             <!-- Nuevo modal para editar icono -->
@@ -277,23 +280,37 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
                             <img class="w-full" src="../../imagenes/amenidades/colegio.png" alt="colegio" />
                         </button>
                     </div>
-                    <button id="btnGuardarIconoEditado" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">
-                        Guardar Cambios
-                    </button>
+                    <div class="flex gap-4">
+                        <button id="cancelarIconoEditado" class="mt-4 bg-gray-200 text-gray-800 px-4 py-2 rounded">
+                            Cancelar
+                        </button>
+                        <button id="btnGuardarIconoEditado" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">
+                            Guardar Cambios
+                        </button>
+                    </div>
                 </div>
             </div>
 
             <!-- Modal para ingresar nombre de amenidad -->
-            <div id="modalNombreAmenidad" class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 items-center justify-center z-[50000]">
+            <div id="modalNombreAmenidad" class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[50000]">
                 <div class="bg-white p-4 max-w-[400px] mx-auto rounded shadow-lg">
                     <h2 class="text-xl mb-4">Ingresa el nombre de la amenidad</h2>
                     <input type="text" id="inputNombreAmenidad" class="border p-2 mb-4 w-full" />
-                    <button id="btnGuardarAmenidad" class="bg-blue-500 text-white px-4 py-2 rounded">
-                        Crear Amenidad
-                    </button>
+                    <div class="flex gap-3">
+
+                        <button id="btnRegresarIconoAmenidad" class="bg-gray-200 text-gray-800 px-4 py-2 rounded">
+                            Regresar
+                        </button>
+                        <button id="btnGuardarAmenidad" class="bg-blue-500 text-white px-4 py-2 rounded">
+                            Crear Amenidad
+                        </button>
+                    </div>
                 </div>
             </div>
-
+            <div id="change_load_imagenes" class="fixed z-[50000] hidden top-0 left-0 w-full h-[100vh] flex items-center justify-center">
+                <p class="text-white relative z-[60000] text-3xl font-bold">Subiendo imagenes ...</p>
+                <div class="bg-black absolute opacity-50 w-full h-full"></div>
+            </div>
             <div id="modal-manager-proyect" class="modal-create md-hidden">
                 <div class="form-create" style="width: 85%; min-height:80vh">
                     <!-- <form id="form_producto_add"> -->
@@ -324,7 +341,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
                                 Galeria
                             </span>
                             <div id="botones-event-gallery" class="flex items-center gap-3 hidden">
-                                <button id="save_img_gallery" class="p-2 rounded-lg text-[10px] inline-block max-h-max text-white bg-success">Guardar</button>
+                                <button id="save_img_gallery" class="p-2 rounded-lg text-[10px] inline-block max-h-max text-white bg-green-600">Guardar</button>
                                 <button id="cancelar_img_gallery" class="p-2 rounded-lg border-1 border-[#ececec] text-[10px] inline-block max-h-max bg-white text-gray-500">Cancelar</button>
                             </div>
 
@@ -417,6 +434,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
 
     <script src="../../js/jquery.min.js"></script>
 
+    <script src="../../js/dinamic/toastmith.js"></script>
     <script src="../../components/sidebar.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
     <script src="../../js/dinamic/gestion_proyectos_a.js"></script>

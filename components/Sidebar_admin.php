@@ -129,6 +129,16 @@ $links = [
             <li class="links-menu-dashboard">
                 <div class="link-block">
                     <div class="left-link">
+                        <a class="toggle-drop <?php echo ($currentUrl === "configuration") ? ' active-link' : ''; ?>"" href=" ../configuration">
+                            <ion-icon name="settings"></ion-icon>
+                            <p>Configuracion</p>
+                        </a>
+                    </div>
+                </div>
+            </li>
+            <li class="links-menu-dashboard">
+                <div class="link-block">
+                    <div class="left-link">
                         <a class="toggle-drop" href="../../controlador/LogoutController.php">
                             <ion-icon name="chevron-back-circle-sharp"></ion-icon>
                             <p>Cerrar sesion</p>

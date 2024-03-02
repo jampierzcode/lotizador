@@ -1755,6 +1755,28 @@ class Usuario
             //throw $th;
         }
     }
+    // funcion business info
+    function buscar_user_info_empresa($id_usuario)
+    {
+        try {
+            $sql = "SELECT * FROM business WHERE user_id=:id_usuario
+            ";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":id_usuario" => $id_usuario));
+            $this->datos = $query->fetchAll(); // retorna objetos o no
+            if (!empty($this->datos)) {
+                return $this->datos;
+            } else {
+                $this->mensaje = "no-register-business";
+                return $this->mensaje;
+            }
+        } catch (\Throwable $error) {
+            $this->mensaje = "fatal_error " + $error;
+            return $this->mensaje;
+            //throw $th;
+        }
+    }
+    // funcion targets socials
     function buscar_user_target_socials($id_usuario)
     {
         try {
@@ -1769,6 +1791,34 @@ class Usuario
                 $this->mensaje = "no-register-socials";
                 return $this->mensaje;
             }
+        } catch (\Throwable $error) {
+            $this->mensaje = "fatal_error " + $error;
+            return $this->mensaje;
+            //throw $th;
+        }
+    }
+    function update_user_business($data, $id_usuario)
+    {
+        try {
+            // consultar existencia
+            $sql = "SELECT * FROM business WHERE user_id=:id_usuario
+            ";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":id_usuario" => $id_usuario));
+            $this->datos = $query->fetchAll(); // retorna objetos o no
+            if (!empty($this->datos)) {
+                $sql = "UPDATE business SET nombre_razon=:nombre_razon, website=:website, phone_contact=:phone_contact, email=:email, logo=:logo WHERE user_id=:id_usuario
+            ";
+                $query = $this->conexion->prepare($sql);
+                $query->execute(array(":id_usuario" => $id_usuario, ":logo" => $data->logo, ":nombre_razon" => $data->nombre_razon, ":website" => $data->website, ":phone_contact" => $data->phone_contact, ":email" => $data->email));
+            } else {
+                $sql = "INSERT INTO business (user_id, nombre_razon, website, phone_contact, email, logo) VALUES (:id_usuario, :nombre_razon, :website, :phone_contact, :email, :logo)
+            ";
+                $query = $this->conexion->prepare($sql);
+                $query->execute(array(":id_usuario" => $id_usuario, ":logo" => $data->logo, ":nombre_razon" => $data->nombre_razon, ":website" => $data->website, ":phone_contact" => $data->phone_contact, ":email" => $data->email));
+            }
+
+            $this->mensaje = "update-sucess";
         } catch (\Throwable $error) {
             $this->mensaje = "fatal_error " + $error;
             return $this->mensaje;
@@ -1924,6 +1974,20 @@ class Usuario
             //throw $th;
         }
     }
+    function eliminar_amenidad($id)
+    {
+        try {
+            $sql = "DELETE FROM amenidades WHERE id=:id";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":id" => $id));
+            $this->mensaje = "delete-amenidad";
+            return $this->mensaje;
+        } catch (\Throwable $error) {
+            $this->mensaje = "no-delete-amenidad " + $error;
+            return $this->mensaje;
+            //throw $th;
+        }
+    }
     function subir_description_proyect($id, $description)
     {
         try {
@@ -2013,15 +2077,19 @@ class Usuario
             ic.status AS task_status,
             ic.fecha_visita,
             ic.hora_visita,
-            CONCAT('[', GROUP_CONCAT(CONCAT('{\"nombre\":\"', e.nombre, '\"}') ORDER BY e.id SEPARATOR ', '), ']') AS etiquetas
+            CONCAT('[', GROUP_CONCAT(CONCAT('{\"nombre\":\"', et.nombre, '\"}') SEPARATOR ', '), ']') AS etiquetas
             FROM cliente c
             INNER JOIN proyectos p ON c.proyet_id = p.id
             INNER JOIN user_proyect up ON p.id = up.proyecto_id
             INNER JOIN usuario u ON up.user_id = u.id_usuario
             LEFT JOIN user_cliente uc on c.id_cliente=uc.cliente_id
-            LEFT JOIN etiqueta_cliente ec ON c.id_cliente= ec.cliente_id
-            LEFT JOIN etiqueta e ON ec.etiqueta_id = e.id
-            LEFT JOIN interaccion_cliente ic ON ic.cliente_id = c.id_cliente
+            LEFT JOIN (
+            SELECT ec.cliente_id, GROUP_CONCAT(et.nombre SEPARATOR ', ') AS nombre
+            FROM etiqueta_cliente ec
+            JOIN etiqueta et ON ec.etiqueta_id = et.id AND et.user_id = :id_usuario
+            GROUP BY ec.cliente_id
+        ) et ON c.id_cliente = et.cliente_id
+            LEFT JOIN interaccion_cliente ic ON ic.cliente_id = c.id_cliente AND ic.status = 'PENDIENTE'
             WHERE 
                 uc.user_id = :id_usuario AND c.archived=0
             GROUP BY 

@@ -301,16 +301,39 @@ $(document).ready(function () {
       const $inputUsername = $(
         `<input type="text" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-[12px] rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Ingresa tu username(opcional)" required>`
       ).val(red.username);
-      const $inputUrl = $(
-        `<input type="text" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-[12px] rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="${red.placeholder}" required>`
-      ).val(red.url);
-
-      $inputUsername.on("keyup", function () {
+      var $inputUrl;
+      var btnEditWhatsapp;
+      if (red.social === "whatsapp") {
+        $inputUrl = $(
+          `<input disabled id="input_whatsapp" type="text" class="cursor-not-allowed w-full bg-gray-300 border border-gray-300 text-gray-900 text-[12px] rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="${red.placeholder}" required>`
+        ).val(red.url);
+        btnEditWhatsapp =
+          $(`<button id="edit_whatsapp" class="bg-yellow-500 text-sm mt-3 flex items-center rounded text-black font-bold px-3 py-2">
+        <ion-icon name="build-outline"></ion-icon> Editar
+    </button>`);
+      } else {
+        $inputUrl = $(
+          `<input type="text" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-[12px] rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="${red.placeholder}" required>`
+        ).val(red.url);
+      }
+      $inputUsername.on("keyup change", function () {
         let word = $inputUsername.val();
         red.username = word;
+        if (
+          JSON.stringify(statenewDataSocial) !==
+          JSON.stringify(dataTargetSocial)
+        ) {
+          console.log("entro activar");
+          enabled_update_acces_btn();
+        } else {
+          console.log("entro desactivar");
+          disabled_update_acces_btn();
+        }
+        console.log($(`switch-${index}`));
+        pintarPreviewRedes(statenewDataSocial);
       });
 
-      $inputUrl.on("keyup", function () {
+      $inputUrl.on("keyup change", function () {
         let word = $inputUrl.val();
         console.log(word);
         red.url = word;
@@ -361,8 +384,16 @@ $(document).ready(function () {
           disabled_update_acces_btn();
         }
       });
-
-      $contenidoInputs.append($span, $inputUsername, $inputUrl);
+      if (red.social === "whatsapp") {
+        $contenidoInputs.append(
+          $span,
+          $inputUsername,
+          $inputUrl,
+          btnEditWhatsapp
+        );
+      } else {
+        $contenidoInputs.append($span, $inputUsername, $inputUrl);
+      }
       $botonEncend.append($switchInput, $switchLabel);
       $li.append($details, $botonEncend);
       // template += `${$li}`;
@@ -370,6 +401,61 @@ $(document).ready(function () {
     });
     // redesSocialesContainer.html(template);
   }
+  function decodificarTexto(texto) {
+    return decodeURIComponent(texto.replace(/\+/g, " "));
+  }
+  $(document).on("click", "#edit_whatsapp", function () {
+    console.log("click");
+    let url = $("#input_whatsapp").val();
+    if (url.includes("phone") && url.includes("&text")) {
+      // Parsear manualmente la URL para extraer los parámetros
+      let parametros = url.split("?")[1].split("&");
+      let phone = null;
+      let text = null;
+
+      parametros.forEach((parametro) => {
+        let partes = parametro.split("=");
+        if (partes[0] === "phone") {
+          phone = partes[1];
+        }
+        if (partes[0] === "text") {
+          text = decodificarTexto(partes[1]);
+        }
+      });
+      $("#numero_link").val(phone);
+      $("#mensaje_link").val(text);
+    }
+    $("#generar-link").removeClass("md-hidden");
+    setTimeout(() => {
+      $("#generar-link .form-create").addClass("modal-show");
+    }, 300);
+  });
+  $("#generar-link .close-modal, #cancelar-link-btn ").on("click", function () {
+    $("#generar-link .form-create").removeClass("modal-show");
+    setTimeout(() => {
+      $("#generar-link").addClass("md-hidden");
+    }, 300);
+  });
+  $("#generar-link-btn").on("click", function () {
+    let saltoMsg = $("#mensaje_link").val();
+    let numero = $("#numero_link").val();
+    // Reemplazar saltos de línea con %0A en el mensaje
+    const mensajeFormateado = encodeURIComponent(saltoMsg.replace(/\n/g, "\n"));
+    const link_generate = `https://api.whatsapp.com/send?phone=${numero}&text=${mensajeFormateado}`;
+    for (let i = 0; i < statenewDataSocial.length; i++) {
+      if (statenewDataSocial[i].social === "whatsapp") {
+        statenewDataSocial[i].url = link_generate; // Cambia "nueva URL" por la URL que desees
+        break; // Termina el bucle una vez que se haya actualizado el objeto
+      }
+    }
+
+    $("#input_whatsapp").val(link_generate);
+    enabled_update_acces_btn();
+    $("#generar-link .form-create").removeClass("modal-show");
+    setTimeout(() => {
+      $("#generar-link").addClass("md-hidden");
+    }, 300);
+  });
 
   $("#actualizar").on("click", function () {
     // Puedes enviar la lista actualizada de redes sociales a tu servidor o realizar otras acciones necesarias.

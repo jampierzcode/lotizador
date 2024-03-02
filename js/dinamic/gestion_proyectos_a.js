@@ -117,7 +117,8 @@ $(document).ready(function () {
     if (file) {
       // Verifica si el tamaño del archivo es mayor que 10 MB (10 * 1024 * 1024 bytes)
       if (file.size > 15 * 1024 * 1024) {
-        alert(
+        add_toast(
+          "warning",
           "La imagen seleccionada supera los 15 MB. Por favor, elija una imagen más pequeña."
         );
         // Restablece el valor del input de tipo "file"
@@ -172,7 +173,7 @@ $(document).ready(function () {
             (response) => {
               console.log(response);
               if (response.trim() === "update-sucess") {
-                alert("Se cambio el logo correctamente");
+                add_toast("success", "Se cambio el logo correctamente");
                 $("#content-avatar-logo").append(
                   `<span id="edit-logo" class="bottom-0 cursor-pointer left-7 absolute flex items-center jutify-center  w-[30px] h-[30px] bg-[#ffde00] border-2 border-white dark:border-gray-800 rounded-full">
                                             <ion-icon class="w-full" aria-hidden="true" name="create"></ion-icon>
@@ -183,7 +184,7 @@ $(document).ready(function () {
 
                 $("#botones-event").remove();
               } else {
-                alert("Hubi un error contacta al administrador");
+                add_toast("error", "Hubo un error contacta al administrador");
                 console.log(error);
               }
             }
@@ -340,13 +341,13 @@ $(document).ready(function () {
       (response) => {
         console.log(response);
         if (response.trim() === "deleted-success") {
-          // alert("Imagen eliminada");
+          add_toast("success", "Imagen eliminada");
           multimedia = multimedia.filter(function (img) {
             return img.id !== id_img;
           });
           pintarMultimediaProeyctos();
         } else {
-          alert("Hubo un error contacta al administrador");
+          add_toast("error", "Hubo un error contacta al administrador");
         }
       }
     );
@@ -433,7 +434,10 @@ $(document).ready(function () {
       { funcion, id: idProyecto, description: valor },
       (response) => {
         if (response.trim() === "update-sucess") {
-          alert("Se actualizo correctamente la descripcion del proyecto");
+          add_toast(
+            "success",
+            "Se actualizo correctamente la descripcion del proyecto"
+          );
           descriptionProyecto = valor;
           changedescriptionProyecto = valor;
           $("#viewbuttonsdescription").addClass("hidden");
@@ -482,7 +486,10 @@ $(document).ready(function () {
       { funcion, id: idProyecto, video: valor },
       (response) => {
         if (response.trim() === "update-sucess") {
-          alert("Se actualizo correctamente el url del video del proyecto");
+          add_toast(
+            "success",
+            "Se actualizo correctamente el url del video del proyecto"
+          );
           videoProyecto = valor;
           changevideoProyecto = valor;
           $("#viewbuttonsvideo").addClass("hidden");
@@ -514,6 +521,7 @@ $(document).ready(function () {
   });
   // cancelare y guardar gallery
   $(document).on("click", "#save_img_gallery", function () {
+    $("#change_load_imagenes").removeClass("hidden");
     let result = subirImagenesGallery(nombreProyecto);
     result
       .then((gallery) => {
@@ -529,13 +537,15 @@ $(document).ready(function () {
             galeria,
           },
           (response) => {
+            $("#change_load_imagenes").addClass("hidden");
             if (response.trim() == "create-sucess") {
-              alert("se subieron todas las imagenes");
+              add_toast("success", "se subieron todas las imagenes");
               imagenesCargadas = [];
               $(".image-card>span").remove();
 
               $("#botones-event-gallery").addClass("hidden");
             } else {
+              add_toast("error", "ocurrio un error, contacta a soporte");
               console.log(response);
             }
           }
@@ -727,7 +737,10 @@ $(document).ready(function () {
           row.find("#saveLote").hide();
           row.find("#cancelLote").hide();
         } else {
-          alert("No se pudo actualizar, contacta al administrador");
+          add_toast(
+            "error",
+            "No se pudo actualizar, contacta al administrador"
+          );
         }
       }
     );
@@ -773,7 +786,7 @@ $(document).ready(function () {
         }, 10);
         dataTableLotes.clear().rows.add(lotes).draw();
       } else {
-        alert("Aun no hay lotes registrados");
+        add_toast("warning", "Aun no hay lotes registrados");
       }
     } catch (error) {
       console.error("Error al buscar lotes:", error);

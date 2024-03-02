@@ -329,6 +329,18 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
                     <select class="fieldSelect" name="" id="listMyProyects">
 
                     </select>
+                    <select class="fieldSelect" name="" id="listOrigen">
+                        <option value="0">Seleccionar Origen</option>
+                        <option value="Facebook Ads">Facebook Ads</option>
+                        <option value="Marketplace">Marketplace</option>
+                        <option value="WhatsApp">WhatsApp</option>
+                        <option value="Messenger">Messenger</option>
+                        <option value="Tiktok">Tiktok</option>
+                        <option value="Instagram">Instagram</option>
+                        <option value="Llamada">Llamada</option>
+                        <option value="Prospección">Prospección</option>
+                        <option value="otro">otro</option>
+                    </select>
                 </div>
                 <div>
                     <button id="subirData" class="btn-add">Subir data</button>
@@ -348,6 +360,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
 
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
     <!-- lectura excel -->
     <script src="https://unpkg.com/read-excel-file@5.x/bundle/read-excel-file.min.js"></script>
     <script src="./readFile.js"></script>
