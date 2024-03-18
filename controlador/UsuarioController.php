@@ -67,6 +67,17 @@ if ($_POST["funcion"] == "buscar_cliente_id") {
         echo $jsonstring;
     }
 }
+if ($_POST["funcion"] == "buscar_cliente_proyecto") {
+    $proyecto_id = $_POST["id"];
+    $usuario->buscar_cliente_proyecto($proyecto_id);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+        $jsonstring = json_encode($usuario->datos);
+        echo $jsonstring;
+    }
+}
 if ($_POST["funcion"] == "borrar_cliente") {
     $id_cliente = $_POST["id_cliente"];
     $usuario->borrar_cliente($id_cliente);
@@ -437,6 +448,18 @@ if ($_POST["funcion"] == "buscar_proyectos_user") {
             );
         }
         $jsonstring = json_encode($json);
+        echo $jsonstring;
+    }
+}
+if ($_POST["funcion"] == "buscar_proyectos_mi_creator") {
+
+    $user = $_SESSION["creator"];
+    $usuario->buscar_proyectos_mi_creator($user);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+        $jsonstring = json_encode($usuario->datos);
         echo $jsonstring;
     }
 }
@@ -1170,6 +1193,19 @@ if ($_POST["funcion"] == "buscar_user_asesor") {
 if ($_POST["funcion"] == "buscar_user_info_empresa") {
     $json = array();
     $usuario->buscar_user_info_empresa($_SESSION["id_usuario"]);
+    if ($usuario->mensaje) {
+        echo $usuario->mensaje;
+    }
+    if ($usuario->datos) {
+
+        $jsonstring = json_encode($usuario->datos);
+        echo $jsonstring;
+    }
+}
+if ($_POST["funcion"] == "buscar_by_user_info_empresa") {
+    $json = array();
+    $user = $_SESSION["creator"];
+    $usuario->buscar_user_info_empresa($user);
     if ($usuario->mensaje) {
         echo $usuario->mensaje;
     }

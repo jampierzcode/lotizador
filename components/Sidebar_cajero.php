@@ -97,9 +97,9 @@ $links = [
             <li class="links-menu-dashboard">
                 <div class="link-block">
                     <div class="left-link">
-                        <a class="toggle-drop <?php echo ($currentUrl === "separar" || $currentUrl === "vender") ? ' active-link' : ''; ?>" href="../crm">
+                        <a class="toggle-drop <?php echo ($currentUrl === "separar" || $currentUrl === "ventas") ? ' active-link' : ''; ?>" href="../ventas">
                             <ion-icon name="bag-handle"></ion-icon>
-                            <p>Vender</p>
+                            <p>Ventas</p>
                         </a>
                     </div>
                 </div>
@@ -107,7 +107,7 @@ $links = [
             <li class="links-menu-dashboard">
                 <div class="link-block">
                     <div class="left-link">
-                        <a class="toggle-drop <?php echo ($currentUrl === "pagos" || $currentUrl === "cuotas") ? ' active-link' : ''; ?>" href="../crm">
+                        <a class="toggle-drop <?php echo ($currentUrl === "pagos" || $currentUrl === "cuotas") ? ' active-link' : ''; ?>" href="../pagos">
                             <ion-icon name="card"></ion-icon>
                             <p>Pagos</p>
                         </a>

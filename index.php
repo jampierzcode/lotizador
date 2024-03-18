@@ -12,7 +12,7 @@ if (!empty($_SESSION["id_usuario"])) {
             header("Location: views_asesor/Dashboard");
             break;
         case 4:
-            header("Location: views_caja/caja");
+            header("Location: views_cajero/caja");
             break;
 
         default:

@@ -15,6 +15,7 @@ if (!empty($usuario->datos)) {
 
     foreach ($usuario->datos as $dato) {
         $_SESSION["id_usuario"] = $dato->id_usuario;
+        $_SESSION["creator"] = $dato->creator;
         $_SESSION["nombres"] = $dato->nombre . " " . $dato->apellido;
         $_SESSION["us_tipo"] = $dato->tipo;
     }

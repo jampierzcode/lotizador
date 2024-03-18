@@ -187,25 +187,32 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                         <h1 class="text-sm font-bold text-white tet-center">Vista Previa</h1>
                     </div>
                     <!-- Creating an HTML element to be converted to a PDF -->
-                    <div class="border border-gray-500">
+                    <div class="">
                         <div class="invoice-wrapper">
                             <div id="proforma-print" class="invoice">
                                 <div class="invoice-container">
                                     <div class="invoice-head">
-                                        <div class="invoice-head-top">
+                                        <div class="grid grid-cols-2 mb-[60px]">
                                             <div class="invoice-head-top-left text-start">
-                                                <img id="logoproyecto-proforma" src="">
+                                                <img class="h-[60px] object-contain" id="logoproyecto-proforma" src="">
 
-                                                <p id="name-proyecto-proforma">...</p>
+                                                <p id="name-proyecto-proforma" class="text-sm">...</p>
                                             </div>
-                                            <div class="invoice-head-top-right text-end">
-                                                <h3>Proforma</h3>
+                                            <div id="info_empresa" class="justify-end text-end flex  items-center gap-2">
+                                                <div>
+                                                    <p id="name-business-proforma" class="text-sm">...</p>
+                                                    <p id="email-business-proforma" class="text-sm">...</p>
+                                                    <p id="phonecontact-business-proforma" class="text-sm">...</p>
+                                                    <p id="website-business-proforma" class="text-sm">...</p>
+                                                </div>
+                                                <img class="h-[80px] object-contain" id="logobusiness-proforma" src="">
                                             </div>
                                         </div>
+                                        <h1 class="w-full text-center text-3xl font-bold mt-8 pb-8 text-gray-800">PROFORMA</h1>
                                         <div class="hr"></div>
                                         <div class="invoice-head-middle">
                                             <div class="invoice-head-middle-left text-start">
-                                                <p><span class="text-bold">Fecha</span>: <span id="fecha-proforma">05/12/2020</span> </p>
+                                                <p><span class="text-bold text-sm">Fecha</span>: <span id="fecha-proforma" class="text-sm">05/12/2020</span> </p>
                                             </div>
                                             <div class="invoice-head-middle-right text-end">
                                                 <p>
@@ -218,8 +225,8 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                                             <div class="invoice-head-bottom-left">
                                                 <ul>
                                                     <li class='text-bold'>Cliente:</li>
-                                                    <li id="name-cliente-proforma">Smith Rhodes</li>
-                                                    <li id="contact-cliente-proforma">Smith Rhodes</li>
+                                                    <li id="name-cliente-proforma" class="text-sm">Smith Rhodes</li>
+                                                    <li id="contact-cliente-proforma" class="text-sm">Smith Rhodes</li>
                                                 </ul>
                                             </div>
                                             <div class="invoice-head-bottom-right">
@@ -274,18 +281,18 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
 
                                     <h1 class="w-full text-sm font-bold my-8 text-gray-800">Amenidades del proyecto</h1>
 
-                                    <div id="list-amenidades-proforma" class="w-full grid grid-cols-4 gap-3">
+                                    <div id="list-amenidades-proforma" class="w-full grid grid-cols-6 gap-3">
 
                                     </div>
 
                                 </div>
-                                <h1 class="w-full text-sm font-bold my-8 text-gray-800">Plano lotizador</h1>
+
                             </div>
                             <!-- <div id="text-lotizador" class="py-8">
                                 <h1 class="w-full text-sm font-bold my-8 text-gray-800">Plano lotizador</h1>
                             </div> -->
                         </div>
-                        <div id="mapacontainer" class="relative w-full h-[500px]">
+                        <div id="mapacontainer" class="relative w-full">
                             <div id="loading_lotizador" style="z-index: 40000;" class="w-full gap-4 bg-blue-600 flex flex-col items-center justify-center absolute top-0 left-0 right-0 bottom-0 h-100" role="status">
                                 <svg aria-hidden="true" class="inline w-10 h-10 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor" />
@@ -293,12 +300,13 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                                 </svg>
                                 <h1 class="text-sm text-white">Cargando Lotizador...</h1>
                             </div>
-                            <div id="map1" class="px-[70px] border-2 border-gray-200 rounded h-[500px]"></div>
+                            <h1 class="w-full text-sm font-bold my-8 pb-8 text-gray-800">Plano lotizador</h1>
+                            <div id="map1" class="rounded h-[500px]"></div>
                         </div>
                     </div>
 
                     <div>
-                        <button id="generar-proforma-pdf" class="px-4 py-3 bg-violet-700 text-white text-sm font-bold">Generar proforma</button>
+                        <button id="generar-proforma-pdf" class="px-4 mt-4 py-3 bg-violet-700 text-white text-sm font-bold">Generar proforma</button>
                     </div>
                 </div>
             </div>
@@ -351,6 +359,7 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                                     <option value="Instagram">Instagram</option>
                                     <option value="Llamada">Llamada</option>
                                     <option value="Prospección">Prospección</option>
+                                    <option value="Oficina">Oficina</option>
                                     <option value="otro">otro</option>
                                 </select>
                             </div>
@@ -360,11 +369,11 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 3) {
                             </div>
                             <div class="mb-6">
                                 <label for="ciudad" class="block mb-2 text-[12px] font-medium text-gray-900 dark:text-white">Ciudad</label>
-                                <input type="text" id="ciudad-lead" placeholder="Ingrese ciudad de origen" class="bg-white border border-gray-300 text-gray-900 text-[12px] rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                                <input type="text" id="ciudad-lead" placeholder="Ingrese ciudad" class="bg-white border border-gray-300 text-gray-900 text-[12px] rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
                             </div>
                             <div class="mb-6">
                                 <label for="proyecto" class="block mb-2 text-[12px] font-medium text-gray-900 dark:text-white">Proyecto</label>
-                                <select type="text" id="proyecto-lead" placeholder="Ingrese ciudad de origen" class="bg-white border border-gray-300 text-gray-900 text-[12px] rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"></select>
+                                <select type="text" id="proyecto-lead" class="bg-white border border-gray-300 text-gray-900 text-[12px] rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"></select>
                             </div>
                         </div>
                         <button type="submit" id="registrar_lead_btn" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-[12px] w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Registrar</button>

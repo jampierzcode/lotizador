@@ -5,6 +5,7 @@ $(document).ready(function () {
   var templateMsg;
   var idCliente;
   var proyectosList = [];
+  var businessInfo;
   var typefilter;
   var clientesFilter;
   var dataTable = $("#usuariosList").DataTable({
@@ -692,13 +693,14 @@ $(document).ready(function () {
     <img class="w-16 h-16 border border-gray-200 rounded-full" src="../../${targeta.picture_perfil}" alt="">
     
     <li class='text-bold'>Asesor</li>
-    <li class='text-bold text-end'>${meuser?.nombre} ${meuser?.apellido}</li>
-    <li class='text-end'>${meuser?.phone_number}</li>
-    <li class='text-end'>${meuser?.correo}</li>
+    <li class='text-bold text-end text-sm'>${meuser?.nombre} ${meuser?.apellido}</li>
+    <li class='text-end text-sm'>${meuser?.phone_number}</li>
+    <li class='text-end text-sm'>${meuser?.correo}</li>
     </div>
     `;
     $("#datos-asesor").html(template_asesor);
     let cliente = $(this).attr("keyClient");
+    // pintar proyecto
     let proyectokey = $(this).attr("keyProyecto");
     let proformaproyecto = proyectosList.find((p) => p.id === proyectokey);
     pintarmapa(proformaproyecto);
@@ -707,10 +709,28 @@ $(document).ready(function () {
     $("#logoproyecto-proforma").attr("src", "");
     $("#logoproyecto-proforma").attr("src", `../../${proformaproyecto.logo}`);
     $("#name-proyecto-proforma").html(proformaproyecto.nombreProyecto);
+    // fin de pintar proyecto
+
+    // pintar cliente
     $("#name-cliente-proforma").html(
       `${clienteproforma.nombres} ${clienteproforma?.apellidos || ""}`
     );
     $("#contact-cliente-proforma").html(`${clienteproforma.celular}`);
+    // fin de pintar cliente
+
+    // pintar empresa
+    if (businessInfo.length > 0) {
+      $("#info_empresa").removeClass("hidden");
+      $("#logobusiness-proforma").attr("src", "");
+      $("#logobusiness-proforma").attr("src", `../../${businessInfo[0]?.logo}`);
+      $("#name-business-proforma").html(businessInfo[0]?.nombre_razon);
+      $("#email-business-proforma").html(businessInfo[0]?.email);
+      $("#phonecontact-business-proforma").html(businessInfo[0]?.phone_contact);
+      $("#website-business-proforma").html(businessInfo[0]?.website);
+    } else {
+      $("#info_empresa").addClass("hidden");
+    }
+    // fin de pintar empresa
     $("#generar-proforma").removeClass("md-hidden");
     setTimeout(() => {
       $("#generar-proforma .form-create").addClass("modal-show");
@@ -1688,6 +1708,15 @@ $(document).ready(function () {
 
     llenarFiltros();
     llenarFiltrosRendimiento();
+  }
+  buscar_info_business();
+  async function buscar_info_business() {
+    funcion = "buscar_by_user_info_empresa";
+    const response = await $.post("../../controlador/UsuarioController.php", {
+      funcion,
+    });
+    const info = JSON.parse(response);
+    businessInfo = info;
   }
 
   // Llamar a la función de animación

@@ -48,7 +48,7 @@ $(document).ready(function () {
       { data: "correo" },
       { data: "celular" },
       // { data: "telefono" },
-      // { data: "origen" },
+      { data: "origen" },
       // { data: "ciudad" },
       { data: "nombre_proyecto" },
       {

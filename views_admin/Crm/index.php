@@ -558,8 +558,8 @@ if (empty($_SESSION["id_usuario"]) || $_SESSION["us_tipo"] != 2) {
                             <th>Fecha Hora Creacion</th>
                             <th>Correo</th>
                             <th>Celular</th>
-                            <!-- <th>Telefono</th>
                             <th>Origen</th>
+                            <!-- <th>Telefono</th>
                             <th>Ciudad</th> -->
                             <th>Proyecto</th>
                             <th>Agente</th>

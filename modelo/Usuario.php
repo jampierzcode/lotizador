@@ -528,6 +528,26 @@ class Usuario
             return $this->mensaje;
         }
     }
+    function buscar_proyectos_mi_creator($user)
+    {
+        try {
+            # code...
+            $sql = "SELECT up.*, p.NombreProyecto as nombre_proyecto FROM user_proyect up inner join proyectos p on up.proyecto_id=p.id  WHERE up.user_id=:id_usuario;
+            ";
+            $query = $this->conexion->prepare($sql);
+            $query->execute(array(":id_usuario" => $user));
+            $this->datos = $query->fetchAll(); // retorna objetos o no
+            if (!empty($this->datos)) {
+                return $this->datos;
+            } else {
+                $this->mensaje = "no-register";
+                return $this->mensaje;
+            }
+        } catch (\Throwable $error) {
+            $this->mensaje = "no-proyectos" . $error;
+            return $this->mensaje;
+        }
+    }
     function buscar_etiquetas_cliente($id_cliente)
     {
         try {
@@ -1078,6 +1098,20 @@ class Usuario
             return $this->datos;
         } else {
             $this->mensaje = "No existen registro de este cliente cree uno nuevo";
+            return $this->mensaje;
+        }
+    }
+    function buscar_cliente_proyecto($proyecto_id)
+    {
+        $sql = "SELECT c.* FROM cliente c where c.proyet_id = :proyecto";
+        $query = $this->conexion->prepare($sql);
+        $query->execute(array(":proyecto" => $proyecto_id));
+        $this->datos = $query->fetchAll(); // retorna objetos o no
+        if (!empty($this->datos)) {
+
+            return $this->datos;
+        } else {
+            $this->mensaje = "no-register";
             return $this->mensaje;
         }
     }
